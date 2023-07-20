@@ -106,43 +106,41 @@ echo -e '\033[6 q'
 
 #   Personal Aliases 
 #   ------------------------------------------------------------
-    alias zedit='$EDITOR ~/.zshrc'
-    alias zreload='source ~/.zshrc'
-    alias znvim='$EDITOR ~/.config/nvim/init.vim'
-    alias ztmux='$EDITOR ~/.tmux.conf'
-    alias nv='nvim'
-    alias nvz='nvim -o `fzf`'
+    alias ....='cd ..; cd ..; cd ..'
+    alias ...='cd ..; cd ..'
+    alias ..='cd ..'
+    alias bm="bookmark"                         # zshmarks plugin
     alias code='cd ~/codespace'
     alias codespace='cd ~/codespace'
-    alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable Paths
-    alias rm='rm -i'                            # Preferred 'rm' implementation - requires confirm
     alias cp='cp -iv'                           # Preferred 'cp' implementation - requires confirm
-    alias mv='mv -iv'                           # Preferred 'mv' implementation - requires confirm 
-    alias mkdir='mkdir -pv'                     # Preferred 'mkdir' implementation - doesn't clobber existing
-    alias ..='cd ..'
-    alias ...='cd ..; cd ..'
-    alias ....='cd ..; cd ..; cd ..'
+    alias dm="deletemark"                       # zshmarks plugin
+    alias fd='fdfind --hidden'
+    alias gm="jump"                             # zshmarks plugin
+    alias lr="ls -Rlp | awk '{ if (NF==1) print \$0; } { if (NF>2) print \$NF; } { if (NF==0) print \$0; }'"
     alias ls='ls -Ahv --color --group-directories-first'
     alias lsd='ls -Adh *(/) --color'            # list only directories
-    alias bm="bookmark"                         # zshmarks plugin
-    alias gm="jump"                             # zshmarks plugin
-    alias dm="deletemark"                       # zshmarks plugin
+    alias m="fg"
+    alias mkdir='mkdir -pv'                     # Preferred 'mkdir' implementation - doesn't clobber existing
+    alias mv='mv -iv'                           # Preferred 'mv' implementation - requires confirm 
+    alias nv='nvim'
+    alias nvz='nvim -o `fzf`'
+    alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable Paths
+    alias rm='rm -i'                            # Preferred 'rm' implementation - requires confirm
+    alias rmhio='rm -f *.hi && rm -f *.o'       # haskell
     alias sm="showmarks"                        # zshmarks plugin
-   #alias tmux="TERM=screen-256color-bce tmux"
     alias tm="tmux ls"
-    alias tmuxname='tmux display-message -p "#S"'
-    alias tmat="tmux attach -t"
     alias tmac="tmux new -s codespace || tmux attach -t codespace"
+    alias tmat="tmux attach -t"
+    alias tmnp="~/.tmux/scripts/new-tmux-panes.zsh"
     alias tmns="~/.tmux/scripts/new-tmux-session-window-panes.zsh"
     alias tmnw="~/.tmux/scripts/new-tmux-window-panes.zsh"
-    alias tmnp="~/.tmux/scripts/new-tmux-panes.zsh"
-    alias m="fg"
-    alias rmhio='rm -f *.hi && rm -f *.o'       # haskell
+    alias tmuxname='tmux display-message -p "#S"'
     alias tree='tree -a -I node_modules --noreport'
-    alias fd='fdfind --hidden'
-
-#   lr:  Full Recursive Directory Listing
-    alias lr="ls -Rlp | awk '{ if (NF==1) print \$0; } { if (NF>2) print \$NF; } { if (NF==0) print \$0; }'"
+    alias zedit='$EDITOR ~/.zshrc'
+    alias znvim='$EDITOR ~/.config/nvim/init.vim'
+    alias zreload='source ~/.zshrc'
+    alias ztmux='$EDITOR ~/.tmux.conf'
+   #alias tmux="TERM=screen-256color-bce tmux"
 
 #   Set cursor style (https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands)
 #   ------------------------------------------
