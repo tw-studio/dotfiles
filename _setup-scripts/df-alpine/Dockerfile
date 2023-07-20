@@ -38,7 +38,6 @@ RUN cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime \
 ARG USER=alpine
 RUN adduser -s /bin/zsh -D -g '' $USER
 RUN echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
-# RUN echo "$USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 ENV HOME=/home/$USER
 ENV CODESPACE=codespace
 ENV RUSER=root
@@ -54,7 +53,7 @@ RUN mkdir -p $HOME/$CODESPACE
 # Clone dotfiles from public repo
 RUN git clone https://github.com/tw-studio/dotfiles .dotfiles
 
-# Install oh-my-zsh
+# Install and configure oh-my-zsh
 ENV ZSH=$HOME/.oh-my-zsh
 ENV RZSH=$RHOME/.oh-my-zsh
 ENV SHELL=/bin/zsh
@@ -120,7 +119,7 @@ RUN chown -R $USER $HOME
 RUN perl -i -pe 's:/bin/ash:/bin/zsh:' /etc/passwd
 
 # Set the active user
-USER alpine
+USER $USER
 
 # Last setup
 RUN source ~/.zshrc
