@@ -5,8 +5,7 @@
 #     $ . /path/to/codespace-alpine.sh
 #
 #     Or from github, install better wget, then run with wget:
-#     $ apk add --no-cache wget
-#     $ sh -c "$(wget https://raw.github.com/...sh -O -)"
+#     $ apk update && apk add --no-cache wget && sh -c "$(wget https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-alpine.sh -O -)"
 #
 ###############################################################################
 
@@ -15,25 +14,25 @@ set -ex
 
 # Install packages
 echo "Installing packages..." \
-&& apk update \
-&& apk add --no-cache \
-  bash \
-  ca-certificates \
-  coreutils \
-  curl \
-  fd \
-  git \
-  ncurses \
-  neovim \
-  perl \
-  ripgrep \
-  sudo \
-  tmux \
-  tree \
-  tzdata \
-  util-linux \
-  wget \
-  zsh
+ && apk update \
+ && apk add --no-cache \
+    bash \
+    ca-certificates \
+    coreutils \
+    curl \
+    fd \
+    git \
+    ncurses \
+    neovim \
+    perl \
+    ripgrep \
+    sudo \
+    tmux \
+    tree \
+    tzdata \
+    util-linux \
+    wget \
+    zsh
 apk add --no-cache perl-file-rename --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 apk -v cache clean
 
