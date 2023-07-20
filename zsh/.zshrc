@@ -92,8 +92,8 @@ echo -e '\033[6 q'
 #   Add color to terminal
 #   ------------------------------------------------------------
     export CLICOLOR=1                   # Ansi Colors for iTerm2   
-    export LSCOLORS=Gxfxcxdxbxegedabagacad             # default
 #   Set LS_COLORS to default LSCOLORS values for coreutils ls 
+    export LSCOLORS=Gxfxcxdxbxegedabagacad             # default
     export LS_COLORS='di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 
 #   Configure iTerm2
@@ -103,6 +103,10 @@ echo -e '\033[6 q'
 #   Configure neovim
 #   ------------------------------------------------------------
     set runtimepath^=~/.config/nvim
+    
+#   Autoloads
+#   ------------------------------------------------------------
+    autoload zmv
 
 #   Personal Aliases 
 #   ------------------------------------------------------------
@@ -125,10 +129,17 @@ echo -e '\033[6 q'
     alias nv='nvim'
     alias nvz='nvim -o `fzf`'
     alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable Paths
+    alias power='sudo powermetrics --samplers smc -i1 -n1'
+    alias pn="pnpm"
+    alias rg="rg --hidden --max-columns 200"
+    alias rgni="\rg --hidden --no-ignore -g '!{.git,node_modules}' --max-columns 200"
     alias rm='rm -i'                            # Preferred 'rm' implementation - requires confirm
     alias rmhio='rm -f *.hi && rm -f *.o'       # haskell
     alias sm="showmarks"                        # zshmarks plugin
+    alias timeout90="timeout --preserve-status --kill-after=90s 90s"
     alias tm="tmux ls"
+    alias tm#="tmux attach #"
+    alias tma="tmux attach -t"
     alias tmac="tmux new -s codespace || tmux attach -t codespace"
     alias tmat="tmux attach -t"
     alias tmnp="~/.tmux/scripts/new-tmux-panes.zsh"
@@ -140,7 +151,7 @@ echo -e '\033[6 q'
     alias znvim='$EDITOR ~/.config/nvim/init.vim'
     alias zreload='source ~/.zshrc'
     alias ztmux='$EDITOR ~/.tmux.conf'
-   #alias tmux="TERM=screen-256color-bce tmux"
+#   alias tmux="TERM=screen-256color-bce tmux"
 
 #   Set cursor style (https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands)
 #   ------------------------------------------
@@ -155,14 +166,24 @@ echo -e '\033[6 q'
 #   ------------------------------------------
     altercd(){ cd(){ unset -f cd ; cd $*; ls ; altercd; } } ; altercd 
     revertcd(){ cd(){ unset -f cd; cd $*; } }
+    qcd(){ unset -f cd; cd $*; altercd; }
     cl() { cd "$@" && ls; }
     cs() { cd "$@" && ls; }
-    snapfile() { cp -r "$1" "$1"-`date +%Y-%m-%d-%H%M` }
+    snap() {
+      cp -r "$1" "$1"_WORKING_COPY; 
+      # TODO: fix rename regex to also work with hidden files (ex: .env.js)
+      rename 's/(.*)(\..*)_WORKING_COPY/$1_'$(date +"%Y-%m-%d-%H%M")'$2/' *_WORKING_COPY;
+    }
+    snapm() { 
+      mv "$1" "$1"_WORKING_COPY >/dev/null; 
+      # TODO: fix rename regex to also work with hidden files (ex: .env.js)
+      rename -v 's/(.*)(\..*)_WORKING_COPY/$1_'$(date +"%Y-%m-%d-%H%M")'$2/' *_WORKING_COPY;
+    }
     snapdir() { cp -r "$1" "$1"-`date +%Y-%m-%d-%H%M` }
 
     # fh - search in your command history and execute selected command
     fh() {
-        eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
+      eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
     }
 
 #   fzf configuration
@@ -186,4 +207,6 @@ echo -e '\033[6 q'
       source $HOME/.ec2env
     fi
     
-typeset -aU path    # dedupes path
+#   final steps
+#   ------------------------------------------
+    typeset -aU path    # dedupes path
