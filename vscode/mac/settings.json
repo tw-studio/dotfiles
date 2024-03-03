@@ -1,0 +1,421 @@
+{
+    "[css]": {
+      "editor.defaultFormatter": "vscode.css-language-features"
+    },
+    "[haskell]": {
+      "editor.quickSuggestions": {
+        "comments": false,
+        "other": false,
+        "strings": false
+      }
+    },
+    "[html]": {
+      "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[markdown]": {
+        "editor.quickSuggestions": {
+            "comments": false,
+            "other": false,
+            "strings": false
+        },
+        "editor.fontFamily": "Roboto Mono",
+        "editor.fontSize": 12,
+        "editor.fontWeight": "500"
+    },
+    "[markdown-mono]": {
+        "editor.quickSuggestions": {
+            "comments": false,
+            "other": false,
+            "strings": false
+        },
+        "editor.fontFamily": "Roboto Mono",
+        "editor.fontSize": 12,
+        "editor.fontWeight": "500"
+    },
+    "[markdown-sansserif]": {
+        "editor.quickSuggestions": {
+            "comments": false,
+            "other": false,
+            "strings": false
+        },
+        "editor.fontFamily": "SF UI Display",
+        "editor.fontSize": 13.5,
+        "editor.fontWeight": "500"
+    },
+    "[plaintext]": {
+      "editor.parameterHints.enabled": false,
+      "editor.quickSuggestions": {
+        "comments": false,
+        "other": false,
+        "strings": false
+      }
+    },
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "[swift]": {
+      "editor.fontFamily": "Roboto Mono",
+      "editor.fontSize": 12,
+      "editor.fontWeight": "500"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescript-ARCHIVE]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.quickSuggestions": {
+            "comments": false,
+            "other": false,
+            "strings": false
+        }
+    },
+    "breadcrumbs.enabled": false,
+    "color-highlight.languages": [
+      "*",
+      "!css",
+      "!sass",
+      "!scss"
+    ],
+    "color-highlight.markerType": "background",
+    "color-highlight.markRuler": false,
+    "color-highlight.matchWords": false,
+    "colorize.colorized_colors": [
+      "ARGB",
+      "HEXA",
+      "HSL",
+      "RGB"
+    ],
+    "colorize.exclude": [
+        "**/*.css",
+        "**/*.scss"
+    ],
+    "colorize.hide_current_line_decorations": false,
+    "colorize.include": [
+        "**/*.json",
+        "**/*.repl",
+        "**/*.tmTheme",
+        "**/*.md"
+    ],
+    "customizeUI.stylesheet": {
+        ".editor-actions": "display: none !important;"
+    },
+    "debug.console.fontSize": 12,
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.codeActionsOnSave": {},
+    "editor.cursorBlinking": "solid",
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.detectIndentation": false,
+    "editor.find.seedSearchStringFromSelection": "selection",
+    "editor.fontFamily": "Meslo LG L DZ for Powerline",
+    "editor.fontWeight": "600",
+    "editor.formatOnSave": false,
+    "editor.inlineSuggest.enabled": true,
+    "editor.inlineSuggest.showToolbar": "always",
+    "editor.insertSpaces": true,
+    "editor.lineNumbers": "relative",
+    "editor.minimap.enabled": false,
+    "editor.parameterHints.enabled": false,
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": false
+    },
+    "editor.rulers": [80,100],
+    "editor.scrollBeyondLastLine": false,
+    "editor.selectionHighlight": true,
+    "editor.tabSize": 2,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": []
+    },
+    "eslint.alwaysShowStatus": true,
+    "eslint.enable": true,
+    "eslint.format.enable": true,
+    "eslint.packageManager": "pnpm",
+    "eslint.run": "onType",
+    "eslint.runtime": "/usr/local/n/versions/node/18.16.0/bin/node",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.openEditors.visible": 9,
+    "extensions.autoUpdate": false,
+    "extensions.ignoreRecommendations": true,
+    "files.associations": {
+      "*.config": "shellscript",
+      "*.mdx": "mdx"
+    },
+    "git.decorations.enabled": false,
+    "git.openRepositoryInParentFolders": "never",
+    "git-graph.openToTheRepoOfTheActiveTextEditorDocument": true,
+    "github.copilot.enable": {
+      "*": true,
+      "plaintext": false,
+      "markdown": false,
+      "scminput": false,
+      "secret": false,
+      "javascript": false
+    },
+    "gitlens.currentLine.enabled": false,
+    "gitlens.currentLine.format": "${date}",
+    "gitlens.codeLens.authors.enabled": false,
+    "gitlens.codeLens.enabled": false,
+    "gitlens.hovers.avatars": false,
+    "gitlens.hovers.currentLine.over": "line",
+    "gitlens.hovers.enabled": false,
+    "gitlens.menus": false,
+    "haskell.hlint.executablePath": "/usr/local/Cellar/hlint/2.2.11/bin/hlint",
+    "insertDateString.format": "M/D/YY hh:mm",
+    "insertDateString.formatDate": "YYYY-MM-DD",
+    "insertDateString.formatTime": "hh:mm:ss",
+    "javascript.format.enable": true,
+    "javascript.suggestionActions.enabled": false,
+    "javascript.validate.enable": true,
+    "json.schemaDownload.enable": true,
+    "json.validate.enable": true,
+    "jupyter.askForKernelRestart": false,
+    "macros": {
+        "openFileAndKeep": [
+            "list.select",
+            "workbench.action.keepEditor"
+        ],
+        "filesExplorerFocusUpAndPreview": [
+            "list.focusUp",
+            "filesExplorer.openFilePreserveFocus"
+        ],
+        "filesExplorerFocusDownAndPreview": [
+            "list.focusDown",
+            "filesExplorer.openFilePreserveFocus"
+        ],
+        "openEditorsFocusUpAndSwitch": [
+          "list.focusUp",
+          "list.select",
+          "workbench.files.action.focusOpenEditorsView"
+        ],
+        "openEditorsFocusDownAndSwitch": [
+          "list.focusDown",
+          "list.select",
+          "workbench.files.action.focusOpenEditorsView"
+        ]
+    },
+    "markdown.preview.scrollEditorWithPreview": false,
+    "markdown.preview.scrollPreviewWithEditor": false,
+    "markdown.styles": [],
+    "markdownExtended.exportOutDirName": "out",
+    "markdown-toc.bulletCharacter": "*",
+    "markdown-toc.detectAndAutoSetSection": false,
+    "markdown-toc.insertAnchor": false,
+    "markdown-toc.orderedList": false,
+    "markdown-toc.updateOnSave": false,
+    "markdown-toc.withLinks": true,
+    "markJump.additionalSectionPatterns": [
+      "^#+\\s+(?<description>.+)$"
+    ],
+    "markJump.includeFilePattern": ".",
+    "markJump.maximumLimit": 1,
+    "markJump.sectionPatterns": [
+      "//\\s*(?<heading>\\>+)?\\s*[Mm][Aa][Rr][Kk]\\s*:\\s*(?<description>.+)$",
+      "#\\s*(?<heading>\\>+)?\\s*pragma\\s+(?<description>.+)$"
+    ],
+    "markJump.showProjectMarks": false,
+    "markJump.strictLimit": "limit",
+    "mdmath.delimiters": "gitlab",
+    "npm.packageManager": "yarn",
+    "prettier.enable": false,
+    "python.autoComplete.extraPaths": ["__pypackages__/3.11/lib"],
+    "python.analysis.extraPaths": ["__pypackages__/3.11/lib"],
+    "python.formatting.blackArgs": [
+      "--line-length",
+      "120",
+      "--single-quote",
+      "--skip-string-normalization"
+    ],
+    "python.formatting.provider": "black",
+    "scm.diffDecorations": "none",
+    "sde.buildOnSave": false,
+    "sde.enable": false,
+    "sde.languageServerMode": "sourcekit-lsp",
+    "sde.sourcekit.compilerOptions": [
+      "-Xswiftc",
+      "-sdk",
+      "-Xswiftc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk",
+      "-Xswiftc",
+      "-target",
+      "-Xswiftc",
+      "x86_64-apple-ios14.5-simulator"
+    ],
+    "settings.cycle": [{
+        "id": "lineNumbers",
+        "values":[
+            {
+                "editor.lineNumbers": "off"
+            },
+            {
+                "editor.lineNumbers": "on"
+            },
+            {
+                "editor.lineNumbers": "relative"
+            }
+        ]
+    }],
+    "sourcekit-lsp.serverArguments": [
+      "-Xswiftc",
+      "-sdk",
+      "-Xswiftc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk",
+      "-Xswiftc",
+      "-target",
+      "-Xswiftc",
+      "x86_64-apple-ios14.5-simulator"
+    ],
+    "sourcekit-lsp.serverPath": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp",
+    "spaces-inside-braces.enableForAngle": false,
+    "spaces-inside-braces.enableForBraces": true,
+    "spaces-inside-braces.enableForBrackets": false,
+    "spaces-inside-braces.enableForParens": false,
+    "swiftformat.enable": true,
+    "swiftformat.options": [
+      "--disable",
+      "andOperator,",
+      "blankLinesAtStartOfScope,",
+      "consecutiveSpaces,",
+      "trailingClosures,",
+      "unusedArguments",
+      "--enable",
+      "wrapSwitchCases",
+      "--indentcase",
+      "true",
+      "--ranges",
+      "spaced",
+      "--wrapparameters",
+      "preserve",
+      "--xcodeindentation",
+      "enabled",
+      "--wraparguments",
+      "preserve",
+      "--wrapreturntype",
+      "if-multiline"
+    ],
+    "terminal.integrated.allowChords": false,
+    "terminal.integrated.cursorBlinking": false,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.drawBoldTextInBrightColors": false,
+    "terminal.integrated.env.osx": {},
+    "terminal.integrated.fontFamily": "Meslo LG L DZ for Powerline",
+    "terminal.integrated.fontWeight": "600",
+    "terminal.integrated.macOptionIsMeta": true,
+    "terminal.integrated.profiles.osx": {
+      "tw": {
+        "path": "/Users/tomw/codespace/.vscode/scripts/vsc-tmux.sh",
+        "icon": "terminal-tmux"
+      },
+      "bash": {
+        "path": "bash",
+        "args": [
+          "-l"
+        ],
+        "icon": "terminal-bash"
+      },
+      "zsh": {
+        "path": "zsh",
+        "args": [
+          "-l"
+        ]
+      },
+      "tmux": {
+        "path": "tmux",
+        "icon": "terminal-tmux"
+      }
+    },
+    "todohighlight.defaultStyle": {
+      "backgroundColor": "#ae2463",
+      "color": "#f6f6f6",
+      "overviewRulerColor": "#ae2463",
+      "borderRadius": "2px",
+      "isWholeLine": false
+    },
+    "todohighlight.keywords": [
+      {
+        "text": "TODO:",
+        "backgroundColor": "#ae2463",
+        "color": "#f6f6f6",
+        "overviewRulerColor": "#ae2463"
+      },
+      "COMMIT:",
+      "ERROR:",
+      "FUTURE:",
+      "HARDCODE:",
+      "IMPORTANT:",
+      "ISSUE:",
+      {
+        "text": "NOTE:",
+        "backgroundColor": "#0d56ca",
+        "color": "#f6f6f6",
+        "overviewRulerColor": "#0d56ca"
+      },
+      "RESEARCH:"
+    ],
+    "todohighlight.include": [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.html",
+      "**/*.php",
+      "**/*.css",
+      "**/*.scss",
+      "**/*.md"
+    ],
+    "update.mode": "manual",
+    "update.showReleaseNotes": false,
+    "vscode-neovim.neovimInitPath": "/Users/tomw/.config/nvim/init-vscode.vim",
+    "vscode-neovim.neovimPath": "/Users/tomw/codespace/.vscode/nvim-osx64/bin/nvim",
+    "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init-vscode.vim",
+    "vscode-neovim.neovimExecutablePaths.darwin": "/Users/tomw/codespace/.vscode/nvim-osx64/bin/nvim",
+    "window.newWindowDimensions": "maximized",
+    "workbench.activityBar.visible": false,
+    "workbench.colorTheme": "Monokai +Pink",
+    "workbench.colorCustomizations": {
+        "activityBarBadge.background": "#0000",
+        "activityBarBadge.foreground": "#0000",
+        "editor.lineHighlightBackground": "#242424",
+        "editorIndentGuide.activeBackground": "#f6f6f622",
+        "editorIndentGuide.background": "#f6f6f622",
+        "gitDecoration.addedResourceForeground": "#f6f6f6",
+        "gitDecoration.modifiedResourceForeground": "#f6f6f6",
+        "gitDecoration.untrackedResourceForeground": "#f6f6f6",
+        "list.errorForeground": "#f6f6f6"
+    },
+    "workbench.editor.enablePreview": true,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    "workbench.editor.openPositioning": "last",
+    "workbench.editor.openSideBySideDirection": "down",
+    "workbench.editor.showTabs": true,
+    "workbench.editor.tabSizing": "shrink",
+    "workbench.editor.untitled.hint": "hidden",
+    "workbench.enableExperiments": false,
+    "workbench.fontAliasing": "antialiased",
+    "workbench.panel.defaultLocation": "right",
+    "workbench.sideBar.location": "left",
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.statusBar.visible": false,
+    "yaml.completion": false,
+    "yaml.schemaStore.enable": false
+}
