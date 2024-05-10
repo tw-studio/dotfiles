@@ -16,7 +16,7 @@ set -ex
 # Default USER to first dir in /home, if exists
 USER="ubuntu"
 FIRST_HOME_DIR=$(find /home -maxdepth 1 -mindepth 1 -type d | head -n 1)
-if [[ -n "$FIRST_HOME_DIR" ]; then
+if [[ -n "$FIRST_HOME_DIR" ]]; then
   FIRST_HOME_DIR=$(basename "$FIRST_HOME_DIR")
   USER="$FIRST_HOME_DIR"
 fi
