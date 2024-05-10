@@ -11,7 +11,7 @@
 ###############################################################################
 
 # errexit, xtrace
-set -ex
+set -e
 
 # Default USER to first dir in /home, if exists
 USER="ubuntu"
@@ -23,7 +23,7 @@ fi
 
 # Request username from user
 if [[ -z "$1" ]]; then
-  echo "Enter the login user name: ($USER) "
+  echo "Enter the user name for Ubuntu login: ($USER) "
   read user_name
   if [[ ! -z "$user_name" ]]; then
     USER="$user_name"
@@ -31,14 +31,15 @@ if [[ -z "$1" ]]; then
 else
   USER="$1"
 fi
+echo "Setting USER to $USER..."
 
 # Set timezone
 export TZ=America/Los_Angeles
+echo "Setting timezone to $TZ..."
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install packages
 echo "Installing packages..." \
- && set -ex \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
     bash \
@@ -61,6 +62,7 @@ echo "Installing packages..." \
 rm -rf /var/lib/apt/lists/*
  
 # Fix locale issues, e.g. with Perl
+echo "Fix locale issues, e.g. with Perl..."
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
  && dpkg-reconfigure --frontend=noninteractive locales \
  && update-locale LANG=en_US.UTF-8
@@ -68,6 +70,7 @@ export LANG=en_US.UTF-8
  
 # Configure home, user, and working dir
 export OS_NAME=ubuntu
+echo "Setting default shell for $USER to zsh..."
 ZSH_PATH="/bin/zsh"
 if id "$USER" &>/dev/null; then
   # Change default shell to zsh for existing user
@@ -85,12 +88,15 @@ export RUSER=root
 export RHOME=/root
 
 # Create codespace directory
+echo "Creating $HOME/$CODESPACE directory..."
 mkdir -p $HOME/$CODESPACE
 
 # Clone dotfiles from public repo
+echo "Cloning personal dotfiles from tw-studio..."
 git clone https://github.com/tw-studio/dotfiles $HOME/.dotfiles
 
 # Install and configure oh-my-zsh
+echo "Installing and configuring oh-my-zsh..."
 export ZSH=$HOME/.oh-my-zsh
 export RZSH=$RHOME/.oh-my-zsh
 export SHELL=/bin/zsh
@@ -104,6 +110,7 @@ git clone https://github.com/jocelynmallon/zshmarks $ZSH/custom/plugins/zshmarks
 cp -r $ZSH/custom/plugins/zshmarks $RZSH/custom/plugins/zshmarks
 
 # Install fzf from git
+echo "Installing fzf..."
 git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
 cp -r $HOME/.fzf $RHOME/.fzf
 $HOME/.fzf/install --all || true
@@ -111,6 +118,7 @@ rm -f $HOME/.bashrc $HOME/.fzf/code.bash
 rm -f $RHOME/.bashrc $RHOME/.fzf.bash
 
 # Configure neovim
+echo "Configuring neovim..."
 mkdir -p $HOME/.config/nvim/colors \
  && mkdir -p $HOME/.local/share/nvim/site/autoload \
  && cp $HOME/.dotfiles/neovim/init-ec2.vim $HOME/.config/nvim/init.vim \
@@ -128,6 +136,7 @@ mkdir -p $RHOME/.config/nvim/colors \
 nvim --headless +PlugInstall +qall
 
 # Configure tmux
+echo "Configuring tmux..."
 cp $HOME/.dotfiles/tmux/.tmux.conf $HOME/
 cp $HOME/.dotfiles/tmux/.tmux.conf $RHOME/
 git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
@@ -143,19 +152,23 @@ mkdir -p $RHOME/.tmux/scripts \
  && cp -r $HOME/.dotfiles/tmux/scripts $RHOME/.tmux/
 
 # Cleanup
+echo "Cleaning up..."
 rm -rf $HOME/.dotfiles
 
 # Give user their stuff
+echo "Giving user ownership of their directory..."
 chown -R $USER $HOME
 
 # Set default shell for root
+echo "Setting default shell for root..."
 perl -i -pe 's:/bin/bash:/bin/zsh:' /etc/passwd
 
 # Fix insecure completion-dependent directories permissions
+echo "Fixing insecure completion-dependent directories permissions..."
 chmod g-w,o-w $HOME/.oh-my-zsh
 chmod g-w,o-w $RHOME/.oh-my-zsh
 
 # Start zsh in codespace
-mkdir -p $HOME/$CODESPACE
-cd $HOME/$CODESPACE
+# mkdir -p $HOME/$CODESPACE
+# cd $HOME/$CODESPACE
 # su - $USER -c "zsh"
