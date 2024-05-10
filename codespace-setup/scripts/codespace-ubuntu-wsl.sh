@@ -68,7 +68,16 @@ export LANG=en_US.UTF-8
  
 # Configure home, user, and working dir
 export OS_NAME=ubuntu
-useradd -m -s /bin/zsh $USER
+ZSH_PATH="/bin/zsh"
+if id "$USER" &>/dev/null; then
+  # Change default shell to zsh for existing user
+  if getent passwd "$USER" | cut -d: -f7 | grep -q "$ZSH_PATH"; then
+    usermod -s "$ZSH_PATH" "$USER"
+  fi
+else
+  # Add user with default zsh shell when doesn't exist
+  useradd -m -s "$ZSH_PATH" "$USER"
+fi
 echo "$USER ALL=(ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
 export HOME=/home/$USER
 export CODESPACE=codespace
