@@ -13,19 +13,15 @@
 # errexit, xtrace
 set -ex
 
-# Request user name; default to first dir in /home, if exists
+# Default USER to first dir in /home, if exists
 USER="ubuntu"
-HOME_DIRECTORIES=($(ls -d /home/*/))
-if [ ${#HOME_DIRECTORIES[@]} -gt 0 ]; then
-  
-  # Choose first directory in /home and clean up
-  FIRST_HOME_DIR="${HOME_DIRECTORIES[0]}"
-  FIRST_HOME_DIR="${FIRST_HOME_DIR%/}"
+FIRST_HOME_DIR=$(find /home -maxdepth 1 -mindepth 1 -type d | head -n 1)
+if [[ -n "$FIRST_HOME_DIR" ]; then
   FIRST_HOME_DIR=$(basename "$FIRST_HOME_DIR")
-
-  # Set as default value for USER
   USER="$FIRST_HOME_DIR"
 fi
+
+# Request username from user
 if [[ -z "$1" ]]; then
   echo "Enter the login user name: ($USER) "
   read user_name
