@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ###############################################################################
 # 
 #     Run script as root with "dot space syntax" when local:
