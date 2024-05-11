@@ -46,6 +46,7 @@ echo "Installing packages..." \
     ca-certificates \
     coreutils \
     curl \
+    dos2unix \
     fd-find \
     git \
     keychain \
