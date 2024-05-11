@@ -2,7 +2,7 @@
 ###############################################################################
 # 
 #     Run script as root with "dot space syntax" when local:
-#     $ . /path/to/codespace-ubuntu.sh
+#     $ . /path/to/codespace-ubuntu-wsl.sh
 #
 #     Or from github, install better wget and ca-certificates,
 #     then run with wget:
