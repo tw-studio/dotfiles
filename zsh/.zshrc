@@ -19,7 +19,11 @@ DISABLE_AUTO_TITLE="true"
 
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-plugins=(git zshmarks)
+plugins=(git ssh-agent zshmarks)
+
+# Configure plugins
+#zsshagent# zstyle :omz:plugins:ssh-agent identities SSH_IDENTITY
+#keychain# eval $(keychain --eval --agents ssh SSH_IDENTITY)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -88,6 +92,7 @@ echo -e '\033[6 q'
 #   ------------------------------------------------------------
     export EDITOR=/usr/bin/nvim
     export NVIM=/usr/bin/nvim
+    export VS=$EDITOR   # TODO: Change to VSCode executable
 
 #   Add color to terminal
 #   ------------------------------------------------------------
@@ -147,6 +152,10 @@ echo -e '\033[6 q'
     alias tmnw="~/.tmux/scripts/new-tmux-window-panes.zsh"
     alias tmuxname='tmux display-message -p "#S"'
     alias tree='tree -a -I node_modules --noreport'
+    alias vedit='$VS ~/.zshrc'
+    alias vnvim='$VS ~/.config/nvim/init.vim'
+    alias vs='$VS'
+    alias vtmux='$VS ~/.tmux.conf'
     alias zedit='$EDITOR ~/.zshrc'
     alias znvim='$EDITOR ~/.config/nvim/init.vim'
     alias zreload='source ~/.zshrc'
