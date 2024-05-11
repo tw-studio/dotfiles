@@ -23,7 +23,7 @@ plugins=(git ssh-agent zshmarks)
 
 # Configure plugins
 #zsshagent# zstyle :omz:plugins:ssh-agent identities SSH_IDENTITY
-#keychain# eval $(keychain --eval --agents ssh SSH_IDENTITY)
+#keychain# eval $(keychain -q --eval --agents ssh SSH_IDENTITY)
 
 source $ZSH/oh-my-zsh.sh
 
