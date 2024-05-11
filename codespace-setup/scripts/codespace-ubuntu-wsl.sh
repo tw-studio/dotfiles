@@ -51,7 +51,6 @@ echo "Installing packages..." \
     keychain \
     locales \
     ncurses-base \
-    neovim \
     rename \
     ripgrep \
     sudo \
@@ -61,7 +60,19 @@ echo "Installing packages..." \
     zsh \
  && apt-get clean
 rm -rf /var/lib/apt/lists/*
- 
+
+# Install neovim from latest releases
+NVIM_DOWNLOAD_DIR="/opt/nvim"
+NVIM_INSTALL_DIR="/usr/local/bin"
+NVIM_RELEASE_FILE="nvim-linux64.tar.gz"
+NVIM_URL=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep 'browser_download_url.*nvim-linux64.tar.gz"$' | cut -d '"' -f 4)
+rm -rf $NVIM_DOWNLOAD_DIR
+mkdir -p $NVIM_DOWNLOAD_DIR
+curl -L $NVIM_URL -o $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE
+tar xzvf $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE --strip-components 1
+rm -f $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE
+ln -s $NVIM_DOWNLOAD_DIR/bin/nvim $NVIM_INSTALL_DIR/nvim
+
 # Fix locale issues, e.g. with Perl
 echo "Fix locale issues, e.g. with Perl..."
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
@@ -122,7 +133,7 @@ rm -f $RHOME/.bashrc $RHOME/.fzf.bash
 echo "Configuring neovim..."
 mkdir -p $HOME/.config/nvim/colors \
  && mkdir -p $HOME/.local/share/nvim/site/autoload \
- && cp $HOME/.dotfiles/neovim/init-ec2.vim $HOME/.config/nvim/init.vim \
+ && cp $HOME/.dotfiles/neovim/init-vscode.vim $HOME/.config/nvim/init.vim \
  && cp $HOME/.dotfiles/neovim/monokai-fusion.vim $HOME/.config/nvim/colors/ \
  && cp $HOME/.dotfiles/neovim/plug.vim $HOME/.local/share/nvim/site/autoload/ \
  && cp $HOME/.dotfiles/neovim/dracula-airline.vim $HOME/.config/nvim/dracula.vim \
