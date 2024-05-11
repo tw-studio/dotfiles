@@ -48,6 +48,7 @@ echo "Installing packages..." \
     curl \
     fd-find \
     git \
+    keychain \
     locales \
     ncurses-base \
     neovim \
