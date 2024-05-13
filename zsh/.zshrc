@@ -208,12 +208,8 @@ echo -e '\033[6 q'
         path="${path/#\~/$HOME}"
       fi
 
-      # Convert relative path to absolute path
-      if [[ "$path" == ./* ]]; then
-        path="$PWD/${path:2}"
-      elif [[ "$path" != /* ]]; then
-        path="$PWD/$path"
-      fi
+      # Resolve potential relative paths or symbolic links
+      path=$(realpath "$path")
 
       # Ensure the path exists
       if [ ! -e "$path" ]; then
@@ -224,6 +220,7 @@ echo -e '\033[6 q'
       # Execute the VS Code Remote command
       vs --remote wsl+Ubuntu "$path"
     }
+
 
     # fh - search in your command history and execute selected command
     fh() {
