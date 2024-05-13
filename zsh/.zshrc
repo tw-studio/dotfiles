@@ -201,24 +201,24 @@ echo -e '\033[6 q'
         return 1
       fi
 
-      local path="$1"
+      local path_arg="$1"
 
       # Expand the tilde to the user's home directory
-      if [[ "$path" == ~* ]]; then
-        path="${path/#\~/$HOME}"
+      if [[ "$path_arg" == ~* ]]; then
+        path_arg="${path_arg/#\~/$HOME}"
       fi
 
       # Resolve potential relative paths or symbolic links
-      path=$(realpath "$path")
+      path_arg=$(realpath "$path_arg")
 
       # Ensure the path exists
-      if [ ! -e "$path" ]; then
-        echo "The path '$path' does not exist."
+      if [ ! -e "$path_arg" ]; then
+        echo "The path '$path_arg' does not exist."
         return 1
       fi
 
       # Execute the VS Code Remote command
-      vs --remote wsl+Ubuntu "$path"
+      vs --remote wsl+Ubuntu "$path_arg"
     }
 
 
