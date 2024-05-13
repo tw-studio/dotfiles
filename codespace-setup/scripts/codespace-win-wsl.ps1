@@ -319,42 +319,48 @@ if (-not (Test-Path $vsCodePath)) {
 $vscodeCLIPath = "$env:USERPROFILE\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $vscodeCLIPath)) { $vscodeCLIPath = "C:\Program Files\Microsoft VS Code\bin\code.cmd" }
 
-# |2.2| Function to install a VSCode extension by id only when not already installed
-function Install-VSCodeExtension {
-  Param([string]$ExtensionId)
-  $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
-  $installedExtensions = & $vscodeCLIPath --list-extensions
-  if ($baseExtensionId -notin $installedExtensions) {
-    Write-Host "Installing extension: $ExtensionId..."
-    & $vscodeCLIPath --install-extension $ExtensionId
-  } else {
-    Write-Host "Extension $ExtensionId is already installed."
-  }
-}
+if ($vscodeCLIPath) {
 
-# |2.3| Install extensions by id
-@(
-  # Most Important
-  "alefragnani.project-manager",
-  "asvetliakov.vscode-neovim@0.0.42",
-  "ms-vscode-remote.remote-wsl",
-  "tw.monokai-accent",
-  # Nice to Have
-  "dbaeumer.vscode-eslint",
-  "dunstontc.viml",
-  "geddski.macros",
-  "huntertran.auto-markdown-toc",
-  "jebbs.markdown-extended",
-  "jsynowiec.vscode-insertdatestring",
-  "mhutchie.git-graph",
-  "ms-python.black-formatter",
-  "naumovs.color-highlight",
-  "redhat.vscode-yaml",
-  "spywhere.mark-jump",
-  "tyriar.sort-lines",
-  "wayou.vscode-todo-highlight"
-) | ForEach-Object {
-  Install-VSCodeExtension $_
+  # |2.2| Function to install a VSCode extension by id only when not already installed
+  function Install-VSCodeExtension {
+    Param([string]$ExtensionId)
+    $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
+    $installedExtensions = & $vscodeCLIPath --list-extensions
+    if ($baseExtensionId -notin $installedExtensions) {
+      Write-Host "Installing extension: $ExtensionId..."
+      & $vscodeCLIPath --install-extension $ExtensionId
+    } else {
+      Write-Host "Extension $ExtensionId is already installed."
+    }
+  }
+
+  # |2.3| Install extensions by id
+  @(
+    # Most Important
+    "alefragnani.project-manager",
+    "asvetliakov.vscode-neovim@0.0.42",
+    "ms-vscode-remote.remote-wsl",
+    "tw.monokai-accent",
+    # Nice to Have
+    "dbaeumer.vscode-eslint",
+    "dunstontc.viml",
+    "geddski.macros",
+    "huntertran.auto-markdown-toc",
+    "jebbs.markdown-extended",
+    "jsynowiec.vscode-insertdatestring",
+    "mhutchie.git-graph",
+    "ms-python.black-formatter",
+    "naumovs.color-highlight",
+    "redhat.vscode-yaml",
+    "spywhere.mark-jump",
+    "tyriar.sort-lines",
+    "wayou.vscode-todo-highlight"
+  ) | ForEach-Object {
+    Install-VSCodeExtension $_
+  }
+} else {
+
+  Write-Host "VSCode binary is not found."
 }
 
 # >> MARK: |3| Import personal settings and keybindings files
