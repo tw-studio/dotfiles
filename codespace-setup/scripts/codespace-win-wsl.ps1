@@ -331,10 +331,11 @@ function Install-VSCodeExtension {
 # |2.3| Install extensions by id
 @(
   # Most Important
-  "tw.monokai-accent",
-  "asvetliakov.vscode-neovim@0.0.42",
-  # Nice to Have
   "alefragnani.project-manager",
+  "asvetliakov.vscode-neovim@0.0.42",
+  "ms-vscode-remote.remote-wsl",
+  "tw.monokai-accent",
+  # Nice to Have
   "dbaeumer.vscode-eslint",
   "dunstontc.viml",
   "geddski.macros",
