@@ -152,10 +152,10 @@ echo -e '\033[6 q'
     alias tmnw="~/.tmux/scripts/new-tmux-window-panes.zsh"
     alias tmuxname='tmux display-message -p "#S"'
     alias tree='tree -a -I node_modules --noreport'
-    alias vedit='$VS ~/.zshrc'
-    alias vnvim='$VS ~/.config/nvim/init.vim'
+    alias vedit='vsr ~/.zshrc'
+    alias vnvim='vsr ~/.config/nvim/init.vim'
     alias vs='$VS'
-    alias vtmux='$VS ~/.tmux.conf'
+    alias vtmux='vsr ~/.tmux.conf'
     alias zedit='$EDITOR ~/.zshrc'
     alias znvim='$EDITOR ~/.config/nvim/init.vim'
     alias zreload='source ~/.zshrc'
@@ -173,11 +173,14 @@ echo -e '\033[6 q'
 
 #   Personal Functions
 #   ------------------------------------------
+    # better cd
     altercd(){ cd(){ unset -f cd ; cd $*; ls ; altercd; } } ; altercd 
     revertcd(){ cd(){ unset -f cd; cd $*; } }
     qcd(){ unset -f cd; cd $*; altercd; }
     cl() { cd "$@" && ls; }
     cs() { cd "$@" && ls; }
+
+    # snap - archives files and dirs
     snap() {
       cp -r "$1" "$1"_WORKING_COPY; 
       # TODO: fix rename regex to also work with hidden files (ex: .env.js)
@@ -189,6 +192,38 @@ echo -e '\033[6 q'
       rename -v 's/(.*)(\..*)_WORKING_COPY/$1_'$(date +"%Y-%m-%d-%H%M")'$2/' *_WORKING_COPY;
     }
     snapdir() { cp -r "$1" "$1"-`date +%Y-%m-%d-%H%M` }
+    
+    # vsr - starts given file or directory in vscode --remote wsl+Ubuntu mode
+    vsr() {
+      # Check if an argument was provided
+      if [ -z "$1" ]; then
+        echo "Usage: vsr <path-to-file-or-directory>"
+        return 1
+      fi
+
+      local path="$1"
+
+      # Expand the tilde to the user's home directory
+      if [[ "$path" == ~* ]]; then
+        path="${path/#\~/$HOME}"
+      fi
+
+      # Convert relative path to absolute path
+      if [[ "$path" == ./* ]]; then
+        path="$PWD/${path:2}"
+      elif [[ "$path" != /* ]]; then
+        path="$PWD/$path"
+      fi
+
+      # Ensure the path exists
+      if [ ! -e "$path" ]; then
+        echo "The path '$path' does not exist."
+        return 1
+      fi
+
+      # Execute the VS Code Remote command
+      vs --remote wsl+Ubuntu "$path"
+    }
 
     # fh - search in your command history and execute selected command
     fh() {
