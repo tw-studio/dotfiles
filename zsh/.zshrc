@@ -77,9 +77,10 @@ echo -e '\033[6 q'
 #   Export environment variables
 #   -----------------------------------------------------------
     export CODESPACE=$HOME/codespace
-    export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
     export LANGUAGE=en_US.UTF-8
+    export LC_ALL=en_US.UTF-8
+    export WINHOME=$(wslpath $(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r'))
 
 #   Navigate to codespace
 #   ------------------------------------------------------------
@@ -92,7 +93,7 @@ echo -e '\033[6 q'
 #   ------------------------------------------------------------
     export EDITOR=nvim
     export NVIM=nvim
-    export VS=$EDITOR   # TODO: Change to VSCode executable
+    export VS="$WINHOME/AppData/Local/Programs/Microsoft VS Code/bin/code"
 
 #   Add color to terminal
 #   ------------------------------------------------------------
@@ -152,10 +153,10 @@ echo -e '\033[6 q'
     alias tmnw="~/.tmux/scripts/new-tmux-window-panes.zsh"
     alias tmuxname='tmux display-message -p "#S"'
     alias tree='tree -a -I node_modules --noreport'
-    alias vedit='vsr ~/.zshrc'
-    alias vnvim='vsr ~/.config/nvim/init.vim'
+    alias vedit='vs ~/.zshrc'
+    alias vnvim='vs ~/.config/nvim/init.vim'
     alias vs='$VS'
-    alias vtmux='vsr ~/.tmux.conf'
+    alias vtmux='vs ~/.tmux.conf'
     alias zedit='$EDITOR ~/.zshrc'
     alias znvim='$EDITOR ~/.config/nvim/init.vim'
     alias zreload='source ~/.zshrc'
@@ -194,6 +195,7 @@ echo -e '\033[6 q'
     snapdir() { cp -r "$1" "$1"-`date +%Y-%m-%d-%H%M` }
     
     # vsr - starts given file or directory in vscode --remote wsl+Ubuntu mode
+    # NOTE: not needed when invoking vs with bin/code instead of Code.exe
     vsr() {
       # Check if an argument was provided
       if [ -z "$1" ]; then
