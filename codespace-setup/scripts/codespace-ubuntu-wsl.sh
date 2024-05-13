@@ -164,6 +164,12 @@ mkdir -p $HOME/.tmux/scripts \
 mkdir -p $RHOME/.tmux/scripts \
  && cp -r $HOME/.dotfiles/tmux/scripts $RHOME/.tmux/
 
+# Make vsc-tmux startup script accessible
+echo "Making vsc-tmux accessible..."
+mkdir -p $HOME/$CODESPACE/scripts
+cp $HOME/.dotfiles/vscode/vsc-tmux.sh $HOME/$CODESPACE/scripts/
+chmod +x $HOME/$CODESPACE/scripts/vsc-tmux.sh
+
 # Cleanup
 echo "Cleaning up..."
 rm -rf $HOME/.dotfiles
