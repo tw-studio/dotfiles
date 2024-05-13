@@ -8,7 +8,7 @@
 
 ###
 ##
-# Global variables
+# MARK: Global variables
 $userProfileName = Split-Path $env:USERPROFILE -leaf
 $wslUbuntuDrive = "\\wsl.localhost\Ubuntu"
 $wslUserPSDirectory = Get-ChildItem -Path "$wslUbuntuDrive\home" -Directory | Select-Object -First 1
@@ -16,11 +16,11 @@ if ($wslUserPSDirectory) { $wslUserName = $wslUserPSDirectory.Name }
 
 ###
 ##
-# |A| Install WSL and Ubuntu
+# MARK: |A| Install WSL and Ubuntu
 
 Write-Host "Starting..."
 
-# |1| Enable WSL and Virtual Machine Platform
+# >> MARK: |1| Enable WSL and Virtual Machine Platform
 if (-not (Get-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online).State -eq "Enabled") {
   Write-Host "Enabling WSL..."
   Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
@@ -34,12 +34,13 @@ if (-not (Get-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online
   Write-Host "Virtual Machine Platform is already enabled."
 }
 
-# |2| Install WSL 2 kernel update package and distribution only if no distributions are installed
+# >> MARK: |2| Install WSL 2 kernel update package and distribution only if no distributions are installed
+$readyToInstallUbuntu = $false
 $mustInitializeUbuntu = $false
 $wslOutput = wsl -l -v 2>&1
 if ($LASTEXITCODE -ne 0) {
   
-  # |3| Restart system when WSL is finishing an upgrade
+  # Restart system when WSL is finishing an upgrade
   if ($wslOutput -like "*WSL is finishing an upgrade*") {
 
     Write-Host "WSL is finishing an upgrade and may require a restart."
@@ -52,7 +53,7 @@ if ($LASTEXITCODE -ne 0) {
       exit 1
     }
   
-  # |4| Install and configure WSL update package and distribution otherwise
+  # Install and configure WSL update package and distribution otherwise
   } else {
 
     Write-Host "WSL distributions are not found."
@@ -76,13 +77,9 @@ if ($LASTEXITCODE -ne 0) {
       Write-Host "Setting WSL default version to 2..."
       wsl --set-default-version 2
     }
-
-    # Install Ubuntu distribution
-    Write-Host "Installing Ubuntu..."
-    wsl --install --no-launch -d Ubuntu
-    Write-Host "Wait 10 seconds for installation to finish..."
-    Start-Sleep -Seconds 10
-    $mustInitializeUbuntu = $true
+    
+    $readyToInstallUbuntu = $true
+    
   }
   
 } else {
@@ -105,17 +102,23 @@ if ($LASTEXITCODE -ne 0) {
       Write-Host "Setting WSL default version to 2..."
       wsl --set-default-version 2
     }
-
-    # Install Ubuntu distribution
-    Write-Host "Installing Ubuntu..."
-    wsl --install --no-launch -d Ubuntu
-    Write-Host "Wait 10 seconds for installation to finish..."
-    Start-Sleep -Seconds 10
-    $mustInitializeUbuntu = $true
+    
+    $readyToInstallUbuntu = $true
   }
 }
 
-# Instruct user to initialize Ubuntu distribution
+# >> MARK: |3| Install Ubuntu if not already installed
+if ($readyToInstallUbuntu) {
+
+  # Install Ubuntu distribution
+  Write-Host "Installing Ubuntu..."
+  wsl --install --no-launch -d Ubuntu
+  Write-Host "Wait 10 seconds for installation to finish..."
+  Start-Sleep -Seconds 10
+  $mustInitializeUbuntu = $true
+}
+
+# >> MARK: |4| Instruct user to initialize Ubuntu distribution
 if ($mustInitializeUbuntu) {
 
   Write-Host ""
@@ -143,47 +146,45 @@ if ($mustInitializeUbuntu) {
 
 ###
 ##
-# |X| Create a codespace directory
+# MARK: |B| Create a winspace directory in %USERPROFILE%
 
-# |1| Create a codespace directory if it doesn't already exist
-$codespaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "codespace"
-if (-not (Test-Path -Path $codespaceDir)) {
+$winspaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "winspace"
+if (-not (Test-Path -Path $winspaceDir)) {
   
-  Write-Host "codespace directory in $env:USERPROFILE doesn't exist."
-  Write-Host "Creating codespace in $env:USERPROFILE..."
-  New-Item -Path $codespaceDir -ItemType Directory | Out-Null
+  Write-Host "winspace directory in $env:USERPROFILE doesn't exist."
+  Write-Host "Creating winspace in $env:USERPROFILE..."
+  New-Item -Path $winspaceDir -ItemType Directory | Out-Null
 } else {
    
-  Write-Host "codespace directory in $env:USERPROFILE already exists."
+  Write-Host "winspace directory in $env:USERPROFILE already exists."
 }
     
 ###
 ##
-# |X| Invoke codespace-setup inside Ubuntu
+# MARK: |C| Invoke codespace-ubuntu-wsl inside Ubuntu
 
-# |1| 
-$codespaceScriptsDir = Join-Path -Path $codespaceDir -ChildPath "scripts"
-$codespaceUbuntuWinPath = Join-Path -Path $codespaceScriptsDir -ChildPath "codespace-ubuntu-wsl.sh"
-$codespaceUbuntuUnixPath = $codespaceUbuntuWinPath -replace '^C:\\', '/mnt/c/'
-$codespaceUbuntuUnixPath = $codespaceUbuntuUnixPath -replace '\\', '/'
+$winspaceScriptsDir = Join-Path -Path $winspaceDir -ChildPath "scripts"
+$winspaceUbuntuWinPath = Join-Path -Path $winspaceScriptsDir -ChildPath "codespace-ubuntu-wsl.sh"
+$winspaceUbuntuUnixPath = $winspaceUbuntuWinPath -replace '^C:\\', '/mnt/c/'
+$winspaceUbuntuUnixPath = $winspaceUbuntuUnixPath -replace '\\', '/'
 
-if (-not (Test-Path $codespaceUbuntuWinPath)) {
+if (-not (Test-Path $winspaceUbuntuWinPath)) {
 
-  # Create scripts directory if needed
-  if (-not (Test-Path -Path $codespaceScriptsDir)) {
+  # >> MARK: |1| Create scripts directory in winspace
+  if (-not (Test-Path -Path $winspaceScriptsDir)) {
 
-    Write-Host "scripts directory in codespace doesn't exist."
-    Write-Host "Creating codespace/scripts in $env:USERPROFILE..."
-    New-Item -Path $codespaceScriptsDir -ItemType Directory | Out-Null
+    Write-Host "scripts directory in winspace doesn't exist."
+    Write-Host "Creating winspace/scripts in $env:USERPROFILE..."
+    New-Item -Path $winspaceScriptsDir -ItemType Directory | Out-Null
   }
 
-  # Download personal setup script for codespace on Ubuntu
+  # >> MARK: |2| Download personal setup script for codespace on Ubuntu
   Write-Host "Setup script for codespace-ubuntu-wsl is not found."
   Write-Host "Downloading personal setup script for codespace on Ubuntu for WSL..."
   $codespaceSetupUbuntuUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-ubuntu-wsl.sh"
-  Invoke-WebRequest -Uri $codespaceSetupUbuntuUrl -OutFile $codespaceUbuntuWinPath
+  Invoke-WebRequest -Uri $codespaceSetupUbuntuUrl -OutFile $winspaceUbuntuWinPath
   
-  # Invoke script in WSL Ubuntu
+  # >> MARK: |3| Fix nameserver in wsl.conf and resolv.conf
   Write-Host "Fixing wsl.conf in Ubuntu..."
   $appendWslConfLines = @"
 [network]
@@ -200,9 +201,11 @@ fi
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f +i /etc/resolv.conf"
+
+  # >> MARK: |4| Run codespace setup in Ubuntu
   Write-Host "Running codespace setup script in Ubuntu..."
-  wsl -d Ubuntu -u root -- bash -c "chmod +x $codespaceUbuntuUnixPath"
-  wsl -d Ubuntu -u root -- bash -c $codespaceUbuntuUnixPath
+  wsl -d Ubuntu -u root -- bash -c "chmod +x $winspaceUbuntuUnixPath"
+  wsl -d Ubuntu -u root -- bash -c $winspaceUbuntuUnixPath
 
 } else {
 
@@ -211,9 +214,9 @@ fi
 
 ###
 ##
-# |X| Generate SSH keys for GitHub and add to SSH agent
+# MARK: |C| Generate SSH keys for GitHub and add to SSH agent
 
-# |1| Generate SSH keys
+# >> MARK: |1| Generate SSH keys in WSL for the WSL user (optional)
 if ($wslUserName) { $wslUserSSHDir = "$wslUbuntuDrive\home\$wslUserName\.ssh" }
 if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
 
@@ -253,7 +256,7 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
   Write-Host "SSH key files for WSL user already exist."
 }
 
-# |2| Add SSH keys to ssh-agent
+# >> MARK: |2| Add SSH keys to ssh-agent
 if ($didGenerateSSHKeys) {
 
   Write-Host "Adding SSH private key to ssh-agent..."
@@ -279,11 +282,12 @@ if ($didGenerateSSHKeys) {
     # Careful syntax required to preserve environment for ssh-add
     wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-agent bash -c 'ssh-add ~/.ssh/$sshKeyName'"
     
-    # Update .zshrc to load identify in ssh-agent when sourced
-    wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent#/c\zstyle :omz:plugins:ssh-agent identities $sshKeyName' ~/.zshrc"
-
     # Initialize funtoo/keychain with ssh key
     wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#keychain#/c\eval \$\(keychain -q --eval --agents ssh $sshKeyName)' ~/.zshrc"
+
+    # Update .zshrc to load identify in ssh-agent when sourced (disabled, keychain sufficient)
+    # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent#/c\zstyle :omz:plugins:ssh-agent identities $sshKeyName' ~/.zshrc"
+
   } else {
     
     Write-Host "Unexpected error. SSH key not added to ssh-agent."
@@ -292,9 +296,9 @@ if ($didGenerateSSHKeys) {
 
 ###
 ##
-# |X| Install VSCode
+# MARK: |D| Install VSCode
 
-# |1| Download and install VS Code if not already installed
+# >> MARK: |1| Download and install VS Code if not already installed
 $vsCodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe"
 if (-not (Test-Path $vsCodePath)) {
   Write-Host "VSCode is not installed."
@@ -309,7 +313,7 @@ if (-not (Test-Path $vsCodePath)) {
   Write-Host "VSCode is already installed."
 }
 
-# |2| Install extensions
+# >> MARK: |2| Install extensions
 
 # |2.1| Define the path to code CLI command
 $vscodeCLIPath = "$env:USERPROFILE\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd"
@@ -353,7 +357,7 @@ function Install-VSCodeExtension {
   Install-VSCodeExtension $_
 }
 
-# |3| Import personal settings and keybindings files
+# >> MARK: |3| Import personal settings and keybindings files
 
 # |3.1| First check whether backup files already exist, and continue only if they don't
 $vsCodeUserPath = "$env:APPDATA\Code\User"
@@ -406,7 +410,7 @@ if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
   Write-Host "Backups for default settings and keybindings are found."
 }
 
-# |4| Install personal VSCode fonts if not already installed
+# >> MARK: |4| Install personal VSCode fonts if not already installed
 
 # |4.1| Check if fonts are already installed
 $fontName1 = "MesloLGLDZNerdFontMono-Bold.ttf"
@@ -452,9 +456,9 @@ if (-not ((Test-Path -Path $fontFilePath1) -and (Test-Path -Path $fontFilePath2)
 
 ###
 ##
-# |X| Install PowerToys
+# MARK: |E| Install PowerToys
 
-# |1| Continue only if PowerToys is not already installed
+# Continue only if PowerToys is not already installed
 $alreadyInstalledPowerToys = Get-CimInstance -ClassName Win32_Product |
                              Where-Object { $_.Name -like "*PowerToys*" }
 if ($alreadyInstalledPowerToys) {
@@ -464,12 +468,12 @@ if ($alreadyInstalledPowerToys) {
 
   Write-Host "Microsoft PowerToys is not installed."
  
-  # |2| Use the GitHub API URL for fetching metadata about the latest release
+  # Use the GitHub API URL for fetching metadata about the latest release
   $repo = "microsoft/PowerToys"
   $apiUrl = "https://api.github.com/repos/$repo/releases/latest"
   $latestReleaseAll = Invoke-RestMethod -Uri $apiUrl
 
-  # |3| Download PowerToysUserSetup (assets[4])
+  # Download PowerToysUserSetup (assets[4])
   $latestRelease = $latestReleaseAll.assets[4]
   $downloadUrl = $latestRelease.browser_download_url
   $downloadName = $latestRelease.name
@@ -477,11 +481,11 @@ if ($alreadyInstalledPowerToys) {
   Write-Host "Downloading $downloadName..."
   Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath
 
-  # |4| Run the downloaded exe installer
+  # Run the downloaded exe installer
   Write-Host "Installing $downloadName..."
   Start-Process -FilePath $downloadPath -Wait
 
-  # |5| Wait for user to install PowerToys
+  # Wait for user to install PowerToys
   Write-Host "The Keyboard Manager PowerToy is useful for remapping Caps Lock to Esc."
   Read-Host "Press Enter after you have finished installing Microsoft PowerToys."
   $didInstallPowerToys = $true
@@ -489,9 +493,9 @@ if ($alreadyInstalledPowerToys) {
 
 ###
 ##
-# |X| Install WinGet
+# MARK: |F| Install WinGet
 
-# |1| Install NuGet CLI
+# >> MARK: |1| Install NuGet CLI
 if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
   
   Write-Host "NuGet CLI is not installed."
@@ -530,7 +534,7 @@ if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
   Write-Host "NuGet CLI is already installed."
 }
 
-# |2| Use NuGet to install Microsoft.UI.Xaml framework dependency for WinGet
+# >> MARK: |2| Use NuGet to install Microsoft.UI.Xaml framework dependency for WinGet
 $xamlPackageName = "Microsoft.UI.Xaml"
 $nugetGlobalPackagesPath = Join-Path -Path $env:USERPROFILE -ChildPath ".nuget\packages\$xamlPackageName"
 if (-not (Test-Path $nugetGlobalPackagesPath)) {
@@ -541,7 +545,7 @@ if (-not (Test-Path $nugetGlobalPackagesPath)) {
   Write-Host "$xamlPackageName >=2.8 is already installed."
 }
 
-# |3| Download and install winget-cli
+# >> MARK: |3| Download and install winget-cli
 $wingetPackageName = "Microsoft.DesktopAppInstaller"
 if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
@@ -573,9 +577,9 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
 ###
 ##
-# |X| Install Windows Terminal
+# MARK: |G| Install Windows Terminal
 
-# |1| Install Windows Terminal via winget
+# >> MARK: |1| Install Windows Terminal via winget
 $windowsTerminalId = "Microsoft.WindowsTerminal"
 $wingetListWindowsTerminalOutput = winget list -q $windowsTerminalId
 if (-not $wingetListWindowsTerminalOutput) {
@@ -588,7 +592,7 @@ if (-not $wingetListWindowsTerminalOutput) {
   Write-Host "$windowsTerminalId is already installed."
 }
 
-# |2| Launch Windows Terminal once when settings.json isn't found
+# >> MARK: |2| Launch Windows Terminal once when settings.json isn't found
 $settingsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 if (-not (Test-Path $settingsPath)) {
 
@@ -603,7 +607,7 @@ if (-not (Test-Path $settingsPath)) {
   Write-Host "Settings file for Windows Terminal already exists."
 }
 
-# |3| Modify settings for Windows Terminal
+# >> MARK: |3| Modify settings for Windows Terminal
 if (Test-Path $settingsPath) {
 
   $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
@@ -688,9 +692,8 @@ if (Test-Path $settingsPath) {
 
 ###
 ##
-# |X| Install NeoVim for Windows
+# MARK: |H| Install NeoVim for Windows
 
-# |1| Install Neovim for Windows via winget, if not already installed
 $neovimId = "Neovim.Neovim"
 $wingetListNeovimOutput = winget list -q $neovimId
 if (-not $wingetListNeovimOutput) {
@@ -705,7 +708,7 @@ if (-not $wingetListNeovimOutput) {
 
 ###
 ##
-# |X| Recommend next steps
+# MARK: |X| Recommend next steps
 
 # Only show recommended tasks related to modifications made in this script run.
 if (-not ($didInstallPowerToys -or $didGenerateSSHKeys)) {
