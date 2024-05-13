@@ -90,8 +90,8 @@ echo -e '\033[6 q'
 
 #   Set default editor
 #   ------------------------------------------------------------
-    export EDITOR=/usr/bin/nvim
-    export NVIM=/usr/bin/nvim
+    export EDITOR=nvim
+    export NVIM=nvim
     export VS=$EDITOR   # TODO: Change to VSCode executable
 
 #   Add color to terminal
