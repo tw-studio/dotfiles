@@ -329,6 +329,7 @@ if ($vscodeCLIPath) {
     if ($baseExtensionId -notin $installedExtensions) {
       Write-Host "Installing extension: $ExtensionId..."
       & $vscodeCLIPath --install-extension $ExtensionId
+      $didInstallExtension = $true
     } else {
       Write-Host "Extension $ExtensionId is already installed."
     }
@@ -724,6 +725,7 @@ if (-not ($didInstallPowerToys -or $didGenerateSSHKeys)) {
 
   if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
   if ($didGenerateSSHKeys) { Write-Host "- Add the generated SSH public key to your GitHub account."}
+  if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar"}
 
   Write-Host "Complete."
 } else {
