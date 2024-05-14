@@ -24,29 +24,9 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
-  "[markdown-mono]": {
-    "editor.fontFamily": "Roboto Mono",
-    "editor.fontSize": 14.5,
-    "editor.fontWeight": "500",
-    "editor.quickSuggestions": {
-      "comments": false,
-      "other": false,
-      "strings": false
-    }
-  },
-  "[markdown-sansserif]": {
-    "editor.fontFamily": "SF UI Display",
-    "editor.fontSize": 13.5,
-    "editor.fontWeight": "500",
-    "editor.quickSuggestions": {
-      "comments": false,
-      "other": false,
-      "strings": false
-    }
-  },
   "[markdown]": {
-    "editor.fontFamily": "Roboto Mono",
-    "editor.fontSize": 13,
+    "editor.fontFamily": "RobotoMono Nerd Font Mono",
+    "editor.fontSize": 12,
     "editor.fontWeight": "500",
     "editor.quickSuggestions": {
       "comments": false,
@@ -97,23 +77,6 @@
   "color-highlight.markerType": "background",
   "color-highlight.markRuler": false,
   "color-highlight.matchWords": false,
-  "colorize.colorized_colors": [
-    "ARGB",
-    "HEXA",
-    "HSL",
-    "RGB"
-  ],
-  "colorize.exclude": [
-    "**/*.css",
-    "**/*.scss"
-  ],
-  "colorize.hide_current_line_decorations": false,
-  "colorize.include": [
-    "**/*.json",
-    "**/*.repl",
-    "**/*.tmTheme",
-    "**/*.md"
-  ],
   "customizeUI.stylesheet": {
     ".editor-actions": "display: none !important;"
   },
@@ -135,7 +98,6 @@
   "editor.insertSpaces": true,
   "editor.lineHeight": 1.4,
   "editor.lineNumbers": "relative",
-  "editor.minimap.enabled": false,
   "editor.parameterHints.enabled": false,
   "editor.quickSuggestions": {
     "comments": false,
@@ -150,13 +112,165 @@
   "editor.selectionHighlight": true,
   "editor.tabSize": 2,
   "editor.tokenColorCustomizations": {
-    "textMateRules": []
+    "textMateRules": [
+      {
+        "name": "Swift: Entity Names",
+        "scope": "entity.name.type",
+        "settings": {
+          "foreground": "#dfbafd"
+        }
+      },
+      {
+        "name": "Swift: Source",
+        "scope": "source.swift",
+        "settings": {
+          "foreground": "#f6f6f6"
+        }
+      },
+      {
+        "name": "Swift: Storage Type",
+        "scope": "storage.type.swift",
+        "settings": {
+          "foreground": "#f82e76"
+        }
+      },
+      {
+        "name": "Swift: Variable Names",
+        "scope": "variable.other.swift",
+        "settings": {
+          "foreground": "#65d7fd"
+        }
+      },
+      {
+        "name": "Markdown: Bold",
+        "scope": "markup.bold.markdown",
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#fd971f"
+        }
+      },
+      {
+        "name": "Markdown: Emphasis",
+        "scope": "markup.italic, markup.italic.markdown",
+        "settings": {
+          "fontStyle": "italic",
+          "foreground": "#fd971f"
+        }
+      },
+      {
+        "name": "Markdown: Heading Punctuation",
+        "scope": [
+          "punctuation.definition.heading.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#c1e4d3"
+        }
+      },
+      {
+        "name": "Markdown: Heading 1",
+        "scope": [
+          "heading.1.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#5faa86"
+        }
+      },
+      {
+        "name": "Markdown: Heading 2",
+        "scope": [
+          "heading.2.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#7bd88f"
+        }
+      },
+      {
+        "name": "Markdown: Heading 3",
+        "scope": [
+          "heading.3.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#78e6d0"
+        }
+      },
+      {
+        "name": "Markdown: Heading 4",
+        "scope": [
+          "heading.4.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#66d6ed"
+        }
+      },
+      {
+        "name": "Markdown: Heading 5",
+        "scope": [
+          "heading.5.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#02BDD3"
+        }
+      },
+      {
+        "name": "Markdown: Heading 6",
+        "scope": [
+          "heading.6.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#0294a5"
+        }
+      },
+      {
+        "name": "Markdown: Heading 7",
+        "scope": [
+          "heading.7.markdown"
+        ],
+        "settings": {
+          "fontStyle": "bold",
+          "foreground": "#008BFF"
+        }
+      },
+      {
+        "name": "Markdown: Fenced Code Blocks",
+        "scope": [
+          "markup.fenced_code.block.markdown"
+        ],
+        "settings": {
+          "foreground": "#ffee99"
+        }
+      },
+      {
+        "name": "Markdown: Punctuation List",
+        "scope": [
+          "punctuation.definition.list.begin.markdown"
+        ],
+        "settings": {
+          "foreground": "#ff80f4"
+        }
+      },
+      {
+        "name": "Markdown: Strikethrough",
+        "scope": [
+          "markup.strikethrough.markdown"
+        ],
+        "settings": {
+          "foreground": "#636363"
+        }
+      }
+    ]
   },
   "eslint.alwaysShowStatus": true,
-  "eslint.enable": true,
-  "eslint.format.enable": true,
+  "eslint.enable": false,
+  "eslint.format.enable": false,
   "eslint.run": "onType",
-  "eslint.runtime": "/usr/local/n/versions/node/18.16.0/bin/node",
+  "eslint.runtime": "",
   "explorer.confirmDragAndDrop": false,
   "explorer.openEditors.visible": 9,
   "extensions.autoUpdate": false,
@@ -243,7 +357,7 @@
   "markJump.showProjectMarks": false,
   "markJump.strictLimit": "limit",
   "mdmath.delimiters": "gitlab",
-  "npm.packageManager": "yarn",
+  "npm.packageManager": "pnpm",
   "prettier.enable": false,
   "python.analysis.extraPaths": [
     "__pypackages__/3.11/lib"
@@ -279,6 +393,7 @@
   "settings.cycle": [
     {
       "id": "lineNumbers",
+      "overrideWorkspaceSettings": false,
       "values": [
         {
           "editor.lineNumbers": "off"
@@ -292,11 +407,21 @@
       ]
     }
   ],
+  "settings.cycle.logLevel": "log",
+  "settings.cycle.warnOnWorkspaceSettingsCollisions": true,
   "settingsSync.ignoredSettings": [
+    "[markdown]",
     "editor.fontFamily",
     "editor.fontSize",
     "editor.lineHeight",
-    "terminal.integrated.fontFamily"
+    "eslint.enable",
+    "eslint.format.enable",
+    "-eslint.runtime",
+    "extensions.experimental.affinity",
+    "terminal.integrated.fontFamily",
+    "vscode-neovim.neovimInitPath",
+    "vscode-neovim.neovimPath",
+    "vscode-neovim.useWSL"
   ],
   "sourcekit-lsp.serverArguments": [
     "-Xswiftc",
@@ -351,38 +476,27 @@
   "terminal.integrated.fontWeight": "600",
   "terminal.integrated.macOptionIsMeta": true,
   "terminal.integrated.profiles.linux": {
-    "bash": {
-      "icon": "terminal-bash",
-      "path": "bash"
-    },
-    "pwsh": {
-      "icon": "terminal-powershell",
-      "path": "pwsh"
-    },
-    "tmux": {
-      "icon": "terminal-tmux",
-      "path": "tmux"
-    },
     "tw": {
       "icon": "terminal-tmux",
       "path": "/home/tomw/codespace/scripts/vsc-tmux.sh"
     },
     "zsh": {
       "path": "zsh"
+    },
+    "bash": {
+      "path": "bash",
+      "icon": "terminal-bash"
+    },
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux"
+    },
+    "pwsh": {
+      "path": "pwsh",
+      "icon": "terminal-powershell"
     }
   },
   "terminal.integrated.profiles.osx": {
-    "bash": {
-      "args": [
-        "-l"
-      ],
-      "icon": "terminal-bash",
-      "path": "bash"
-    },
-    "tmux": {
-      "icon": "terminal-tmux",
-      "path": "tmux"
-    },
     "tw": {
       "icon": "terminal-tmux",
       "path": "/Users/tomw/codespace/.vscode/scripts/vsc-tmux.sh"
@@ -392,33 +506,44 @@
         "-l"
       ],
       "path": "zsh"
+    },
+    "tmux": {
+      "icon": "terminal-tmux",
+      "path": "tmux"
+    },
+    "bash": {
+      "args": [
+        "-l"
+      ],
+      "icon": "terminal-bash",
+      "path": "bash"
     }
   },
   "terminal.integrated.profiles.windows": {
-    "Command Prompt": {
+    "Ubuntu (WSL)": {
+      "path": [
+          "C:\\WINDOWS\\System32\\wsl.exe"
+      ],
       "args": [],
-      "icon": "terminal-cmd",
+      "icon": "terminal-ubuntu",
+    },
+    "PowerShell": {
+      "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "Command Prompt": {
       "path": [
         "${env:windir}\\Sysnative\\cmd.exe",
         "${env:windir}\\System32\\cmd.exe"
-      ]
+      ],
+      "args": [],
+      "icon": "terminal-cmd"
     },
     "Git Bash": {
       "source": "Git Bash"
-    },
-    "PowerShell": {
-      "icon": "terminal-powershell",
-      "source": "PowerShell"
-    },
-    "Ubuntu (WSL)": {
-      "args": [],
-      "icon": "terminal-ubuntu",
-      "path": [
-        "C:\\WINDOWS\\System32\\wsl.exe"
-      ]
     }
   },
-  "terminal.integrated.rightClickBehavior": "nothing",
+  "terminal.integrated.rightClickBehavior":"nothing",
   "todohighlight.defaultStyle": {
     "backgroundColor": "#ae2463",
     "borderRadius": "2px",
@@ -461,11 +586,12 @@
   "update.mode": "manual",
   "update.showReleaseNotes": false,
   "vscode-neovim.logLevel": "info",
+  "vscode-neovim.neovimExecutablePaths.darwin": "/Users/tomw/codespace/.vscode/nvim-osx64/bin/nvim",
   "vscode-neovim.neovimExecutablePaths.linux": "/usr/local/bin/nvim",
+  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init-vscode.vim",
   "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
   "vscode-neovim.useWSL": true,
   "window.newWindowDimensions": "maximized",
-  "workbench.activityBar.location": "hidden",
   "workbench.colorCustomizations": {
     "activityBarBadge.background": "#0000",
     "activityBarBadge.foreground": "#0000",
@@ -490,7 +616,8 @@
   "workbench.panel.defaultLocation": "right",
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
-  "workbench.statusBar.visible": false,
   "yaml.completion": false,
-  "yaml.schemaStore.enable": false
+  "yaml.schemaStore.enable": false,
+  "workbench.statusBar.visible": false,
+  "editor.minimap.enabled": false
 }

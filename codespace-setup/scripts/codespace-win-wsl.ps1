@@ -353,6 +353,7 @@ if ($vscodeCLIPath) {
     "ms-python.black-formatter",
     "naumovs.color-highlight",
     "redhat.vscode-yaml",
+    "hoovercj.vscode-settings-cycler",
     "spywhere.mark-jump",
     "tyriar.sort-lines",
     "wayou.vscode-todo-highlight"
