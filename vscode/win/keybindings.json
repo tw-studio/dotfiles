@@ -224,5 +224,20 @@
       "key": "ctrl+w unknown",
       "command": "-workbench.action.toggleEditorWidths",
       "when": "!editorTextFocus && !terminalFocus && neovim.mode != 'cmdline'"
+    },
+    {
+      "key": "ctrl+j",
+      "command": "-vscode-neovim.send-cmdline",
+      "when": "neovim.init && neovim.mode == 'cmdline'"
+    },
+    {
+      "key": "ctrl+j",
+      "command": "-vscode-neovim.send",
+      "when": "editorTextFocus && neovim.ctrlKeysNormal.j && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+      "key": "ctrl+j",
+      "command": "-vscode-neovim.send",
+      "when": "editorTextFocus && neovim.ctrlKeysInsert.j && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
     }
 ]

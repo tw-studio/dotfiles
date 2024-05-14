@@ -402,8 +402,8 @@ if ($boxCheckerId -notin $installedExtensions) {
 
 # |3.1| First check whether backup files already exist, and continue only if they don't
 $vsCodeUserPath = "$env:APPDATA\Code\User"
-$settingsBackupPattern = 'settings_\d{4}-\d{2}-\d{2}\.json'
-$keybindingsBackupPattern = 'keybindings_\d{4}-\d{2}-\d{2}\.json'
+$settingsBackupPattern = '^settings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
+$keybindingsBackupPattern = '^keybindings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
 
 # |3.2| Function to search for files matching a pattern
 function Find-FilesMatchingPattern {
