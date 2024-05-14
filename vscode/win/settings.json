@@ -24,6 +24,26 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "[markdown-mono]": {
+    "editor.fontFamily": "Roboto Mono",
+    "editor.fontSize": 14.5,
+    "editor.fontWeight": "500",
+    "editor.quickSuggestions": {
+      "comments": false,
+      "other": false,
+      "strings": false
+    }
+  },
+  "[markdown-sansserif]": {
+    "editor.fontFamily": "SF UI Display",
+    "editor.fontSize": 13.5,
+    "editor.fontWeight": "500",
+    "editor.quickSuggestions": {
+      "comments": false,
+      "other": false,
+      "strings": false
+    }
+  },
   "[markdown]": {
     "editor.fontFamily": "RobotoMono Nerd Font Mono",
     "editor.fontSize": 12,
@@ -98,6 +118,7 @@
   "editor.insertSpaces": true,
   "editor.lineHeight": 1.4,
   "editor.lineNumbers": "relative",
+  "editor.minimap.enabled": false,
   "editor.parameterHints.enabled": false,
   "editor.quickSuggestions": {
     "comments": false,
@@ -270,7 +291,7 @@
   "eslint.enable": false,
   "eslint.format.enable": false,
   "eslint.run": "onType",
-  "eslint.runtime": "",
+  "eslint.runtime": "/usr/local/n/versions/node/18.16.0/bin/node",
   "explorer.confirmDragAndDrop": false,
   "explorer.openEditors.visible": 9,
   "extensions.autoUpdate": false,
@@ -476,27 +497,38 @@
   "terminal.integrated.fontWeight": "600",
   "terminal.integrated.macOptionIsMeta": true,
   "terminal.integrated.profiles.linux": {
+    "bash": {
+      "icon": "terminal-bash",
+      "path": "bash"
+    },
+    "pwsh": {
+      "icon": "terminal-powershell",
+      "path": "pwsh"
+    },
+    "tmux": {
+      "icon": "terminal-tmux",
+      "path": "tmux"
+    },
     "tw": {
       "icon": "terminal-tmux",
       "path": "/home/tomw/codespace/scripts/vsc-tmux.sh"
     },
     "zsh": {
       "path": "zsh"
-    },
-    "bash": {
-      "path": "bash",
-      "icon": "terminal-bash"
-    },
-    "tmux": {
-      "path": "tmux",
-      "icon": "terminal-tmux"
-    },
-    "pwsh": {
-      "path": "pwsh",
-      "icon": "terminal-powershell"
     }
   },
   "terminal.integrated.profiles.osx": {
+    "bash": {
+      "args": [
+        "-l"
+      ],
+      "icon": "terminal-bash",
+      "path": "bash"
+    },
+    "tmux": {
+      "icon": "terminal-tmux",
+      "path": "tmux"
+    },
     "tw": {
       "icon": "terminal-tmux",
       "path": "/Users/tomw/codespace/.vscode/scripts/vsc-tmux.sh"
@@ -506,44 +538,33 @@
         "-l"
       ],
       "path": "zsh"
-    },
-    "tmux": {
-      "icon": "terminal-tmux",
-      "path": "tmux"
-    },
-    "bash": {
-      "args": [
-        "-l"
-      ],
-      "icon": "terminal-bash",
-      "path": "bash"
     }
   },
   "terminal.integrated.profiles.windows": {
-    "Ubuntu (WSL)": {
-      "path": [
-          "C:\\WINDOWS\\System32\\wsl.exe"
-      ],
-      "args": [],
-      "icon": "terminal-ubuntu",
-    },
-    "PowerShell": {
-      "source": "PowerShell",
-      "icon": "terminal-powershell"
-    },
     "Command Prompt": {
+      "args": [],
+      "icon": "terminal-cmd",
       "path": [
         "${env:windir}\\Sysnative\\cmd.exe",
         "${env:windir}\\System32\\cmd.exe"
-      ],
-      "args": [],
-      "icon": "terminal-cmd"
+      ]
     },
     "Git Bash": {
       "source": "Git Bash"
+    },
+    "PowerShell": {
+      "icon": "terminal-powershell",
+      "source": "PowerShell"
+    },
+    "Ubuntu (WSL)": {
+      "args": [],
+      "icon": "terminal-ubuntu",
+      "path": [
+        "C:\\WINDOWS\\System32\\wsl.exe"
+      ]
     }
   },
-  "terminal.integrated.rightClickBehavior":"nothing",
+  "terminal.integrated.rightClickBehavior": "nothing",
   "todohighlight.defaultStyle": {
     "backgroundColor": "#ae2463",
     "borderRadius": "2px",
@@ -592,6 +613,7 @@
   "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
   "vscode-neovim.useWSL": true,
   "window.newWindowDimensions": "maximized",
+  "workbench.activityBar.location": "hidden",
   "workbench.colorCustomizations": {
     "activityBarBadge.background": "#0000",
     "activityBarBadge.foreground": "#0000",
@@ -616,8 +638,7 @@
   "workbench.panel.defaultLocation": "right",
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
-  "yaml.completion": false,
-  "yaml.schemaStore.enable": false,
   "workbench.statusBar.visible": false,
-  "editor.minimap.enabled": false
+  "yaml.completion": false,
+  "yaml.schemaStore.enable": false
 }
