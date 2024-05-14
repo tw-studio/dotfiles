@@ -126,6 +126,8 @@ echo -e '\033[6 q'
     alias dm="deletemark"                       # zshmarks plugin
     alias dzi="find . -name \"*:Zone.Identifier\" -type f -delete"
     alias fd='fdfind --hidden'
+    # Fix git when wsl corrupts and empties object
+    alias gitfix="find .git/objects/ -type f -empty | xargs rm; git fetch -p; git fsck --full"
     alias gm="jump"                             # zshmarks plugin
     alias lr="ls -Rlp | awk '{ if (NF==1) print \$0; } { if (NF>2) print \$NF; } { if (NF==0) print \$0; }'"
     alias ls='ls -Ahv --color --group-directories-first'
