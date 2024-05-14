@@ -223,6 +223,15 @@ echo -e '\033[6 q'
       vs --remote wsl+Ubuntu "$path_arg"
     }
 
+    # key - add identity to funtoo/keychain
+    key() {
+      eval $(keychain -q --eval --agents ssh "$1")
+    }
+    
+    # winvar - echo value of Windows environment variable
+    winvar() {
+      echo $(wslpath $(cmd.exe /C "echo %$1%" 2>/dev/null | tr -d '\r'))
+    }
 
     # fh - search in your command history and execute selected command
     fh() {
