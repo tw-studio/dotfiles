@@ -124,6 +124,7 @@ echo -e '\033[6 q'
     alias codespace='cd ~/codespace'
     alias cp='cp -iv'                           # Preferred 'cp' implementation - requires confirm
     alias dm="deletemark"                       # zshmarks plugin
+    alias dzi="find . -name \"*:Zone.Identifier\" -type f -delete"
     alias fd='fdfind --hidden'
     alias gm="jump"                             # zshmarks plugin
     alias lr="ls -Rlp | awk '{ if (NF==1) print \$0; } { if (NF>2) print \$NF; } { if (NF==0) print \$0; }'"
