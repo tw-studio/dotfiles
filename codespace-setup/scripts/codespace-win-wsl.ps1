@@ -365,6 +365,39 @@ if ($vscodeCLIPath) {
   Write-Host "VSCode binary is not found."
 }
 
+# |2.4| Install personal box-checker extension
+
+# Create vscode directory in winspace
+$winspaceVscodeDir = Join-Path -Path $winspaceDir -ChildPath "vscode"
+if (-not (Test-Path -Path $winspaceVscodeDir)) {
+  
+  Write-Host "vscode directory in $winspaceDir doesn't exist."
+  Write-Host "Creating vscode in $winspaceDir..."
+  New-Item -Path $winspaceVscodeDir -ItemType Directory | Out-Null
+} else {
+   
+  Write-Host "vscode directory in $winspaceDir already exists."
+}
+
+# Download box-checker extension file into this directory
+$boxCheckerPath = Join-Path -Path $winspaceVscodeDir -ChildPath "box-checker-0.0.1.vsix"
+if (-not (Test-Path $boxCheckerPath)) {
+  
+  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/box-checker-0.0.1.vsix" -OutFile $boxCheckerPath
+}
+
+# Install box-checker extension from vsix
+$boxCheckerId = "tw.box-checker"
+if ($boxCheckerId -notin $installedExtensions) {
+
+  Write-Host "Installing extension: $boxCheckerId..."
+  & $vscodeCLIPath --install-extension $boxCheckerPath
+  $didInstallExtension = $true
+} else {
+
+  Write-Host "Extension $boxCheckerId is already installed."
+}
+
 # >> MARK: |3| Import personal settings and keybindings files
 
 # |3.1| First check whether backup files already exist, and continue only if they don't
@@ -512,7 +545,7 @@ if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
   $nugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
   $nugetDir = "$env:USERPROFILE"
   $nugetPath = "$nugetDir\nuget.exe"
-  if (-not (Test-Path $nugetPath)) {
+  if (-not (Test-Path -Path $nugetPath)) {
     Write-Host "nuget.exe is not downloaded."
     Write-Host "Downloading NuGet to $nugetDir and adding to PATH..."
     Invoke-WebRequest -Uri $nugetUrl -OutFile $nugetPath
@@ -545,7 +578,7 @@ if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
 # >> MARK: |2| Use NuGet to install Microsoft.UI.Xaml framework dependency for WinGet
 $xamlPackageName = "Microsoft.UI.Xaml"
 $nugetGlobalPackagesPath = Join-Path -Path $env:USERPROFILE -ChildPath ".nuget\packages\$xamlPackageName"
-if (-not (Test-Path $nugetGlobalPackagesPath)) {
+if (-not (Test-Path -Path $nugetGlobalPackagesPath)) {
   Write-Host "$xamlPackageName >=2.8 framework is not already installed."
   Write-Host "Installing $xamlPackageName..."
   nuget install $xamlPackageName -OutputDirectory $nugetGlobalPackagesPath
@@ -569,7 +602,7 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
   $downloadPath = Join-Path -Path $env:TEMP -ChildPath $downloadName
 
   # Check if the winget-cli latest release is already downloaded
-  if (-not (Test-Path $downloadPath)) {
+  if (-not (Test-Path -Path $downloadPath)) {
     Write-Host "Downloading $downloadName..."
     Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath
   } else {
@@ -602,7 +635,7 @@ if (-not $wingetListWindowsTerminalOutput) {
 
 # >> MARK: |2| Launch Windows Terminal once when settings.json isn't found
 $settingsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-if (-not (Test-Path $settingsPath)) {
+if (-not (Test-Path -Path $settingsPath)) {
 
   Write-Host "Settings file for Windows Terminal is not found."
 
@@ -616,7 +649,7 @@ if (-not (Test-Path $settingsPath)) {
 }
 
 # >> MARK: |3| Modify settings for Windows Terminal
-if (Test-Path $settingsPath) {
+if (Test-Path -Path $settingsPath) {
 
   $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
 
