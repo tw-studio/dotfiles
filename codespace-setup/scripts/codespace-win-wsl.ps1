@@ -11,8 +11,28 @@
 # MARK: Global variables
 $userProfileName = Split-Path $env:USERPROFILE -leaf
 $wslUbuntuDrive = "\\wsl.localhost\Ubuntu"
-$wslUserPSDirectory = Get-ChildItem -Path "$wslUbuntuDrive\home" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
-if ($wslUserPSDirectory) { $wslUserName = $wslUserPSDirectory.Name }
+$wslUserName = Get-WslUserName
+
+###
+##
+# MARK: Helper Functions
+
+# >> MARK: Get-WslUserName
+function Get-WslUserName {
+  param (
+    [string]$WslUbuntuDrivePath = $wslUbuntuDrive
+  )
+  
+  # Attempt to get WSL home directories
+  $wslUserPSDirectory = Get-ChildItem -Path "$WslUbuntuDrivePath\home" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+  
+  # If one WSL home directory exists, return its name
+  if ($wslUserPSDirectory) {
+    return $wslUserPSDirectory.Name
+  } else {
+    return $null
+  }
+}
 
 ###
 ##
@@ -233,7 +253,12 @@ fi
 # MARK: |C| Generate SSH keys for GitHub and add to SSH agent
 
 # >> MARK: |1| Generate SSH keys in WSL for the WSL user (optional)
-if ($wslUserName) { $wslUserSSHDir = "$wslUbuntuDrive\home\$wslUserName\.ssh" }
+if (-not $wslUserName) {
+  $wslUserName = Get-WslUserName
+}
+if ($wslUserName) {
+  $wslUserSSHDir = "$wslUbuntuDrive\home\$wslUserName\.ssh"  
+}
 if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
 
   Write-Host "SSH key files for WSL user not found."
@@ -241,6 +266,7 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
   $readReadyForSSHKeygen = Read-Host "Do you want to generate a SSH key for use with GitHub in WSL now? (Y/n)"
   if ((-not $readReadyForSSHKeygen) -or $readReadyForSSHKeygen -eq 'y' -or $readReadyForSSHKeygen -eq 'Y') {
 
+    # TODO: Remove redundant logic
     if (-not $wslUserName) {
       
       $wslUserName = Read-Host "Enter the user name configured for WSL Ubuntu"
