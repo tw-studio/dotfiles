@@ -24,14 +24,28 @@ Write-Host "Starting..."
 if (-not (Get-WindowsOptionalFeature -FeatureName Microsoft-Windows-Subsystem-Linux -Online).State -eq "Enabled") {
   Write-Host "Enabling WSL..."
   Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
+  $enabledWSLOrVMP = $true
 } else {
   Write-Host "WSL is already enabled."
 }
 if (-not (Get-WindowsOptionalFeature -FeatureName VirtualMachinePlatform -Online).State -eq "Enabled") {
   Write-Host "Enabling Virtual Machine Platform..."
   Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+  $enabledWSLOrVMP = $true
 } else {
   Write-Host "Virtual Machine Platform is already enabled."
+}
+if ($enabledWSLOrVMP) {
+  Write-Host "Enabling WSL and/or Virtual Machine Platform requires a restart."
+  Write-Host "Not restarting before continuing the script may result in unexpected errors."
+  $userConfirmation = Read-Host "Do you want to restart the computer now? (Y/n)"
+  if ($userConfirmation -eq 'N' -or $userConfirmation -eq 'n') {
+    Write-Host "Restart aborted. Please remember to manually restart later before retrying the script."
+    exit 1
+  } else {
+    Write-Host "Restarting the computer..."
+    Restart-Computer
+  }
 }
 
 # >> MARK: |2| Install WSL 2 kernel update package and distribution only if no distributions are installed
