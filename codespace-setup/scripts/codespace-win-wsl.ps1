@@ -11,7 +11,7 @@
 # MARK: Global variables
 $userProfileName = Split-Path $env:USERPROFILE -leaf
 $wslUbuntuDrive = "\\wsl.localhost\Ubuntu"
-$wslUserPSDirectory = Get-ChildItem -Path "$wslUbuntuDrive\home" -Directory | Select-Object -First 1
+$wslUserPSDirectory = Get-ChildItem -Path "$wslUbuntuDrive\home" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
 if ($wslUserPSDirectory) { $wslUserName = $wslUserPSDirectory.Name }
 
 ###
