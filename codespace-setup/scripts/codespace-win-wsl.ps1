@@ -139,6 +139,8 @@ if ($mustInitializeUbuntu) {
   Write-Host "ACTION NEEDED: Ubuntu must be launched a first time to initialize."
   Write-Host "IMPORTANT: If on an Intel Mac, first launch Windows from macOS in System Preferences > Startup Disk to enable virtualization."
   Write-Host "When ready to proceed, this script will launch Ubuntu, which will ask you to configure a username and password."
+  Write-Host "Ubuntu will then silently initialize itself, after which it will show the bash prompt."
+  Write-Host "IMPORTANT: Ubuntu initialization may take several minutes without progress indication."
   Write-Host "Once the bash prompt appears, please exit Ubuntu, return to this window, and press Enter to continue."
   $readReadyForUbuntu = Read-Host "Are you ready to proceed? (Y/n)"
   if (($readReadyForUbuntu -eq 'n') -or ($readReadyForUbuntu -eq 'N')) {
