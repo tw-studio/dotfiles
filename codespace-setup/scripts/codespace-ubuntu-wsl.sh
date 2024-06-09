@@ -6,12 +6,22 @@
 #
 #     Or from github, install better wget and ca-certificates,
 #     then run with wget:
-#     $ apt-get update && apt-get install -y --no-install-recommends wget ca-certificates && sh -c "$(wget https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-ubuntu.sh -O -)"
+#     $ apt-get update && apt-get install -y --no-install-recommends wget ca-certificates && sh -c "$(wget https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-ubuntu-wsl.sh -O -)"
 #
 ###############################################################################
 
 # errexit, xtrace
 set -e
+
+# MARK: Confirm script is run as root
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Error: This script must be run as root."
+  exit 1
+fi
+
+###
+##
+# MARK: Set USER
 
 # Default USER to first dir in /home, if exists
 USER="ubuntu"
@@ -33,12 +43,12 @@ else
 fi
 echo "Setting USER to $USER..."
 
-# Set timezone
+# MARK: Set timezone
 export TZ=America/Los_Angeles
 echo "Setting timezone to $TZ..."
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install packages
+# MARK: Install packages
 echo "Installing packages..." \
  && apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -62,26 +72,14 @@ echo "Installing packages..." \
  && apt-get clean
 rm -rf /var/lib/apt/lists/*
 
-# Install neovim from latest releases
-NVIM_DOWNLOAD_DIR="/opt/nvim"
-NVIM_INSTALL_DIR="/usr/local/bin"
-NVIM_RELEASE_FILE="nvim-linux64.tar.gz"
-NVIM_URL=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep 'browser_download_url.*nvim-linux64.tar.gz"$' | cut -d '"' -f 4)
-rm -rf $NVIM_DOWNLOAD_DIR
-mkdir -p $NVIM_DOWNLOAD_DIR
-curl -L $NVIM_URL -o $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE
-tar xzvf $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE --strip-components 1
-rm -f $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE
-ln -s $NVIM_DOWNLOAD_DIR/bin/nvim $NVIM_INSTALL_DIR/nvim
-
-# Fix locale issues, e.g. with Perl
+# MARK: Fix locale issues, e.g. with Perl
 echo "Fix locale issues, e.g. with Perl..."
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
  && dpkg-reconfigure --frontend=noninteractive locales \
  && update-locale LANG=en_US.UTF-8
-export LANG=en_US.UTF-8 
- 
-# Configure home, user, and working dir
+export LANG=en_US.UTF-8
+
+# MARK: Configure home, user, and working dir
 export OS_NAME=ubuntu
 echo "Setting default shell for $USER to zsh..."
 ZSH_PATH="/bin/zsh"
@@ -100,15 +98,15 @@ export CODESPACE=codespace
 export RUSER=root
 export RHOME=/root
 
-# Create codespace directory
+# MARK: Create codespace directory
 echo "Creating $HOME/$CODESPACE directory..."
 mkdir -p $HOME/$CODESPACE
 
-# Clone dotfiles from public repo
+# MARK: Clone dotfiles from public repo
 echo "Cloning personal dotfiles from tw-studio..."
 git clone https://github.com/tw-studio/dotfiles $HOME/.dotfiles
 
-# Install and configure oh-my-zsh
+# MARK: Install and configure oh-my-zsh
 echo "Installing and configuring oh-my-zsh..."
 export ZSH=$HOME/.oh-my-zsh
 export RZSH=$RHOME/.oh-my-zsh
@@ -122,7 +120,7 @@ cp $HOME/.dotfiles/zsh/codespace*.zsh-theme $RZSH/themes/
 git clone https://github.com/jocelynmallon/zshmarks $ZSH/custom/plugins/zshmarks
 cp -r $ZSH/custom/plugins/zshmarks $RZSH/custom/plugins/zshmarks
 
-# Install fzf from git
+# MARK: Install fzf from git
 echo "Installing fzf..."
 git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
 cp -r $HOME/.fzf $RHOME/.fzf
@@ -130,7 +128,51 @@ $HOME/.fzf/install --all || true
 rm -f $HOME/.bashrc $HOME/.fzf/code.bash
 rm -f $RHOME/.bashrc $RHOME/.fzf.bash
 
-# Configure neovim
+###
+##
+# MARK: Install and configure neovim
+
+# |1| Configure variables
+NVIM_DOWNLOADS_DIR="/opt/nvim-downloads"
+TIMESTAMP=$(date +%Y%m%d%H%M%S)
+NVIM_DOWNLOAD_DIR="${NVIM_DOWNLOADS_DIR}/nvim-$TIMESTAMP"
+NVIM_INSTALL_DIR="/opt/nvim"
+NVIM_BIN_DIR="/usr/local/bin"
+NVIM_RELEASE_FILE="nvim-linux64.tar.gz"
+
+# |2| Retrieve URL to latest neovim release
+echo "Retrieving URL to latest neovim release..."
+NVIM_URL=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep 'browser_download_url.*nvim-linux64.tar.gz"$' | cut -d '"' -f 4)
+if [ -z "$NVIM_URL" ]; then
+    echo "Error: Failed to retrieve url to latest neovim release. Aborting."
+    exit 1
+fi
+
+# |3| Download the latest release to a nvim-downloads subdirectory
+mkdir -p $NVIM_DOWNLOAD_DIR
+echo "Downloading latest neovim release to $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE..."
+curl -L $NVIM_URL -o $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE
+if [ $? -ne 0 ]; then
+  echo "Error: Downloading latest neovim release failed. Aborting."
+  exit 1
+fi
+
+# |4| Untar to timestamped download directory
+echo "Untarring $NVIM_RELEASE_FILE to $NVIM_DOWNLOAD_DIR..."
+tar -xzf $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE --strip-components=1 -C $NVIM_DOWNLOAD_DIR
+
+# |5| Remove old installation link, update with new, and link to /usr/local/bin
+echo "Linking nvim binary into $NVIM_BIN_DIR..."
+rm -rf $NVIM_INSTALL_DIR
+ln -s $NVIM_DOWNLOAD_DIR $NVIM_INSTALL_DIR
+ln -sf $NVIM_INSTALL_DIR/bin/nvim $NVIM_BIN_DIR/nvim
+
+# |6| Clean up: keep only the two most recent download directories
+echo "Cleaning up..."
+rm -f $NVIM_DOWNLOAD_DIR/$NVIM_RELEASE_FILE
+ls -1dt $NVIM_DOWNLOADS_DIR/* | tail -n +3 | xargs -d '\n' rm -rf --
+
+# |7| Configure neovim
 echo "Configuring neovim..."
 mkdir -p $HOME/.config/nvim/colors \
  && mkdir -p $HOME/.local/share/nvim/site/autoload \
@@ -146,9 +188,9 @@ mkdir -p $RHOME/.config/nvim/colors \
  && cp $HOME/.dotfiles/neovim/plug.vim $RHOME/.local/share/nvim/site/autoload/ \
  && cp $HOME/.dotfiles/neovim/dracula-airline.vim $RHOME/.config/nvim/dracula.vim \
  && cp $HOME/.dotfiles/neovim/dracula.vim $RHOME/.config/nvim/colors/
-nvim --headless +PlugInstall +qall
+"$NVIM_BIN_DIR/nvim" --headless +PlugInstall +qall
 
-# Configure tmux
+# MARK: Configure tmux
 echo "Configuring tmux..."
 cp $HOME/.dotfiles/tmux/.tmux.conf $HOME/
 cp $HOME/.dotfiles/tmux/.tmux.conf $RHOME/
@@ -170,7 +212,11 @@ mkdir -p $HOME/$CODESPACE/scripts
 cp $HOME/.dotfiles/vscode/vsc-tmux.sh $HOME/$CODESPACE/scripts/
 chmod +x $HOME/$CODESPACE/scripts/vsc-tmux.sh
 
-# Cleanup
+###
+##
+# MARK: Wrap up
+
+# Clean up
 echo "Cleaning up..."
 rm -rf $HOME/.dotfiles
 

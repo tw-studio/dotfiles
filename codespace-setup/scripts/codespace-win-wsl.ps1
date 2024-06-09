@@ -242,6 +242,10 @@ fi
   Write-Host "Running codespace setup script in Ubuntu..."
   wsl -d Ubuntu -u root -- bash -c "chmod +x $winspaceUbuntuUnixPath"
   wsl -d Ubuntu -u root -- bash -c $winspaceUbuntuUnixPath
+  if ($LASTEXITCODE -ne 0) {
+    Write-Host "The codespace-ubuntu-wsl script exited with an error: $LASTEXITCODE"
+    exit $LASTEXITCODE
+  }
 
 } else {
 
