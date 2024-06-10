@@ -523,25 +523,23 @@ if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
 $vscodeUserPath = "$env:APPDATA\Code\User"
 $vscSettingsBackupPattern = '^settings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
 $vscKeybindingsBackupPattern = '^keybindings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
-
-# |3.2| Check if both settings and keybindings backup files exist
-$hasSettingsBackup = Find-FilesMatchingPattern -path $vscodeUserPath -pattern $vscSettingsBackupPattern
-$hasKeybindingsBackup = Find-FilesMatchingPattern -path $vscodeUserPath -pattern $vscKeybindingsBackupPattern
+$hasSettingsBackup = Find-FilesMatchingPattern -path $winspaceSetupDir -pattern $vscSettingsBackupPattern
+$hasKeybindingsBackup = Find-FilesMatchingPattern -path $winspaceSetupDir -pattern $vscKeybindingsBackupPattern
 
 if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
   
-  # |3.3| Back up settings and keybindings only when not already backed up
+  # |3.2| Back up settings and keybindings only when not already backed up
   Write-Host "Backups for default settings and keybindings are not found."
   Write-Host "Backing up settings and keybindings files to $winspaceSetupDir..."
   $vscSettingsPath = Join-Path -Path $vscodeUserPath -ChildPath "settings.json"
   $vscKeybindingsPath = Join-Path -Path $vscodeUserPath -ChildPath "keybindings.json"
   $currentDate = Get-Date -Format "yyyy-MM-dd"
-  $backupSettingsFilename = "settings_$currentDate.json"
-  $backupKeybindingsFilename = "keybindings_$currentDate.json"
-  $backupSettingsPath = Join-Path -Path $winspaceSetupDir -ChildPath $backupSettingsFilename
-  $backupKeybindingsPath = Join-Path -Path $winspaceSetupDir -ChildPath $backupKeybindingsFilename
-  if (Test-Path $vscSettingsPath) { Rename-Item -Path $vscSettingsPath -NewName $backupSettingsPath }
-  if (Test-Path $vscKeybindingsPath) { Rename-Item -Path $vscKeybindingsPath -NewName $backupKeybindingsPath }
+  $backupVscSettingsFilename = "settings_$currentDate.json"
+  $backupVscKeybindingsFilename = "keybindings_$currentDate.json"
+  $backupVscSettingsPath = Join-Path -Path $winspaceSetupDir -ChildPath $backupVscSettingsFilename
+  $backupVscKeybindingsPath = Join-Path -Path $winspaceSetupDir -ChildPath $backupVscKeybindingsFilename
+  if (Test-Path $vscSettingsPath) { Rename-Item -Path $vscSettingsPath -NewName $backupVscSettingsPath }
+  if (Test-Path $vscKeybindingsPath) { Rename-Item -Path $vscKeybindingsPath -NewName $backupVscKeybindingsPath }
 
   # |3.4| Download and replace with personal settings and keybindings files
   Write-Host "Downloading personal settings and keybindings into VSCode..."
