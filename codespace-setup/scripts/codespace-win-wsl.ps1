@@ -119,7 +119,7 @@ if (-not (Test-Path -Path $winspaceDir)) {
   Write-Host "Creating winspace in $env:USERPROFILE..."
   New-Item -Path $winspaceSetupDir -ItemType Directory -Force | Out-Null
 
-} else if (-not (Test-Path -Path $winspaceSetupDir)) {
+} elseif (-not (Test-Path -Path $winspaceSetupDir)) {
   
   Write-Host "setup directory in $winspaceDir doesn't exist."
   Write-Host "Creating setup directory in $winspaceDir..."
