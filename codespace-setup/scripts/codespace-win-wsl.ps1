@@ -209,6 +209,7 @@ if ($cleanedWslOutput -like "*Ubuntu*") {
 # >> MARK: |6| Instruct user to initialize Ubuntu distribution
 if ($mustInitializeUbuntu) {
 
+  # Give instructions
   Write-Host ""
   Write-Host "ACTION NEEDED: Ubuntu must be launched a first time to initialize."
   Write-Host "IMPORTANT: If on an Intel Mac, first launch Windows from macOS in System Preferences > Startup Disk to enable virtualization."
@@ -216,12 +217,15 @@ if ($mustInitializeUbuntu) {
   Write-Host "Ubuntu will then silently initialize itself, after which it will show the bash prompt."
   Write-Host "IMPORTANT: Ubuntu initialization may take several minutes without progress indication."
   Write-Host "Once the bash prompt appears, please exit Ubuntu, return to this window, and press Enter to continue."
+  
+  # Require confirmation of understanding
   $readReadyForUbuntu = Read-Host "Are you ready to proceed? (Y/n)"
   if (($readReadyForUbuntu -eq 'n') -or ($readReadyForUbuntu -eq 'N')) {
     Write-Host "Script aborted. Please ensure Ubuntu launches into a bash prompt before rerunning this script."
     exit 1
   }
 
+  # Launch Ubuntu
   $ubuntuApp = Get-StartApps | Where-Object { $_.Name -like "*ubuntu*" }
   if (-not $ubuntuApp) {
     Write-Host "Error: Ubuntu is not found in the Start Menu apps. Aborting."
@@ -229,9 +233,19 @@ if ($mustInitializeUbuntu) {
   }
   $ubuntuAppId = $ubuntuApp.AppID
   Start-Process "shell:AppsFolder\$ubuntuAppId"
+
+  # Instruct user to wait, then enter new Ubuntu user name
   Write-Host ""
   Read-Host "Press Enter after waiting for the bash prompt to appear and exiting Ubuntu"
   $wslUserName = Read-Host "Enter the new user name configured for Ubuntu"
+
+  # Shutdown and innocuously re-launch Ubuntu for good measure
+  Write-Host "Shutting down WSL for good measure and waiting 3 seconds..."
+  wsl --shutdown
+  Start-Sleep -Seconds 3
+  Write-Host "Restarting WSL Ubuntu..."
+  wsl -d Ubuntu -u root -- bash -c "echo 'Ubuntu restarted successfully'"
+  Start-Sleep -Seconds 1
 }
 
 ###
