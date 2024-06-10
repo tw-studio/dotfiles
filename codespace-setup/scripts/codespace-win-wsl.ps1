@@ -10,12 +10,87 @@
 ##
 # MARK: Global variables
 $userProfileName = Split-Path $env:USERPROFILE -leaf
+$windowsAppsDir = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Microsoft/WindowsApps"
+$winspaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "winspace"
+$winspaceSetupDir = Join-Path -Path $winspaceDir -ChildPath "setup"
 $wslUbuntuDrive = "\\wsl.localhost\Ubuntu"
 $wslUserName = Get-WslUserName
 
 ###
 ##
 # MARK: Helper Functions
+
+# >> MARK: Find-FilesMatchingPattern
+function Find-FilesMatchingPattern {
+  param (
+    [string]$path,
+    [string]$pattern
+  )
+
+  # Search for files that match the pattern
+  $matchingFiles = Get-ChildItem -Path $path -File | Where-Object {
+    $_.Name -match $pattern
+  }
+
+  # Return true if any matching files were found, otherwise false
+  return $matchingFiles.Count -gt 0
+}
+
+# >> MARK: Get-RepoAsset
+function Get-RepoAsset {
+  [CmdletBinding()]
+  param (
+    [Parameter(Mandatory=$true)]
+    [string]$Repo,
+
+    [Parameter(Mandatory=$true)]
+    [int]$AssetsIndex,
+
+    [Parameter(Mandatory=$false)]
+    [string]$OutDirectory = $env:TEMP
+  )
+
+  try {
+    # Get the latest releases for the specified repo via the GitHub API Url
+    $apiUrl = "https://api.github.com/repos/$Repo/releases/latest"
+    Write-Host "Getting metadata for latest release of $Repo..."
+    $latestReleases = Invoke-RestMethod -Uri $apiUrl -Headers @{ Accept = 'application/vnd.github.v3+json' }
+
+    # Check if the specified index is valid
+    if ($latestReleases.assets.Count -le $AssetsIndex -or $AssetsIndex -lt 0) {
+      Write-Error "AssetsIndex is out of range."
+      return $null
+    }
+
+    # Get the asset URL and name
+    $assetUrl = $latestReleases.assets[$AssetsIndex].browser_download_url
+    if (-not $assetUrl) {
+      Write-Error "No download URL found at the specified index."
+      return $null
+    }
+    $assetName = $latestReleases.assets[$AssetsIndex].name
+    if (-not $assetName) {
+      Write-Error "No name found at the specified index."
+      return $null
+    }
+
+    # Ensure the output directory exists
+    if (-not (Test-Path $OutDirectory)) {
+      New-Item -Path $OutDirectory -ItemType Directory
+    }
+
+    # Download the file
+    $outputPath = Join-Path -Path $OutDirectory -ChildPath $assetName
+    Write-Host "Downloading $assetName..."
+    Invoke-WebRequest -Uri $assetUrl -OutFile $outputPath
+
+    # Return the path to the downloaded file
+    return $outputPath
+  } catch {
+    Write-Error "An error occurred: $_"
+    return $null
+  }
+}
 
 # >> MARK: Get-WslUserName
 function Get-WslUserName {
@@ -36,7 +111,29 @@ function Get-WslUserName {
 
 ###
 ##
-# MARK: |A| Install WSL and Ubuntu
+# MARK: |A| Create a winspace directory in %USERPROFILE%
+
+if (-not (Test-Path -Path $winspaceDir)) {
+  
+  Write-Host "winspace directory in $env:USERPROFILE doesn't exist."
+  Write-Host "Creating winspace in $env:USERPROFILE..."
+  New-Item -Path $winspaceSetupDir -ItemType Directory -Force | Out-Null
+
+} else if (-not (Test-Path -Path $winspaceSetupDir)) {
+  
+  Write-Host "setup directory in $winspaceDir doesn't exist."
+  Write-Host "Creating setup directory in $winspaceDir..."
+  New-Item -Path $winspaceSetupDir -ItemType Directory -Force | Out-Null
+
+} else {
+
+  Write-Host "winspace directory in $env:USERPROFILE already exists."
+}
+    
+
+###
+##
+# MARK: |B| Install WSL and Ubuntu
 
 Write-Host "Starting..."
 
@@ -93,7 +190,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "WSL distributions are not found."
 
     # Install the WSL 2 Linux kernel update package
-    $kernelUpdatePath = "$env:TEMP\wsl_update_x64.msi"
+    $kernelUpdatePath = "$winspaceSetupDir\wsl_update_x64.msi"
     if (-not (Test-Path $kernelUpdatePath)) {
       Write-Host "Downloading and installing WSL 2 Linux kernel update package for x64 machines..."
       Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -OutFile $kernelUpdatePath
@@ -182,44 +279,20 @@ if ($mustInitializeUbuntu) {
 
 ###
 ##
-# MARK: |B| Create a winspace directory in %USERPROFILE%
-
-$winspaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "winspace"
-if (-not (Test-Path -Path $winspaceDir)) {
-  
-  Write-Host "winspace directory in $env:USERPROFILE doesn't exist."
-  Write-Host "Creating winspace in $env:USERPROFILE..."
-  New-Item -Path $winspaceDir -ItemType Directory | Out-Null
-} else {
-   
-  Write-Host "winspace directory in $env:USERPROFILE already exists."
-}
-    
-###
-##
 # MARK: |C| Invoke codespace-ubuntu-wsl inside Ubuntu
 
-$winspaceScriptsDir = Join-Path -Path $winspaceDir -ChildPath "scripts"
-$winspaceUbuntuWinPath = Join-Path -Path $winspaceScriptsDir -ChildPath "codespace-ubuntu-wsl.sh"
-$winspaceUbuntuUnixPath = $winspaceUbuntuWinPath -replace '^C:\\', '/mnt/c/'
-$winspaceUbuntuUnixPath = $winspaceUbuntuUnixPath -replace '\\', '/'
+$codespaceUbuntuSetupWinPath = Join-Path -Path $winspaceSetupDir -ChildPath "codespace-ubuntu-wsl.sh"
+$codespaceUbuntuSetupUnixPath = $codespaceUbuntuSetupWinPath -replace '^C:\\', '/mnt/c/'
+$codespaceUbuntuSetupUnixPath = $codespaceUbuntuSetupUnixPath -replace '\\', '/'
 
 # >> MARK: |1| Download personal setup script for codespace on Ubuntu
-if (-not (Test-Path $winspaceUbuntuWinPath)) {
-
-  # Create scripts directory in winspace
-  if (-not (Test-Path -Path $winspaceScriptsDir)) {
-
-    Write-Host "scripts directory in winspace doesn't exist."
-    Write-Host "Creating winspace/scripts in $env:USERPROFILE..."
-    New-Item -Path $winspaceScriptsDir -ItemType Directory | Out-Null
-  }
+if (-not (Test-Path $codespaceUbuntuSetupWinPath)) {
 
   # Download script
   Write-Host "Setup script for codespace-ubuntu-wsl is not found."
   Write-Host "Downloading personal setup script for codespace on Ubuntu for WSL..."
-  $codespaceSetupUbuntuUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-ubuntu-wsl.sh"
-  Invoke-WebRequest -Uri $codespaceSetupUbuntuUrl -OutFile $winspaceUbuntuWinPath
+  $codespaceUbuntuSetupUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-ubuntu-wsl.sh"
+  Invoke-WebRequest -Uri $codespaceUbuntuSetupUrl -OutFile $codespaceUbuntuSetupWinPath
 } else {
 
   Write-Host "Setup script for codespace-ubuntu-wsl already exists."
@@ -255,8 +328,8 @@ $wslEtcPasswdPath = "$wslUbuntuDrive\etc\passwd"
 $rootPasswdEntry = Get-Content $wslEtcPasswdPath | Select-String "^root:"
 if (-not ($rootPasswdEntry -and $rootPasswdEntry -match "root:.*:/bin/zsh$")) {
   Write-Host "Running codespace setup script in Ubuntu..."
-  wsl -d Ubuntu -u root -- bash -c "chmod +x $winspaceUbuntuUnixPath"
-  wsl -d Ubuntu -u root -- bash -c $winspaceUbuntuUnixPath
+  wsl -d Ubuntu -u root -- bash -c "chmod +x $codespaceUbuntuSetupUnixPath"
+  wsl -d Ubuntu -u root -- bash -c $codespaceUbuntuSetupUnixPath
   if ($LASTEXITCODE -ne 0) {
     Write-Host "The codespace-ubuntu-wsl script exited with an error: $LASTEXITCODE"
     exit $LASTEXITCODE
@@ -359,12 +432,12 @@ if ($didGenerateSSHKeys) {
 # MARK: |D| Install VSCode
 
 # >> MARK: |1| Download and install VS Code if not already installed
-$vsCodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe"
-if (-not (Test-Path $vsCodePath)) {
+$vscodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe"
+if (-not (Test-Path $vscodePath)) {
   Write-Host "VSCode is not installed."
 
   Write-Host "Downloading installer for VSCode..."
-  $installerPath = "$env:TEMP\VSCodeSetup.exe"
+  $installerPath = "$winspaceSetupDir\VSCodeSetup.exe"
   Invoke-WebRequest -Uri "https://update.code.visualstudio.com/latest/win32-x64-user/stable" -OutFile $installerPath
   
   Write-Host "Running installer for VSCode..."
@@ -411,6 +484,7 @@ if ($vscodeCLIPath) {
   if ($extensionsToInstall -gt 0) {
     Write-Host "Installing extensions: $($extensionsToInstall -join ', ')..."
     & $vscodeCLIPath --install-extension $($extensionsToInstall -join ' ')
+    $didInstallExtension = $true
   } else {
     Write-Host "All VSCode extensions are already installed."
   }
@@ -427,20 +501,8 @@ if ($vscodeCLIPath) {
 }
 if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
 
-  # Create vscode directory in winspace
-  $winspaceVscodeDir = Join-Path -Path $winspaceDir -ChildPath "vscode"
-  if (-not (Test-Path -Path $winspaceVscodeDir)) {
-    
-    Write-Host "vscode directory in $winspaceDir doesn't exist."
-    Write-Host "Creating vscode in $winspaceDir..."
-    New-Item -Path $winspaceVscodeDir -ItemType Directory | Out-Null
-  } else {
-    
-    Write-Host "vscode directory in $winspaceDir already exists."
-  }
-
   # Download box-checker extension file into this directory
-  $boxCheckerPath = Join-Path -Path $winspaceVscodeDir -ChildPath "box-checker-0.0.1.vsix"
+  $boxCheckerPath = Join-Path -Path $winspaceSetupDir -ChildPath "box-checker-0.0.1.vsix"
   if (-not (Test-Path $boxCheckerPath)) {
     
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/box-checker-0.0.1.vsix" -OutFile $boxCheckerPath
@@ -458,51 +520,35 @@ if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
 # >> MARK: |3| Import personal settings and keybindings files
 
 # |3.1| First check whether backup files already exist, and continue only if they don't
-$vsCodeUserPath = "$env:APPDATA\Code\User"
-$settingsBackupPattern = '^settings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
-$keybindingsBackupPattern = '^keybindings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
+$vscodeUserPath = "$env:APPDATA\Code\User"
+$vscSettingsBackupPattern = '^settings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
+$vscKeybindingsBackupPattern = '^keybindings_\d{4}-\d{2}-\d{2}(-\d{4})?\.json$'
 
-# |3.2| Function to search for files matching a pattern
-function Find-FilesMatchingPattern {
-  param (
-    [string]$path,
-    [string]$pattern
-  )
-
-  # Search for files that match the pattern
-  $matchingFiles = Get-ChildItem -Path $path -File | Where-Object {
-    $_.Name -match $pattern
-  }
-
-  # Return true if any matching files were found, otherwise false
-  return $matchingFiles.Count -gt 0
-}
-
-# |3.3| Check if both settings and keybindings backup files exist
-$hasSettingsBackup = Find-FilesMatchingPattern -path $vsCodeUserPath -pattern $settingsBackupPattern
-$hasKeybindingsBackup = Find-FilesMatchingPattern -path $vsCodeUserPath -pattern $keybindingsBackupPattern
+# |3.2| Check if both settings and keybindings backup files exist
+$hasSettingsBackup = Find-FilesMatchingPattern -path $vscodeUserPath -pattern $vscSettingsBackupPattern
+$hasKeybindingsBackup = Find-FilesMatchingPattern -path $vscodeUserPath -pattern $vscKeybindingsBackupPattern
 
 if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
   
-  # |3.4| Back up settings and keybindings only when not already backed up
+  # |3.3| Back up settings and keybindings only when not already backed up
   Write-Host "Backups for default settings and keybindings are not found."
-  Write-Host "Backing up settings and keybindings files to $vsCodeUserPath..."
-  $settingsPath = Join-Path -Path $vsCodeUserPath -ChildPath "settings.json"
-  $keybindingsPath = Join-Path -Path $vsCodeUserPath -ChildPath "keybindings.json"
+  Write-Host "Backing up settings and keybindings files to $winspaceSetupDir..."
+  $vscSettingsPath = Join-Path -Path $vscodeUserPath -ChildPath "settings.json"
+  $vscKeybindingsPath = Join-Path -Path $vscodeUserPath -ChildPath "keybindings.json"
   $currentDate = Get-Date -Format "yyyy-MM-dd"
-  $newSettingsFilename = "settings_$currentDate.json"
-  $newKeybindingsFilename = "keybindings_$currentDate.json"
-  $newSettingsPath = Join-Path -Path $vsCodeUserPath -ChildPath $newSettingsFilename
-  $newKeybindingsPath = Join-Path -Path $vsCodeUserPath -ChildPath $newKeybindingsFilename
-  if (Test-Path $settingsPath) { Rename-Item -Path $settingsPath -NewName $newSettingsPath }
-  if (Test-Path $keybindingsPath) { Rename-Item -Path $keybindingsPath -NewName $newKeybindingsPath }
+  $backupSettingsFilename = "settings_$currentDate.json"
+  $backupKeybindingsFilename = "keybindings_$currentDate.json"
+  $backupSettingsPath = Join-Path -Path $winspaceSetupDir -ChildPath $backupSettingsFilename
+  $backupKeybindingsPath = Join-Path -Path $winspaceSetupDir -ChildPath $backupKeybindingsFilename
+  if (Test-Path $vscSettingsPath) { Rename-Item -Path $vscSettingsPath -NewName $backupSettingsPath }
+  if (Test-Path $vscKeybindingsPath) { Rename-Item -Path $vscKeybindingsPath -NewName $backupKeybindingsPath }
 
-  # |3.5| Download and replace with personal settings and keybindings files
+  # |3.4| Download and replace with personal settings and keybindings files
   Write-Host "Downloading personal settings and keybindings into VSCode..."
-  $settingsUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/win/settings.json"
-  $keybindingsUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/win/keybindings.json"
-  Invoke-WebRequest -Uri $settingsUrl -OutFile $settingsPath
-  Invoke-WebRequest -Uri $keybindingsUrl -OutFile $keybindingsPath
+  $vscSettingsUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/win/settings.json"
+  $vscKeybindingsUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/win/keybindings.json"
+  Invoke-WebRequest -Uri $vscSettingsUrl -OutFile $vscSettingsPath
+  Invoke-WebRequest -Uri $vscKeybindingsUrl -OutFile $vscKeybindingsPath
 } else {
   
   Write-Host "Backups for default settings and keybindings are found."
@@ -528,10 +574,8 @@ if (-not ((Test-Path -Path $fontFilePath1) -and (Test-Path -Path $fontFilePath2)
   Write-Host "Downloading fonts for VSCode..."
   $fontUrl1 = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/fonts/$fontName1"
   $fontUrl2 = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/fonts/$fontName2"
-  $tempDir = "$env:TEMP\FontDownloads"
-  New-Item -ItemType Directory -Force -Path $tempDir
-  $fontTempPath1 = Join-Path -Path $tempDir -ChildPath $fontName1
-  $fontTempPath2 = Join-Path -Path $tempDir -ChildPath $fontName2
+  $fontTempPath1 = Join-Path -Path $winspaceSetupDir -ChildPath $fontName1
+  $fontTempPath2 = Join-Path -Path $winspaceSetupDir -ChildPath $fontName2
   Invoke-WebRequest -Uri $fontUrl1 -OutFile $fontTempPath1
   Invoke-WebRequest -Uri $fontUrl2 -OutFile $fontTempPath2
 
@@ -544,9 +588,6 @@ if (-not ((Test-Path -Path $fontFilePath1) -and (Test-Path -Path $fontFilePath2)
   Invoke-Item $fontTempPath2
   Read-Host "Press Enter after you have finished installing the font."
 
-  # |4.4| Clean up the downloaded files
-  Write-Host "Cleaning up downloads..."
-  Remove-Item -Path $tempDir -Recurse -Force
 } else {
 
   Write-Host "Fonts for VSCode are already installed."
@@ -562,26 +603,23 @@ $alreadyInstalledPowerToys = Get-CimInstance -ClassName Win32_Product |
 if ($alreadyInstalledPowerToys) {
 
   Write-Host "Microsoft PowerToys is already installed."
+
 } else {
 
   Write-Host "Microsoft PowerToys is not installed."
- 
-  # Use the GitHub API URL for fetching metadata about the latest release
-  $repo = "microsoft/PowerToys"
-  $apiUrl = "https://api.github.com/repos/$repo/releases/latest"
-  $latestReleaseAll = Invoke-RestMethod -Uri $apiUrl
 
-  # Download PowerToysUserSetup (assets[4])
-  $latestRelease = $latestReleaseAll.assets[4]
-  $downloadUrl = $latestRelease.browser_download_url
-  $downloadName = $latestRelease.name
-  $downloadPath = Join-Path -Path $env:TEMP -ChildPath $downloadName
-  Write-Host "Downloading $downloadName..."
-  Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath
+  # Use the GitHub API to fetch metadata about the latest release of winget
+  $powerToysRepo = "microsoft/PowerToys"
+  Write-Host "Downloading the latest release from $powerToysRepo..."
+  $powerToysDownloadPath = Get-RepoAsset -Repo "$powerToysRepo" -AssetsIndex 4 -OutDirectory "$winspaceSetupDir"
+  if (-not $powerToysDownloadPath) {
+    Write-Error "Failed to download Microsoft PowerToys."
+    exit 1
+  }
 
-  # Run the downloaded exe installer
-  Write-Host "Installing $downloadName..."
-  Start-Process -FilePath $downloadPath -Wait
+  # Install PowerToys
+  Write-Host "Installing Microsoft PowerToys..."
+  Start-Process -FilePath "$powerToysDownloadPath" -Wait
 
   # Wait for user to install PowerToys
   Write-Host "The Keyboard Manager PowerToy is useful for remapping Caps Lock to Esc."
@@ -598,33 +636,21 @@ if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
   
   Write-Host "NuGet CLI is not installed."
 
-  # Download NuGet CLI and add to PATH
+  # Download NuGet CLI to WindowsApps directory
   $nugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-  $nugetDir = "$env:USERPROFILE"
+  $nugetDir = "$windowsAppsDir"
   $nugetPath = "$nugetDir\nuget.exe"
-  if (-not (Test-Path -Path $nugetPath)) {
+  if (-not (Test-Path -Path "$nugetPath")) {
     Write-Host "nuget.exe is not downloaded."
-    Write-Host "Downloading NuGet to $nugetDir and adding to PATH..."
-    Invoke-WebRequest -Uri $nugetUrl -OutFile $nugetPath
+    Write-Host "Downloading NuGet to $nugetDir..."
+    Invoke-WebRequest -Uri $nugetUrl -OutFile "$nugetPath"
   } else {
     Write-Host "nuget.exe is already downloaded."
-  }
-  Write-Host "Adding $nugetDir to PATH..."
-  $envPathMachine = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
-  $envPathMachineArray = $envPathMachine -split ';'
-  if (-not ($envPathMachineArray -contains $nugetDir)) {
-    $newEnvPath = "$envPath;$nugetDir"
-    [System.Environment]::SetEnvironmentVariable("PATH", $newEnvPath, "Machine")
-  }
-  $envPath = $env:Path
-  $envPathArray = $envPath -split ';'
-  if (-not ($envPathArray -contains $nugetDir)) {
-    $env:Path += ";$nugetDir"
   }
 
   # Verify installation
   if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
-    Write-Host "Failed to install NuGet CLI."
+    Write-Error "Failed to install NuGet CLI."
     exit 1
   }
 } else {
@@ -634,11 +660,12 @@ if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
 
 # >> MARK: |2| Use NuGet to install Microsoft.UI.Xaml framework dependency for WinGet
 $xamlPackageName = "Microsoft.UI.Xaml"
-$nugetGlobalPackagesPath = Join-Path -Path $env:USERPROFILE -ChildPath ".nuget\packages\$xamlPackageName"
-if (-not (Test-Path -Path $nugetGlobalPackagesPath)) {
+$nugetGlobalPackagesPath = Join-Path -Path "$env:USERPROFILE" -ChildPath ".nuget\packages"
+$xamlPackagePath = Join-Path "$nugetGlobalPackagesPath" -ChildPath "$xamlPackageName"
+if (-not (Test-Path -Path "$xamlPackagePath")) {
   Write-Host "$xamlPackageName >=2.8 framework is not already installed."
   Write-Host "Installing $xamlPackageName..."
-  nuget install $xamlPackageName -OutputDirectory $nugetGlobalPackagesPath
+  nuget install $xamlPackageName -OutputDirectory "$xamlPackagePath"
 } else {
   Write-Host "$xamlPackageName >=2.8 is already installed."
 }
@@ -649,25 +676,18 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
   Write-Host "winget-cli (Microsoft.DesktopAppInstaller) is not already installed."
 
-  # Use the GitHub API URL to fetch metadata about the latest release of winget
-  $repo = "microsoft/winget-cli"
-  $apiUrl = "https://api.github.com/repos/$repo/releases/latest"
-  $latestReleaseAll = Invoke-RestMethod -Uri $apiUrl
-  $latestRelease = $latestReleaseAll.assets[2]
-  $downloadUrl = $latestRelease.browser_download_url
-  $downloadName = $latestRelease.name
-  $downloadPath = Join-Path -Path $env:TEMP -ChildPath $downloadName
-
-  # Check if the winget-cli latest release is already downloaded
-  if (-not (Test-Path -Path $downloadPath)) {
-    Write-Host "Downloading $downloadName..."
-    Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath
-  } else {
-    Write-Host "$downloadName is already downloaded."
+  # Use the GitHub API to fetch metadata about the latest release of winget
+  $wingetCliRepo = "microsoft/winget-cli"
+  Write-Host "Getting latest release info from $wingetCliRepo..."
+  $wingetCliDownloadPath = Get-RepoAsset -Repo "$wingetCliRepo" -AssetsIndex 2 -OutDirectory $winspaceSetupDir
+  if (-not $wingetCliDownloadPath) {
+    Write-Error "Failed to download winget-cli."
+    exit 1
   }
-  
+
+  # Install winget
   Write-Host "Installing $wingetPackageName..."
-  Add-AppxPackage -Path $downloadPath
+  Add-AppxPackage -Path $wingetCliDownloadPath
 } else {
 
   Write-Host "$wingetPackageName is already installed."
@@ -691,8 +711,8 @@ if (-not $wingetListWindowsTerminalOutput) {
 }
 
 # >> MARK: |2| Launch Windows Terminal once when settings.json isn't found
-$settingsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-if (-not (Test-Path -Path $settingsPath)) {
+$windowsTerminalSettingsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+if (-not (Test-Path -Path $windowsTerminalSettingsPath)) {
 
   Write-Host "Settings file for Windows Terminal is not found."
 
@@ -706,44 +726,44 @@ if (-not (Test-Path -Path $settingsPath)) {
 }
 
 # >> MARK: |3| Modify settings for Windows Terminal
-if (Test-Path -Path $settingsPath) {
+if (Test-Path -Path $windowsTerminalSettingsPath) {
 
-  $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
+  $wtSettings = Get-Content -Path $windowsTerminalSettingsPath -Raw | ConvertFrom-Json
 
   # Check if settings has already been modified by this script by checking if "tw" scheme exists
-  if ($settings.schemes -and ($settings.schemes | Where-Object { $_.name -eq "tw" }).Count -gt 0) {
+  if ($wtSettings.schemes -and ($wtSettings.schemes | Where-Object { $_.name -eq "tw" }).Count -gt 0) {
 
     Write-Host "Customizing settings for Windows Terminal..."
     
     # Update global settings
-    $settings | Add-Member -NotePropertyName "alwaysShowTabs" -NotePropertyValue $false -Force
-    $settings | Add-Member -NotePropertyName "confirmCloseAllTabs" -NotePropertyValue $false -Force
-    $settings | Add-Member -NotePropertyName "showTabsInTitlebar" -NotePropertyValue $true -Force
-    $settings | Add-Member -NotePropertyName "theme" -NotePropertyValue "dark" -Force
-    $settings | Add-Member -NotePropertyName "initialCols" -NotePropertyValue 120 -Force
-    $settings | Add-Member -NotePropertyName "initialPosition" -NotePropertyValue "150,75" -Force
-    $settings | Add-Member -NotePropertyName "initialRows" -NotePropertyValue 32 -Force
-    $settings | Add-Member -NotePropertyName "showTerminalTitleInTitlebar" -NotePropertyValue $false -Force
-    $settings | Add-Member -NotePropertyName "tabWidthMode" -NotePropertyValue "equal" -Force
+    $wtSettings | Add-Member -NotePropertyName "alwaysShowTabs" -NotePropertyValue $false -Force
+    $wtSettings | Add-Member -NotePropertyName "confirmCloseAllTabs" -NotePropertyValue $false -Force
+    $wtSettings | Add-Member -NotePropertyName "showTabsInTitlebar" -NotePropertyValue $true -Force
+    $wtSettings | Add-Member -NotePropertyName "theme" -NotePropertyValue "dark" -Force
+    $wtSettings | Add-Member -NotePropertyName "initialCols" -NotePropertyValue 120 -Force
+    $wtSettings | Add-Member -NotePropertyName "initialPosition" -NotePropertyValue "150,75" -Force
+    $wtSettings | Add-Member -NotePropertyName "initialRows" -NotePropertyValue 32 -Force
+    $wtSettings | Add-Member -NotePropertyName "showTerminalTitleInTitlebar" -NotePropertyValue $false -Force
+    $wtSettings | Add-Member -NotePropertyName "tabWidthMode" -NotePropertyValue "equal" -Force
 
     # Update default profile settings, safely
-    if (-not $settings.psobject.Properties.Match("profiles").Count) {
-      $settings | Add-Member -NotePropertyName "profiles" -NotePropertyValue @{} -Force
+    if (-not $wtSettings.psobject.Properties.Match("profiles").Count) {
+      $wtSettings | Add-Member -NotePropertyName "profiles" -NotePropertyValue @{} -Force
     }
-    if (-not $settings.profiles.psobject.Properties.Match("defaults").Count) {
-      $settings.profiles | Add-Member -NotePropertyName "defaults" -NotePropertyValue @{} -Force
+    if (-not $wtSettings.profiles.psobject.Properties.Match("defaults").Count) {
+      $wtSettings.profiles | Add-Member -NotePropertyName "defaults" -NotePropertyValue @{} -Force
     }
-    if (-not $settings.profiles.defaults.psobject.Properties.Match("font").Count) {
-      $settings.profiles.defaults | Add-Member -NotePropertyName "font" -NotePropertyValue @{} -Force
+    if (-not $wtSettings.profiles.defaults.psobject.Properties.Match("font").Count) {
+      $wtSettings.profiles.defaults | Add-Member -NotePropertyName "font" -NotePropertyValue @{} -Force
     }
-    $settings.profiles.defaults | Add-Member -NotePropertyName "colorScheme" -NotePropertyValue "tw" -Force
-    $settings.profiles.defaults | Add-Member -NotePropertyName "historySize" -NotePropertyValue 9001 -Force
-    $settings.profiles.defaults | Add-Member -NotePropertyName "opacity" -NotePropertyValue 90 -Force
-    $settings.profiles.defaults | Add-Member -NotePropertyName "padding" -NotePropertyValue "8" -Force
-    $settings.profiles.defaults | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "%USERPROFILE%/codespace" -Force
-    $settings.profiles.defaults | Add-Member -NotePropertyName "useAcrylic" -NotePropertyValue $true -Force
-    $settings.profiles.defaults.font | Add-Member -NotePropertyName "face" -NotePropertyValue "MesloLGLDZ Nerd Font Mono" -Force
-    $settings.profiles.defaults.font | Add-Member -NotePropertyName "size" -NotePropertyValue 10 -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "colorScheme" -NotePropertyValue "tw" -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "historySize" -NotePropertyValue 9001 -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "opacity" -NotePropertyValue 90 -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "padding" -NotePropertyValue "8" -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "%USERPROFILE%/codespace" -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "useAcrylic" -NotePropertyValue $true -Force
+    $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "face" -NotePropertyValue "MesloLGLDZ Nerd Font Mono" -Force
+    $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "size" -NotePropertyValue 10 -Force
 
     # Add custom color scheme
     $twScheme = @{
@@ -769,13 +789,13 @@ if (Test-Path -Path $settingsPath) {
       white = "#f7f1ff"
       yellow = "#fce566"
     }
-    if (-not $settings.schemes) { $settings.schemes = @() }
-    if (-not ($settings.schemes | Where-Object { $_.name -eq "tw" })) {
-      $settings.schemes += $twScheme
+    if (-not $wtSettings.schemes) { $wtSettings.schemes = @() }
+    if (-not ($wtSettings.schemes | Where-Object { $_.name -eq "tw" })) {
+      $wtSettings.schemes += $twScheme
     }
 
     # Save the updated settings back to the file
-    $settings | ConvertTo-Json -Depth 100 | Set-Content -Path $settingsPath
+    $wtSettings | ConvertTo-Json -Depth 100 | Set-Content -Path $windowsTerminalSettingsPath
 
     Write-Host "Customizing settings for Windows Terminal completed."
   } else {
@@ -792,24 +812,24 @@ if (Test-Path -Path $settingsPath) {
 ##
 # MARK: |H| Install NeoVim for Windows
 
-$neovimId = "Neovim.Neovim"
-$wingetListNeovimOutput = winget list -q $neovimId
-if (-not $wingetListNeovimOutput) {
+# $neovimId = "Neovim.Neovim"
+# $wingetListNeovimOutput = winget list -q $neovimId
+# if (-not $wingetListNeovimOutput) {
 
-  Write-Host "Neovim for Windows is not installed."
-  Write-Host "Installing Neovim with winget..."
-  winget install Neovim.Neovim
-} else {
+#   Write-Host "Neovim for Windows is not installed."
+#   Write-Host "Installing Neovim with winget..."
+#   winget install Neovim.Neovim
+# } else {
 
-  Write-Host "Neovim for Windows is already installed."
-}
+#   Write-Host "Neovim for Windows is already installed."
+# }
 
 ###
 ##
 # MARK: |X| Recommend next steps
 
 # Only show recommended tasks related to modifications made in this script run.
-if (-not ($didInstallPowerToys -or $didGenerateSSHKeys)) {
+if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension) {
 
   Write-Host ""
   Write-Host "Recommended next steps:"
