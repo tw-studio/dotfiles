@@ -697,12 +697,12 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
 # >> MARK: |1| Install Windows Terminal via winget
 $windowsTerminalId = "Microsoft.WindowsTerminal"
-$wingetListWindowsTerminalOutput = winget list -q $windowsTerminalId
+$wingetListWindowsTerminalOutput = winget list -q $windowsTerminalId --accept-source-agreements
 if (-not $wingetListWindowsTerminalOutput) {
 
   Write-Host "$windowsTerminalId is not already installed by $wingetPackageName."
   Write-Host "Installing $windowsTerminalId..."
-  winget install --id=Microsoft.WindowsTerminal -e
+  winget install --id=Microsoft.WindowsTerminal -e --accept-source-agreements --accept-package-agreements
 } else {
   
   Write-Host "$windowsTerminalId is already installed."
@@ -713,6 +713,11 @@ $windowsTerminalSettingsPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Pac
 if (-not (Test-Path -Path $windowsTerminalSettingsPath)) {
 
   Write-Host "Settings file for Windows Terminal is not found."
+
+  if (-not (winget list -q "$windowsTerminalId" | Select-String "$windowsTerminalId")) {
+    Write-Error "Windows Terminal is unexpectedly not installed. Can't launch wt to initialize its settings."
+    exit 1
+  }
 
   Write-Host "Launching Windows Terminal to automatically create its settings.json file..."
   Start-Process wt
