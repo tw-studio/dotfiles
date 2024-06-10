@@ -196,6 +196,18 @@ if ($LASTEXITCODE -ne 0) {
       Write-Host "Downloading and installing WSL 2 Linux kernel update package for x64 machines..."
       Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -OutFile $kernelUpdatePath
       Start-Process -FilePath $kernelUpdatePath -Args "/quiet" -Wait
+
+      # Restart computer
+      Write-Host "Updating the WSL 2 Linux kernel requires a restart."
+      Write-Host "Not restarting before continuing the script may result in unexpected errors."
+      $userConfirmation = Read-Host "Do you want to restart the computer now? (Y/n)"
+      if ($userConfirmation -eq 'N' -or $userConfirmation -eq 'n') {
+        Write-Host "Restart aborted. Please remember to manually restart later before retrying the script."
+        exit 1
+      } else {
+        Write-Host "Restarting the computer..."
+        Restart-Computer
+      }
     } else {
       Write-Host "WSL 2 Linux kernel update package is already downloaded and likely installed."
     }
@@ -211,7 +223,6 @@ if ($LASTEXITCODE -ne 0) {
     }
     
     $readyToInstallUbuntu = $true
-    
   }
   
 } else {
@@ -832,18 +843,19 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
 ###
 ##
-# MARK: Recommended next steps
+# MARK: Suggested next steps
 
-# Only show recommended tasks related to modifications made in this script run.
+# Only show suggested tasks related to modifications made in this script run.
 if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $didInstallVSCode) {
 
   Write-Host ""
-  Write-Host "Recommended next steps:"
+  Write-Host "Suggested next steps:"
 
   if ($didGenerateSSHKeys) { Write-Host "- Add the generated SSH public key to your GitHub account."}
-  if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar"}
+  if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar."}
   if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
   if ($didInstallVSCode) { Write-Host "- Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification."}
+  Write-Host "- (optional) Clean up the directory $winspaceSetupDir."
 
   Write-Host "Complete."
 } else {
