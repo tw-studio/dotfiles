@@ -102,6 +102,7 @@ function Get-WslUserName {
 ###
 ##
 # MARK: Global variables
+
 $userProfileName = Split-Path $env:USERPROFILE -leaf
 $windowsAppsDir = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Microsoft/WindowsApps"
 $winspaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "winspace"
