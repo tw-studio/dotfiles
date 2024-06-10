@@ -672,23 +672,23 @@ if (-not (Test-Path -Path "$xamlPackagePath")) {
 $wingetPackageName = "Microsoft.DesktopAppInstaller"
 if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
-  Write-Host "winget-cli (Microsoft.DesktopAppInstaller) is not already installed."
+  Write-Host "winget-cli ($wingetPackageName) is not already installed."
 
   # Use the GitHub API to fetch metadata about the latest release of winget
   $wingetCliRepo = "microsoft/winget-cli"
   Write-Host "Getting latest release info from $wingetCliRepo..."
   $wingetCliDownloadPath = Get-RepoAsset -Repo "$wingetCliRepo" -AssetsIndex 2 -OutDirectory $winspaceSetupDir
   if (-not $wingetCliDownloadPath) {
-    Write-Error "Failed to download winget-cli."
+    Write-Error "Failed to download winget-cli ($wingetPackageName)."
     exit 1
   }
 
   # Install winget
-  Write-Host "Installing $wingetPackageName..."
+  Write-Host "Installing winget-cli ($wingetPackageName)..."
   Add-AppxPackage -Path $wingetCliDownloadPath
 } else {
 
-  Write-Host "$wingetPackageName is already installed."
+  Write-Host "winget-cli ($wingetPackageName) is already installed."
 }
 
 ###
