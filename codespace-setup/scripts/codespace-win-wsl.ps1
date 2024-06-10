@@ -585,9 +585,12 @@ if ($alreadyInstalledPowerToys) {
 
   # Use the GitHub API to fetch metadata about the latest release of winget
   $powerToysRepo = "microsoft/PowerToys"
-  Write-Host "Downloading the latest release from $powerToysRepo..."
-  $powerToysDownloadPath = Get-RepoAsset -Repo "$powerToysRepo" -AssetsIndex 7 -OutDirectory "$winspaceSetupDir"
-  if (-not $powerToysDownloadPath) {
+  $powerToysDownloadName = "PowerToysUserSetup-0.81.1-x64.exe"
+  $powerToysDownloadUrl = "https://github.com/microsoft/PowerToys/releases/download/v0.81.1/$powerToysDownloadName"
+  $powerToysDownloadPath = Join-Path -Path "$winspaceSetupDir" -ChildPath $powerToysDownloadName
+  Write-Host "Downloading $powerToysDownloadName from $powerToysRepo..."
+  Invoke-WebRequest -Uri "$powerToysDownloadUrl" -OutFile "$powerToysDownloadPath"
+  if (-not (Test-Path "$powerToysDownloadPath")) {
     Write-Error "Failed to download Microsoft PowerToys."
     exit 1
   }
