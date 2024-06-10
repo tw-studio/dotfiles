@@ -379,24 +379,10 @@ if (-not (Test-Path $vsCodePath)) {
 $vscodeCLIPath = "$env:USERPROFILE\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $vscodeCLIPath)) { $vscodeCLIPath = "C:\Program Files\Microsoft VS Code\bin\code.cmd" }
 
+# |2.2| Install all desired third-party extensions not already installed
 if ($vscodeCLIPath) {
-
-  # |2.2| Function to install a VSCode extension by id only when not already installed
-  function Install-VSCodeExtension {
-    Param([string]$ExtensionId)
-    $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
-    $installedExtensions = & $vscodeCLIPath --list-extensions
-    if ($baseExtensionId -notin $installedExtensions) {
-      Write-Host "Installing extension: $ExtensionId..."
-      & $vscodeCLIPath --install-extension $ExtensionId
-      $didInstallExtension = $true
-    } else {
-      Write-Host "Extension $ExtensionId is already installed."
-    }
-  }
-
-  # |2.3| Install extensions by id
-  @(
+  
+  $allExtensions = @(
     # Most Important
     "alefragnani.project-manager",
     "asvetliakov.vscode-neovim@0.0.42",
@@ -417,15 +403,23 @@ if ($vscodeCLIPath) {
     "spywhere.mark-jump",
     "tyriar.sort-lines",
     "wayou.vscode-todo-highlight"
-  ) | ForEach-Object {
-    Install-VSCodeExtension $_
+  )
+  
+  # Install only extensions not already installed
+  $installedExtensions = & $vscodeCLIPath --list-extensions
+  $extensionsToInstall = $allExtensions | Where-Object { $_ -split '@' | Select-Object -First 1 -notin $installedExtensions }
+  if ($extensionsToInstall -gt 0) {
+    Write-Host "Installing extensions: $($extensionsToInstall -join ', ')..."
+    & $vscodeCLIPath --install-extension $($extensionsToInstall -join ' ')
+  } else {
+    Write-Host "All VSCode extensions are already installed."
   }
 } else {
 
   Write-Host "VSCode binary is not found."
 }
 
-# |2.4| Install personal box-checker extension
+# |2.3| Install personal box-checker extension
 
 # Create vscode directory in winspace
 $winspaceVscodeDir = Join-Path -Path $winspaceDir -ChildPath "vscode"
