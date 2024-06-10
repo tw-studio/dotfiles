@@ -333,7 +333,7 @@ if ($didGenerateSSHKeys) {
 
   # Take the opportunity to set private key permissions to 600
   if ($sshKeyName) {
-    wsl -d Ubuntu -u $wslUserName -- bash -c "chmod 600 $wslUserSSHDir/$sshKeyName"
+    wsl -d Ubuntu -u $wslUserName -- bash -c "chmod 600 ~/.ssh/$sshKeyName"
   }
 
   # Configure ssh-agent and funtoo/keychain with SSH key
