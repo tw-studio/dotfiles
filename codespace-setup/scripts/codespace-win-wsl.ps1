@@ -204,9 +204,10 @@ $winspaceUbuntuWinPath = Join-Path -Path $winspaceScriptsDir -ChildPath "codespa
 $winspaceUbuntuUnixPath = $winspaceUbuntuWinPath -replace '^C:\\', '/mnt/c/'
 $winspaceUbuntuUnixPath = $winspaceUbuntuUnixPath -replace '\\', '/'
 
+# >> MARK: |1| Download personal setup script for codespace on Ubuntu
 if (-not (Test-Path $winspaceUbuntuWinPath)) {
 
-  # >> MARK: |1| Create scripts directory in winspace
+  # Create scripts directory in winspace
   if (-not (Test-Path -Path $winspaceScriptsDir)) {
 
     Write-Host "scripts directory in winspace doesn't exist."
@@ -214,13 +215,20 @@ if (-not (Test-Path $winspaceUbuntuWinPath)) {
     New-Item -Path $winspaceScriptsDir -ItemType Directory | Out-Null
   }
 
-  # >> MARK: |2| Download personal setup script for codespace on Ubuntu
+  # Download script
   Write-Host "Setup script for codespace-ubuntu-wsl is not found."
   Write-Host "Downloading personal setup script for codespace on Ubuntu for WSL..."
   $codespaceSetupUbuntuUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/codespace-setup/scripts/codespace-ubuntu-wsl.sh"
   Invoke-WebRequest -Uri $codespaceSetupUbuntuUrl -OutFile $winspaceUbuntuWinPath
-  
-  # >> MARK: |3| Fix nameserver in wsl.conf and resolv.conf
+} else {
+
+  Write-Host "Setup script for codespace-ubuntu-wsl already exists."
+}
+
+# >> MARK: |2| Fix nameserver in wsl.conf and resolv.conf
+$wslResolvConfPath = "$wslUbuntuDrive\etc\resolv.conf"
+if (-not (Select-String -Path $wslResolvConfPath -Pattern "nameserver 8.8.8.8" -Quiet)) {
+
   Write-Host "Fixing wsl.conf in Ubuntu..."
   $appendWslConfLines = @"
 [network]
@@ -237,8 +245,15 @@ fi
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f +i /etc/resolv.conf"
+} else {
 
-  # >> MARK: |4| Run codespace setup in Ubuntu
+  Write-Host "wsl.conf and resolv.conf is already fixed."
+}
+
+# >> MARK: |3| Run codespace setup in Ubuntu
+$wslEtcPasswdPath = "$wslUbuntuDrive\etc\passwd"
+$rootPasswdEntry = Get-Content $wslEtcPasswdPath | Select-String "^root:"
+if (-not ($rootPasswdEntry -and $rootPasswdEntry -match "root:.*:/bin/zsh$")) {
   Write-Host "Running codespace setup script in Ubuntu..."
   wsl -d Ubuntu -u root -- bash -c "chmod +x $winspaceUbuntuUnixPath"
   wsl -d Ubuntu -u root -- bash -c $winspaceUbuntuUnixPath
@@ -246,10 +261,9 @@ fi
     Write-Host "The codespace-ubuntu-wsl script exited with an error: $LASTEXITCODE"
     exit $LASTEXITCODE
   }
-
 } else {
 
-  Write-Host "Setup script for codespace-ubuntu-wsl already exists."
+  Write-Host "Codespace setup script for Ubuntu has already completed successfully."
 }
 
 ###

@@ -224,14 +224,14 @@ rm -rf $HOME/.dotfiles
 echo "Giving user ownership of their directory..."
 chown -R $USER $HOME
 
-# Set default shell for root
-echo "Setting default shell for root..."
-perl -i -pe 's:/bin/bash:/bin/zsh:' /etc/passwd
-
 # Fix insecure completion-dependent directories permissions
 echo "Fixing insecure completion-dependent directories permissions..."
 chmod g-w,o-w $HOME/.oh-my-zsh
 chmod g-w,o-w $RHOME/.oh-my-zsh
+
+# Set default shell for root
+echo "Setting default shell for root..."
+perl -i -pe 's:/bin/bash:/bin/zsh:' /etc/passwd
 
 # Start zsh in codespace
 # mkdir -p $HOME/$CODESPACE
