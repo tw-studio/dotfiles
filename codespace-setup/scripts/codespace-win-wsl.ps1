@@ -454,7 +454,10 @@ if ($vscodeCLIPath) {
   
   # Install only extensions not already installed
   $installedExtensions = & $vscodeCLIPath --list-extensions
-  $extensionsToInstall = $allExtensions | Where-Object { $_ -split '@' | Select-Object -First 1 -notin $installedExtensions }
+  $extensionsToInstall = $allExtensions | Where-Object {
+    $baseExtensionId = $_ -split '@' | Select-Object -First 1
+    $baseExtensionId -notin $installedExtensions
+  }
   if ($extensionsToInstall -gt 0) {
     Write-Host "Installing extensions: $($extensionsToInstall -join ', ')..."
     & $vscodeCLIPath --install-extension $($extensionsToInstall -join ' ')
@@ -555,10 +558,10 @@ if (-not ((Test-Path -Path $fontFilePath1) -and (Test-Path -Path $fontFilePath2)
   Write-Host "Installing fonts requires completing the installations in the dialogs that appear."
   Write-Host "Installing $fontName1..."
   Invoke-Item $fontTempPath1
-  Read-Host "Press Enter after you have finished installing the font."
+  Read-Host "Press Enter after you have finished installing the font"
   Write-Host "Installing $fontName2..."
   Invoke-Item $fontTempPath2
-  Read-Host "Press Enter after you have finished installing the font."
+  Read-Host "Press Enter after you have finished installing the font"
 
 } else {
 
@@ -583,7 +586,7 @@ if ($alreadyInstalledPowerToys) {
   # Use the GitHub API to fetch metadata about the latest release of winget
   $powerToysRepo = "microsoft/PowerToys"
   Write-Host "Downloading the latest release from $powerToysRepo..."
-  $powerToysDownloadPath = Get-RepoAsset -Repo "$powerToysRepo" -AssetsIndex 4 -OutDirectory "$winspaceSetupDir"
+  $powerToysDownloadPath = Get-RepoAsset -Repo "$powerToysRepo" -AssetsIndex 7 -OutDirectory "$winspaceSetupDir"
   if (-not $powerToysDownloadPath) {
     Write-Error "Failed to download Microsoft PowerToys."
     exit 1
