@@ -375,11 +375,11 @@ if (-not (Test-Path $vsCodePath)) {
 
 # >> MARK: |2| Install extensions
 
-# |2.1| Define the path to code CLI command
+# Define the path to code CLI command
 $vscodeCLIPath = "$env:USERPROFILE\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $vscodeCLIPath)) { $vscodeCLIPath = "C:\Program Files\Microsoft VS Code\bin\code.cmd" }
 
-# |2.2| Install all desired third-party extensions not already installed
+# >>>> MARK: |2.1| Install all desired third-party extensions not already installed
 if ($vscodeCLIPath) {
   
   $allExtensions = @(
@@ -419,36 +419,39 @@ if ($vscodeCLIPath) {
   Write-Host "VSCode binary is not found."
 }
 
-# |2.3| Install personal box-checker extension
+# >>>> MARK: |2.2| Install personal box-checker extension
 
-# Create vscode directory in winspace
-$winspaceVscodeDir = Join-Path -Path $winspaceDir -ChildPath "vscode"
-if (-not (Test-Path -Path $winspaceVscodeDir)) {
-  
-  Write-Host "vscode directory in $winspaceDir doesn't exist."
-  Write-Host "Creating vscode in $winspaceDir..."
-  New-Item -Path $winspaceVscodeDir -ItemType Directory | Out-Null
-} else {
-   
-  Write-Host "vscode directory in $winspaceDir already exists."
-}
-
-# Download box-checker extension file into this directory
-$boxCheckerPath = Join-Path -Path $winspaceVscodeDir -ChildPath "box-checker-0.0.1.vsix"
-if (-not (Test-Path $boxCheckerPath)) {
-  
-  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/box-checker-0.0.1.vsix" -OutFile $boxCheckerPath
-}
-
-# Install box-checker extension from vsix
 $boxCheckerId = "tw.box-checker"
-if ($boxCheckerId -notin $installedExtensions) {
+if ($vscodeCLIPath) {
+  $installedExtensions = & $vscodeCLIPath --list-extensions
+}
+if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
 
-  Write-Host "Installing extension: $boxCheckerId..."
-  & $vscodeCLIPath --install-extension $boxCheckerPath
-  $didInstallExtension = $true
+  # Create vscode directory in winspace
+  $winspaceVscodeDir = Join-Path -Path $winspaceDir -ChildPath "vscode"
+  if (-not (Test-Path -Path $winspaceVscodeDir)) {
+    
+    Write-Host "vscode directory in $winspaceDir doesn't exist."
+    Write-Host "Creating vscode in $winspaceDir..."
+    New-Item -Path $winspaceVscodeDir -ItemType Directory | Out-Null
+  } else {
+    
+    Write-Host "vscode directory in $winspaceDir already exists."
+  }
+
+  # Download box-checker extension file into this directory
+  $boxCheckerPath = Join-Path -Path $winspaceVscodeDir -ChildPath "box-checker-0.0.1.vsix"
+  if (-not (Test-Path $boxCheckerPath)) {
+    
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/box-checker-0.0.1.vsix" -OutFile $boxCheckerPath
+  }
+
+  # Install box-checker extension from vsix
+    Write-Host "Installing extension: $boxCheckerId..."
+    & $vscodeCLIPath --install-extension $boxCheckerPath
+    $didInstallExtension = $true
 } else {
-
+  
   Write-Host "Extension $boxCheckerId is already installed."
 }
 
