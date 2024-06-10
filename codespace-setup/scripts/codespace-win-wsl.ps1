@@ -8,16 +8,6 @@
 
 ###
 ##
-# MARK: Global variables
-$userProfileName = Split-Path $env:USERPROFILE -leaf
-$windowsAppsDir = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Microsoft/WindowsApps"
-$winspaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "winspace"
-$winspaceSetupDir = Join-Path -Path $winspaceDir -ChildPath "setup"
-$wslUbuntuDrive = "\\wsl.localhost\Ubuntu"
-$wslUserName = Get-WslUserName
-
-###
-##
 # MARK: Helper Functions
 
 # >> MARK: Find-FilesMatchingPattern
@@ -95,7 +85,7 @@ function Get-RepoAsset {
 # >> MARK: Get-WslUserName
 function Get-WslUserName {
   param (
-    [string]$WslUbuntuDrivePath = $wslUbuntuDrive
+    [string]$WslUbuntuDrivePath = "\\wsl.localhost\Ubuntu"
   )
   
   # Attempt to get WSL home directories
@@ -108,6 +98,16 @@ function Get-WslUserName {
     return $null
   }
 }
+
+###
+##
+# MARK: Global variables
+$userProfileName = Split-Path $env:USERPROFILE -leaf
+$windowsAppsDir = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Microsoft/WindowsApps"
+$winspaceDir = Join-Path -Path $env:USERPROFILE -ChildPath "winspace"
+$winspaceSetupDir = Join-Path -Path $winspaceDir -ChildPath "setup"
+$wslUbuntuDrive = "\\wsl.localhost\Ubuntu"
+$wslUserName = Get-WslUserName
 
 ###
 ##
