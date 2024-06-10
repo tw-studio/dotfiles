@@ -166,94 +166,39 @@ if ($enabledWSLOrVMP) {
   }
 }
 
-# >> MARK: |2| Install WSL 2 kernel update package and distribution only if no distributions are installed
-$readyToInstallUbuntu = $false
-$mustInitializeUbuntu = $false
+# >> MARK: |2| Check for WSL upgrade race condition
 $wslOutput = wsl -l -v 2>&1
 if ($LASTEXITCODE -ne 0) {
-  
-  # Restart system when WSL is finishing an upgrade
   if ($wslOutput -like "*WSL is finishing an upgrade*") {
 
     Write-Host "WSL is finishing an upgrade and may require a restart."
-    $userConfirmation = Read-Host "Do you want to restart the computer now? (y/N)"
-    if ($userConfirmation -eq 'Y' -or $userConfirmation -eq 'y') {
-      Write-Host "Restarting the computer..."
-      Restart-Computer
-    } else {
+    $userConfirmation = Read-Host "Do you want to restart the computer now? (Y/n)"
+    if ($userConfirmation -eq 'N' -or $userConfirmation -eq 'n') {
       Write-Host "Restart aborted. Please remember to manually restart the computer later."
       exit 1
-    }
-  
-  # Install and configure WSL update package and distribution otherwise
-  } else {
-
-    Write-Host "WSL distributions are not found."
-
-    # Install the WSL 2 Linux kernel update package
-    $kernelUpdatePath = "$winspaceSetupDir\wsl_update_x64.msi"
-    if (-not (Test-Path $kernelUpdatePath)) {
-      Write-Host "Downloading and installing WSL 2 Linux kernel update package for x64 machines..."
-      Invoke-WebRequest -Uri "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -OutFile $kernelUpdatePath
-      Start-Process -FilePath $kernelUpdatePath -Args "/quiet" -Wait
-
-      # Restart computer
-      Write-Host "Updating the WSL 2 Linux kernel requires a restart."
-      Write-Host "Not restarting before continuing the script may result in unexpected errors."
-      $userConfirmation = Read-Host "Do you want to restart the computer now? (Y/n)"
-      if ($userConfirmation -eq 'N' -or $userConfirmation -eq 'n') {
-        Write-Host "Restart aborted. Please remember to manually restart later before retrying the script."
-        exit 1
-      } else {
-        Write-Host "Restarting the computer..."
-        Restart-Computer
-      }
     } else {
-      Write-Host "WSL 2 Linux kernel update package is already downloaded and likely installed."
+      Write-Host "Restarting the computer..."
+      Restart-Computer
     }
-    
-    # Ask user to set the default version of WSL distributions
-    $userConfirmation = Read-Host "Set the default version for WSL distributions to 1 or 2 (default)? (1/2)"
-    if ($userConfirmation -eq '1') {
-      Write-Host "Setting WSL default version to 1..."
-      wsl --set-default-version 1
-    } else {
-      Write-Host "Setting WSL default version to 2..."
-      wsl --set-default-version 2
-    }
-    
-    $readyToInstallUbuntu = $true
-  }
-  
-} else {
-
-  $cleanedWslOutput = $wslOutput -replace '[^\P{C}\p{Z}]', ''
-  if ($cleanedWslOutput -like "*Ubuntu*") {
-
-    Write-Host "Ubuntu for WSL is already installed."
-
-  } else {
-
-    Write-Host "WSL distributions are installed, but Ubuntu is not installed."
-
-    # Ask user to set the default version of WSL distributions
-    $userConfirmation = Read-Host "Set the default version for WSL distributions to 1 or 2 (default)? (1/2)"
-    if ($userConfirmation -eq '1') {
-      Write-Host "Setting WSL default version to 1..."
-      wsl --set-default-version 1
-    } else {
-      Write-Host "Setting WSL default version to 2..."
-      wsl --set-default-version 2
-    }
-    
-    $readyToInstallUbuntu = $true
   }
 }
 
-# >> MARK: |3| Install Ubuntu if not already installed
-if ($readyToInstallUbuntu) {
+# >> MARK: |3| Update WSL
+wsl --update
+# TODO: Test whether wsl --shutdown is needed (needs clean Win install)
 
-  # Install Ubuntu distribution
+# >> MARK: |4| Set the default version of WSL distributions
+Write-Host "Setting WSL default version to 2..."
+wsl --set-default-version 2
+
+# >> MARK: |5| Install Ubuntu if not installed
+$cleanedWslOutput = $wslOutput -replace '[^\P{C}\p{Z}]', ''
+if ($cleanedWslOutput -like "*Ubuntu*") {
+
+  Write-Host "Ubuntu for WSL is already installed."
+
+} else {
+
   Write-Host "Installing Ubuntu..."
   wsl --install --no-launch -d Ubuntu
   Write-Host "Wait 10 seconds for installation to finish..."
@@ -261,7 +206,7 @@ if ($readyToInstallUbuntu) {
   $mustInitializeUbuntu = $true
 }
 
-# >> MARK: |4| Instruct user to initialize Ubuntu distribution
+# >> MARK: |6| Instruct user to initialize Ubuntu distribution
 if ($mustInitializeUbuntu) {
 
   Write-Host ""
@@ -273,7 +218,7 @@ if ($mustInitializeUbuntu) {
   Write-Host "Once the bash prompt appears, please exit Ubuntu, return to this window, and press Enter to continue."
   $readReadyForUbuntu = Read-Host "Are you ready to proceed? (Y/n)"
   if (($readReadyForUbuntu -eq 'n') -or ($readReadyForUbuntu -eq 'N')) {
-    Write-Host "Script aborted."
+    Write-Host "Script aborted. Please ensure Ubuntu launches into a bash prompt before rerunning this script."
     exit 1
   }
 
