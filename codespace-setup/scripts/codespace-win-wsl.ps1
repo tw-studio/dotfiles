@@ -583,7 +583,7 @@ if ($alreadyInstalledPowerToys) {
 
   Write-Host "Microsoft PowerToys is not installed."
 
-  # Use the GitHub API to fetch metadata about the latest release of winget
+  # Use the GitHub API to fetch metadata about the latest release of PowerToys
   $powerToysRepo = "microsoft/PowerToys"
   $powerToysDownloadName = "PowerToysUserSetup-0.81.1-x64.exe"
   $powerToysDownloadUrl = "https://github.com/microsoft/PowerToys/releases/download/v0.81.1/$powerToysDownloadName"
@@ -656,16 +656,20 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
   # Use the GitHub API to fetch metadata about the latest release of winget
   $wingetCliRepo = "microsoft/winget-cli"
-  Write-Host "Getting latest release info from $wingetCliRepo..."
-  $wingetCliDownloadPath = Get-RepoAsset -Repo "$wingetCliRepo" -AssetsIndex 2 -OutDirectory $winspaceSetupDir
-  if (-not $wingetCliDownloadPath) {
-    Write-Error "Failed to download winget-cli ($wingetPackageName)."
+  $wingetCliDownloadName = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
+  $wingetCliDownloadUrl = "https://github.com/microsoft/winget-cli/releases/download/v1.7.11261/$wingetCliDownloadName"
+  $wingetCliDownloadPath = Join-Path -Path "$winspaceSetupDir" -ChildPath $wingetCliDownloadName
+  Write-Host "Downloading $wingetCliDownloadName from $wingetCliRepo..."
+  Invoke-WebRequest -Uri "$wingetCliDownloadUrl" -OutFile "$wingetCliDownloadPath"
+  if (-not (Test-Path "$wingetCliDownloadPath")) {
+    Write-Error "Failed to download winget-cli."
     exit 1
   }
 
   # Install winget
   Write-Host "Installing winget-cli ($wingetPackageName)..."
   Add-AppxPackage -Path $wingetCliDownloadPath
+
 } else {
 
   Write-Host "winget-cli ($wingetPackageName) is already installed."
