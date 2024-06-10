@@ -270,8 +270,7 @@ if (-not (Test-Path $codespaceUbuntuSetupWinPath)) {
 }
 
 # >> MARK: |2| Fix nameserver in wsl.conf and resolv.conf
-$wslResolvConfPath = "$wslUbuntuDrive\etc\resolv.conf"
-if (Test-Path "$wslResolvConfPath" -and (Select-String -Path $wslResolvConfPath -Pattern "nameserver 8.8.8.8" -Quiet)) {
+if (wsl -d Ubuntu -u root -- bash -c "grep 'nameserver 8.8.8.8' /etc/resolv.conf") {
 
   Write-Host "wsl.conf and resolv.conf is already fixed."
 
@@ -289,6 +288,7 @@ fi
 "@
   wsl -d Ubuntu -u root -- bash -c $appendWslConfCommand
   Write-Host "Fixing resolv.conf in Ubuntu..."
+  # TODO: Test removing sudo
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f -i /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
@@ -297,7 +297,7 @@ fi
 
 # >> MARK: |3| Run codespace setup in Ubuntu
 $wslEtcPasswdPath = "$wslUbuntuDrive\etc\passwd"
-$rootPasswdEntry = Get-Content $wslEtcPasswdPath | Select-String "^root:"
+$rootPasswdEntry = wsl -d Ubuntu -u root -- bash -c "grep '^root:' /etc/passwd"
 if (-not ($rootPasswdEntry -and $rootPasswdEntry -match "root:.*:/bin/zsh$")) {
   Write-Host "Running codespace setup script in Ubuntu..."
   wsl -d Ubuntu -u root -- bash -c "chmod +x $codespaceUbuntuSetupUnixPath"
