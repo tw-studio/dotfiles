@@ -341,7 +341,7 @@ if (-not ($rootPasswdEntry -and $rootPasswdEntry -match "root:.*:/bin/zsh$")) {
 
 ###
 ##
-# MARK: |C| Generate SSH keys for GitHub and add to SSH agent
+# MARK: |D| Generate SSH keys for GitHub and add to SSH agent
 
 # >> MARK: |1| Generate SSH keys in WSL for the WSL user (optional)
 if (-not $wslUserName) {
@@ -429,7 +429,7 @@ if ($didGenerateSSHKeys) {
 
 ###
 ##
-# MARK: |D| Install VSCode
+# MARK: |E| Install VSCode
 
 # >> MARK: |1| Download and install VS Code if not already installed
 $vscodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe"
@@ -595,7 +595,7 @@ if (-not ((Test-Path -Path $fontFilePath1) -and (Test-Path -Path $fontFilePath2)
 
 ###
 ##
-# MARK: |E| Install PowerToys
+# MARK: |F| Install PowerToys
 
 # Continue only if PowerToys is not already installed
 $alreadyInstalledPowerToys = Get-CimInstance -ClassName Win32_Product |
@@ -629,7 +629,7 @@ if ($alreadyInstalledPowerToys) {
 
 ###
 ##
-# MARK: |F| Install WinGet
+# MARK: |G| Install WinGet
 
 # >> MARK: |1| Install NuGet CLI
 if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
@@ -695,7 +695,7 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
 ###
 ##
-# MARK: |G| Install Windows Terminal
+# MARK: |H| Install Windows Terminal
 
 # >> MARK: |1| Install Windows Terminal via winget
 $windowsTerminalId = "Microsoft.WindowsTerminal"
@@ -810,7 +810,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
 ###
 ##
-# MARK: |H| Install NeoVim for Windows
+# MARK: |I| Install NeoVim for Windows
 
 # $neovimId = "Neovim.Neovim"
 # $wingetListNeovimOutput = winget list -q $neovimId
@@ -826,7 +826,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
 ###
 ##
-# MARK: |X| Recommend next steps
+# MARK: Recommended next steps
 
 # Only show recommended tasks related to modifications made in this script run.
 if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension) {
