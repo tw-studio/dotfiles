@@ -442,6 +442,8 @@ if (-not (Test-Path $vscodePath)) {
   
   Write-Host "Running installer for VSCode..."
   Start-Process -FilePath $installerPath -Args "/silent /mergetasks=!runcode" -Wait
+  
+  $didInstallVSCode = $true
 } else {
   Write-Host "VSCode is already installed."
 }
@@ -832,14 +834,15 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 # MARK: Recommended next steps
 
 # Only show recommended tasks related to modifications made in this script run.
-if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension) {
+if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $didInstallVSCode) {
 
   Write-Host ""
   Write-Host "Recommended next steps:"
 
-  if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
   if ($didGenerateSSHKeys) { Write-Host "- Add the generated SSH public key to your GitHub account."}
   if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar"}
+  if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
+  if ($didInstallVSCode) { Write-Host "- Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification."}
 
   Write-Host "Complete."
 } else {
