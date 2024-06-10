@@ -257,7 +257,11 @@ if (-not (Test-Path $codespaceUbuntuSetupWinPath)) {
 
 # >> MARK: |2| Fix nameserver in wsl.conf and resolv.conf
 $wslResolvConfPath = "$wslUbuntuDrive\etc\resolv.conf"
-if (-not (Select-String -Path $wslResolvConfPath -Pattern "nameserver 8.8.8.8" -Quiet)) {
+if (Test-Path "$wslResolvConfPath" -and (Select-String -Path $wslResolvConfPath -Pattern "nameserver 8.8.8.8" -Quiet)) {
+
+  Write-Host "wsl.conf and resolv.conf is already fixed."
+
+} else {
 
   Write-Host "Fixing wsl.conf in Ubuntu..."
   $appendWslConfLines = @"
@@ -275,9 +279,6 @@ fi
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f +i /etc/resolv.conf"
-} else {
-
-  Write-Host "wsl.conf and resolv.conf is already fixed."
 }
 
 # >> MARK: |3| Run codespace setup in Ubuntu
