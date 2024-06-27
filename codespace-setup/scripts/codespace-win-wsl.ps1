@@ -426,10 +426,24 @@ if (-not (Test-Path $vscodePath)) {
 $vscodeCLIPath = "$env:USERPROFILE\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd"
 if (-not (Test-Path $vscodeCLIPath)) { $vscodeCLIPath = "C:\Program Files\Microsoft VS Code\bin\code.cmd" }
 
-# >>>> MARK: |2.1| Install all desired third-party extensions not already installed
 if ($vscodeCLIPath) {
-  
-  $allExtensions = @(
+
+  # >>>> MARK: |2.1| Install-VSCodeExtension function installs a VSCode extension by id only when not already installed
+  function Install-VSCodeExtension {
+    Param([string]$ExtensionId)
+    $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
+    $installedExtensions = & $vscodeCLIPath --list-extensions
+    if ($baseExtensionId -notin $installedExtensions) {
+      Write-Host "Installing extension: $ExtensionId..."
+      & $vscodeCLIPath --install-extension $ExtensionId
+      $didInstallExtension = $true
+    } else {
+      Write-Host "Extension $ExtensionId is already installed."
+    }
+  }
+
+  # >>>> MARK: |2.2| Install extensions by id
+  @(
     # Most Important
     "alefragnani.project-manager",
     "asvetliakov.vscode-neovim@0.0.42",
@@ -450,27 +464,15 @@ if ($vscodeCLIPath) {
     "spywhere.mark-jump",
     "tyriar.sort-lines",
     "wayou.vscode-todo-highlight"
-  )
-  
-  # Install only extensions not already installed
-  $installedExtensions = & $vscodeCLIPath --list-extensions
-  $extensionsToInstall = $allExtensions | Where-Object {
-    $baseExtensionId = $_ -split '@' | Select-Object -First 1
-    $baseExtensionId -notin $installedExtensions
-  }
-  if ($extensionsToInstall -gt 0) {
-    Write-Host "Installing extensions: $($extensionsToInstall -join ', ')..."
-    & $vscodeCLIPath --install-extension $($extensionsToInstall -join ' ')
-    $didInstallExtension = $true
-  } else {
-    Write-Host "All VSCode extensions are already installed."
+  ) | ForEach-Object {
+    Install-VSCodeExtension $_
   }
 } else {
 
   Write-Host "VSCode binary is not found."
 }
 
-# >>>> MARK: |2.2| Install personal box-checker extension
+# >>>> MARK: |2.3| Install personal box-checker extension
 
 $boxCheckerId = "tw.box-checker"
 if ($vscodeCLIPath) {
