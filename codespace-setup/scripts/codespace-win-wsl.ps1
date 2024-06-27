@@ -435,7 +435,7 @@ if ($vscodeCLIPath) {
     $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
     $installedExtensions = & $vscodeCLIPath --list-extensions
     if ($baseExtensionId -notin $installedExtensions) {
-      Write-Host "Installing extension: $ExtensionId..."
+      # Write-Host "Installing extension: $ExtensionId..."
       & $vscodeCLIPath --install-extension $ExtensionId
       $didInstallExtension = $true
     } else {
