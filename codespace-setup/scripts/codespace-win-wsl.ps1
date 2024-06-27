@@ -189,6 +189,7 @@ wsl --update
 
 # >> MARK: |4| Set the default version of WSL distributions
 Write-Host "Setting WSL default version to 2..."
+Start-Sleep -Seconds 2 # Avoids "file cannot be accessed" error
 wsl --set-default-version 2
 
 # >> MARK: |5| Install Ubuntu if not installed
