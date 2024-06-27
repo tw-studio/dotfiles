@@ -685,7 +685,7 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 # >> MARK: |1| Install Windows Terminal via winget
 $windowsTerminalId = "Microsoft.WindowsTerminal"
 $wingetListWindowsTerminalOutput = winget list -q $windowsTerminalId --accept-source-agreements
-if (-not $wingetListWindowsTerminalOutput) {
+if (-not $wingetListWindowsTerminalOutput -or ($wingetListWindowsTerminalOutput -like "*No installed package found*")) {
 
   Write-Host "$windowsTerminalId is not already installed by $wingetPackageName."
   Write-Host "Installing $windowsTerminalId..."
