@@ -214,7 +214,8 @@ cp $HOME/.dotfiles/vscode/vsc-tmux.sh $HOME/$CODESPACE/scripts/
 chmod +x $HOME/$CODESPACE/scripts/vsc-tmux.sh
 
 # MARK: Install node, pnpm, and pm2
-# curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | bash
+echo "Installing node, pnpm, and pm2..."
+curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | bash
 
 ###
 ##
