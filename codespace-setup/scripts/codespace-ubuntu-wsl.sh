@@ -68,6 +68,7 @@ echo "Installing packages..." \
     tmux \
     tree \
     util-linux \
+    wget \
     zsh \
  && apt-get clean
 rm -rf /var/lib/apt/lists/*
