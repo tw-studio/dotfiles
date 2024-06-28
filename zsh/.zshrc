@@ -71,8 +71,24 @@ echo -e '\033[6 q'
     export PATH=$PATH:/usr/local/bin
     export PATH=$PATH:/usr/sbin
     export PATH=$PATH:/usr/local/sbin
-    #export PATH=$PATH:$(yarn global bin)
     # typeset -aU path    # dedupes PATH ## PLACED AT END OF FILE
+
+#   Configure node
+#   ------------------------------------------------------------
+    if command -v pnpm &> /dev/null; then
+      export PNPM_HOME="$HOME/.local/share/pnpm"
+      export PATH=$PATH:$(dirname $(command -v pnpm))
+      export PATH=$PATH:$(pnpm bin)
+      export PATH=$PATH:$PNPM_HOME
+    fi
+    if [[ -f $HOME/.nvm/nvm.sh ]]; then
+      export NVM_DIR="$HOME/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    fi
+    if command -v yarn &> /dev/null; then
+      export PATH=$PATH:$(yarn global bin)
+    fi
 
 #   Export environment variables
 #   -----------------------------------------------------------
@@ -80,20 +96,26 @@ echo -e '\033[6 q'
     export LANG=en_US.UTF-8
     export LANGUAGE=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
-    export WINHOME=$(wslpath $(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r'))
+    if command -v wslpath &> /dev/null; then
+      export WINHOME=$(wslpath $(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r'))
+    fi
 
 #   Navigate to codespace
 #   ------------------------------------------------------------
     export START=$CODESPACE
     if [[ $PWD == $HOME ]]; then
-        cd $START
+      cd $START
     fi
 
 #   Set default editor
 #   ------------------------------------------------------------
     export EDITOR=nvim
     export NVIM=nvim
-    export VS="$WINHOME/AppData/Local/Programs/Microsoft VS Code/bin/code"
+    if command -v wslpath &> /dev/null; then
+      export VS="$WINHOME/AppData/Local/Programs/Microsoft VS Code/bin/code"
+    else
+      export VS=""
+    fi
 
 #   Add color to terminal
 #   ------------------------------------------------------------
@@ -256,12 +278,12 @@ echo -e '\033[6 q'
     # Source key bindings etc
     [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-#   source ec2 environment if exists
+#   Source ec2 environment if exists
 #   ------------------------------------------
     if [[ -f $HOME/.ec2env ]]; then
       source $HOME/.ec2env
     fi
     
-#   final steps
+#   Final steps
 #   ------------------------------------------
     typeset -aU path    # dedupes path
