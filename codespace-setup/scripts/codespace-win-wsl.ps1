@@ -750,7 +750,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "historySize" -NotePropertyValue 9001 -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "opacity" -NotePropertyValue 90 -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "padding" -NotePropertyValue "8" -Force
-    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "%USERPROFILE%\codespace" -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "%USERPROFILE%\winspace" -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "useAcrylic" -NotePropertyValue $true -Force
     $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "face" -NotePropertyValue "MesloLGLDZ Nerd Font Mono" -Force
     $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "size" -NotePropertyValue 10 -Force
