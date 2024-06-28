@@ -604,7 +604,7 @@ if ($alreadyInstalledPowerToys) {
 
   # Wait for user to install PowerToys
   Write-Host "The Keyboard Manager PowerToy is useful for remapping Caps Lock to Esc."
-  Read-Host "Press Enter after you have finished installing Microsoft PowerToys."
+  Read-Host "Press Enter after you have finished installing Microsoft PowerToys"
   $didInstallPowerToys = $true
 }
 
@@ -709,7 +709,7 @@ if (-not (Test-Path -Path $windowsTerminalSettingsPath)) {
   Write-Host "Launching Windows Terminal to automatically create its settings.json file..."
   Start-Process wt
 
-  Read-Host "Please close Windows Terminal and then press Enter to continue."
+  Read-Host "Please close Windows Terminal and then press Enter to continue"
 } else {
 
   Write-Host "Settings file for Windows Terminal already exists."
