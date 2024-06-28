@@ -5,12 +5,25 @@
 # errexit
 set -e
 
+# Check for f flag argument
+while getopts "f" OPT; do
+  case $OPT in
+    f )
+      FLAG_F=true
+      ;;
+    \? )
+      echo "Usage: cmd [-f]"
+      exit 1
+      ;;
+  esac
+done
+
 ###
 ##
 # Install node, pnpm, and pm2
 
-# Continue when nvm doesn't exist
-if [[ ! -f ~/.nvm/nvm.sh ]]; then
+# Continue when nvm doesn't exist or when forced with f flag
+if [[ $FLAG_F || ! -f ~/.nvm/nvm.sh ]]; then
 
   # Install and activate nvm
   echo "Downloading and running nvm v0.39.7 install script..."
