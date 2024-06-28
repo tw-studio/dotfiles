@@ -141,6 +141,7 @@ echo -e '\033[6 q'
     alias ....='cd ..; cd ..; cd ..'
     alias ...='cd ..; cd ..'
     alias ..='cd ..'
+    alias addnode="curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | bash"
     alias bm="bookmark"                         # zshmarks plugin
     alias code='cd ~/codespace'
     alias codespace='cd ~/codespace'
