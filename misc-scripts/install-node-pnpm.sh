@@ -58,4 +58,8 @@ typeset -aU path    # dedupes path
   echo "Installing pm2 globally using pnpm..."
   pnpm add --global pm2
 
+else
+  
+  echo "nvm is already installed."
+
 fi
