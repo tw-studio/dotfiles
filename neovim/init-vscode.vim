@@ -52,7 +52,8 @@ else
   Plug 'dbakker/vim-projectroot'
   Plug 'dense-analysis/ale'
   Plug 'godlygeek/tabular'
-  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
+  " Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
+  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
   Plug 'junegunn/vim-easy-align'
   Plug 'kshenoy/vim-signature'        " for marks
   Plug 'mg979/vim-visual-multi'       " multiple cursors
