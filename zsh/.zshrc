@@ -81,7 +81,7 @@ echo -e '\033[6 q'
       export PATH=$PATH:$(pnpm bin)
       export PATH=$PATH:$PNPM_HOME
     fi
-    if [[ -f $HOME/.nvm/nvm.sh ]]; then
+    if [[ -f $HOME/.nvm/nvm.sh && -s $HOME/.nvm/nvm.sh ]]; then
       export NVM_DIR="$HOME/.nvm"
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
