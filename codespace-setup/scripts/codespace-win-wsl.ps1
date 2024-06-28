@@ -721,7 +721,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
   $wtSettings = Get-Content -Path $windowsTerminalSettingsPath -Raw | ConvertFrom-Json
 
   # Check if settings has already been modified by this script by checking if "tw" scheme exists
-  if ($wtSettings.schemes -and ($wtSettings.schemes | Where-Object { $_.name -eq "tw" }).Count -gt 0) {
+  if (-not ($wtSettings.schemes -and ($wtSettings.schemes | Where-Object { $_.name -eq "tw" }).Count -gt 0)) {
 
     Write-Host "Customizing settings for Windows Terminal..."
     
