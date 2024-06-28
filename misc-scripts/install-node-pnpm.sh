@@ -37,7 +37,7 @@ if [[ ! -f ~/.nvm/nvm.sh ]]; then
   # Add pnpm global bin env var to .zshrc
   echo "Adding PNPM_HOME to .zshrc..."
   export PNPM_HOME="$HOME/.local/share/pnpm"
-  grep -qxF 'export PNPM_HOME="$HOME/.local/share/pnpm"' ~/.zshrc || \
+  grep -qF 'export PNPM_HOME="$HOME/.local/share/pnpm"' ~/.zshrc || \
   echo 'export PNPM_HOME="$HOME/.local/share/pnpm"
 ' >> ~/.zshrc
 
@@ -47,12 +47,12 @@ if [[ ! -f ~/.nvm/nvm.sh ]]; then
   export PATH=$PATH:$(pnpm bin)
   export PATH=$PATH:$PNPM_HOME
   typeset -aU path
-  grep -qxF "export PATH=\$PATH:$(dirname $(command -v pnpm))" ~/.zshrc || \
-  echo "export PATH=\$PATH:$(dirname $(command -v pnpm))
-export PATH=\$PATH:$(pnpm bin)
-export PATH=\$PATH:\$PNPM_HOME
+  grep -qF 'export PATH=$PATH:$(dirname $(command -v pnpm))' ~/.zshrc || \
+  echo 'export PATH=$PATH:$(dirname $(command -v pnpm))
+export PATH=$PATH:$(pnpm bin)
+export PATH=$PATH:$PNPM_HOME
 typeset -aU path    # dedupes path
-" >> ~/.zshrc
+' >> ~/.zshrc
 
   # Use pnpm to install pm2
   echo "Installing pm2 globally using pnpm..."
