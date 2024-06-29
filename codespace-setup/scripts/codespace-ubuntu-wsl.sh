@@ -33,8 +33,7 @@ fi
 
 # Request username from user
 if [[ -z "$1" ]]; then
-  echo "Enter the user name for Ubuntu login: ($USER) "
-  read user_name
+  read -p "Enter the user name for Ubuntu login: ($USER) " user_name
   if [[ ! -z "$user_name" ]]; then
     USER="$user_name"
   fi
