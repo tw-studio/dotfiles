@@ -3,7 +3,7 @@
 #
 # To run:
 # 1)  Press Windows + X and select Windows PowerShell (Admin) or Terminal (Admin)� if you're on a newer version of Windows.
-# 2)  Allow the current user to run scripts by running: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`
+# 2)  Allow scripts by running: `Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process`
 # 3)  Run this script directly from PowerShell
 
 ###
