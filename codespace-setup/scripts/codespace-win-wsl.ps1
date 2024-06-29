@@ -742,13 +742,13 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
     # Update default profile settings, safely
     if (-not ($wtSettings.PSObject.Properties.Name -contains "profiles")) {
-      $wtSettings | Add-Member -NotePropertyName "profiles" -NotePropertyValue @{} -Force
+      $wtSettings | Add-Member -NotePropertyName "profiles" -NotePropertyValue (New-Object PSObject -Property @{}) -Force
     }
     if (-not ($wtSettings.profiles.PSObject.Properties.Name -contains "defaults")) {
-      $wtSettings.profiles | Add-Member -NotePropertyName "defaults" -NotePropertyValue @{} -Force
+      $wtSettings.profiles | Add-Member -NotePropertyName "defaults" -NotePropertyValue (New-Object PSObject -Property @{}) -Force
     }
     if (-not ($wtSettings.profiles.defaults.PSObject.Properties.Name -contains "font")) {
-      $wtSettings.profiles.defaults | Add-Member -NotePropertyName "font" -NotePropertyValue @{} -Force
+      $wtSettings.profiles.defaults | Add-Member -NotePropertyName "font" -NotePropertyValue (New-Object PSObject -Property @{}) -Force
     }
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "colorScheme" -NotePropertyValue "tw" -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "historySize" -NotePropertyValue 9001 -Force
