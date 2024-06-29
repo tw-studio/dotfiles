@@ -725,7 +725,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
   $wtSettings = Get-Content -Path $windowsTerminalSettingsPath -Raw | ConvertFrom-Json
 
   # Check if settings has already been modified by this script by checking if "tw" scheme exists
-  if (-not ($wtSettings.schemes -and ($wtSettings.schemes | Where-Object { $_.name -eq "tw" }).Count -gt 0)) {
+  if (-not ($wtSettings.schemes -and ($wtSettings.schemes | Where-Object { $_.name -eq "tw" }))) {
 
     Write-Host "Customizing settings for Windows Terminal..."
     
@@ -777,7 +777,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
       }
 
       # Reorder profiles to put Ubuntu first
-      $wtOtherProfiles = $wtSettings.profiles.list | Where-Object { $_.source -like "CanonicalGroupLimited.Ubuntu*" }
+      $wtOtherProfiles = $wtSettings.profiles.list | Where-Object { $_.source -notlike "CanonicalGroupLimited.Ubuntu*" }
       $wtSettings.profiles.list = @($wtUbuntuProfile) + $wtOtherProfiles
     }
 
