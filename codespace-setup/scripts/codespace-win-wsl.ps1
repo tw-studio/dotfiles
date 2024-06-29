@@ -451,7 +451,7 @@ if ($vscodeCLIPath) {
   @(
     # Most Important
     "alefragnani.project-manager",
-    "asvetliakov.vscode-neovim@0.0.42",
+    "asvetliakov.vscode-neovim",
     "ms-vscode-remote.remote-wsl",
     "tw.monokai-accent",
     # Nice to Have
