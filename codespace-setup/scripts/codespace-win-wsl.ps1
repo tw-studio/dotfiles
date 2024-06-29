@@ -741,13 +741,13 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     $wtSettings | Add-Member -NotePropertyName "tabWidthMode" -NotePropertyValue "equal" -Force
 
     # Update default profile settings, safely
-    if (-not $wtSettings.PSObject.Properties.Match("profiles").Count) {
+    if (-not $wtSettings.PSObject.Properties.Match("profiles")) {
       $wtSettings | Add-Member -NotePropertyName "profiles" -NotePropertyValue @{} -Force
     }
-    if (-not $wtSettings.profiles.PSObject.Properties.Match("defaults").Count) {
+    if (-not $wtSettings.profiles.PSObject.Properties.Match("defaults")) {
       $wtSettings.profiles | Add-Member -NotePropertyName "defaults" -NotePropertyValue @{} -Force
     }
-    if (-not $wtSettings.profiles.defaults.PSObject.Properties.Match("font").Count) {
+    if (-not $wtSettings.profiles.defaults.PSObject.Properties.Match("font")) {
       $wtSettings.profiles.defaults | Add-Member -NotePropertyName "font" -NotePropertyValue @{} -Force
     }
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "colorScheme" -NotePropertyValue "tw" -Force
@@ -772,7 +772,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
         Write-Error "Unexpected error. User name for wsl is not detected."
         exit 1
       }
-      if (-not $wtUbuntuProfile.PSObject.Properties.Name -contains "startingDirectory") {
+      if (-not ($wtUbuntuProfile.PSObject.Properties.Name -contains "startingDirectory")) {
         $wtUbuntuProfile | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue ("$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\'))
       }
 
@@ -805,7 +805,9 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
       white = "#f7f1ff"
       yellow = "#fce566"
     }
-    if (-not $wtSettings.schemes) { $wtSettings.schemes = @() }
+    if (-not $wtSettings.schemes) {
+      $wtSettings.schemes = @()
+    }
     if (-not ($wtSettings.schemes | Where-Object { $_.name -eq "tw" })) {
       $wtSettings.schemes += $twScheme
     }
