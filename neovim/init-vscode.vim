@@ -1,7 +1,9 @@
+" ==========
 " Set leader
 " ==========
 :let mapleader = ","
 
+" ====================
 " General Vim settings
 " ====================
 :autocmd FileType *      set formatoptions=tcql nocindent comments&
@@ -40,6 +42,13 @@
 " Set font
 :set guifont=Meslo_LG_L_DZ_Bold_Nerd_Font_Complete_Mono:h12
 
+" ----------------------------------
+" Configure Vim-Polyglot before load
+" ----------------------------------
+:let g:polyglot_disabled = ['javascript']
+:let g:polyglot_disabled = ['jsx']
+
+" =============================
 " Install plugins with Vim-Plug
 " =============================
 :call plug#begin('~/.local/share/nvim/plugged')
@@ -80,20 +89,18 @@ endif
 " Plug 'Xuyuanp/nerdtree-git-plugin'
 :call plug#end()
 
+" =================
 " Configure plugins
 " =================
 
+" ---------
 " EasyAlign
 " ---------
 " Start interactiveEasyAlign in visual and normal modes
 :xmap ga <Plug>(EasyAlign)
 :nmap ga <Plug>(EasyAlign)
 
-" Vim-Polyglot
 " ------------
-:let g:polyglot_disabled = ['javascript']
-:let g:polyglot_disabled = ['jsx']
-
 " Vim-Markdown
 " Markdown style guide: https://cirosantilli.com/markdown-style-guide
 " ------------
@@ -104,8 +111,8 @@ endif
 ":let g:vim_markdown_autowrite = 1                      " autowrite when following links from unsaved changes
 ":let g:vim_markdown_auto_extension_ext = 'txt'         " default 'md'
 ":let g:vim_markdown_edit_url_in = 'tab'                " default 'current' buffer. also 'vsplit', 'hsplit'
-" ---
 
+" -----------
 " delimitMate
 " -----------
 :let g:delimitMate_expand_cr = 2
@@ -114,6 +121,7 @@ endif
 :let g:delimitMate_jump_expansion = 1
 :let g:delimitMate_balance_matchpairs = 1
 
+" ============
 " Code Folding
 " ============
 " Set open folding when files open using Vim folding options
@@ -144,6 +152,7 @@ endif
 " Disable all folding
 :set nofoldenable
 
+" ============
 " Twiddle case
 " ============
 " Toggle with ~ through UPPER CASE, lower case, and Title Case
@@ -159,6 +168,7 @@ endif
 :endfunction
 :vnoremap ~ y:call setreg('', TwiddleCase(@"), getregtype(''))<CR>gv""Pgv
 
+" ===========
 " Cursor modes
 " ===========
 " Required for neovim in iTerm2 (but not Tmux)
