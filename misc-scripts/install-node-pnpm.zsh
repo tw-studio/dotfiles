@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/zsh
 #
-# install-node-pnpm.sh
+# install-node-pnpm.zsh
 
 # errexit
 set -e
@@ -56,14 +56,15 @@ if [[ $FLAG_F || ! -f ~/.nvm/nvm.sh ]]; then
 
   # Add pnpm to path in .zshrc
   echo "Updating PATH with pnpm locations in .zshrc..."
-  export PATH=$PATH:$(dirname $(command -v pnpm))
-  export PATH=$PATH:$(pnpm bin)
-  export PATH=$PATH:$PNPM_HOME
+  path+=("$(dirname $(command -v pnpm))")
+  path+=("$(pnpm bin)")
+  path+=("$PNPM_HOME")
   typeset -aU path
-  grep -qF 'export PATH=$PATH:$(dirname $(command -v pnpm))' ~/.zshrc || \
-  echo 'export PATH=$PATH:$(dirname $(command -v pnpm))
-export PATH=$PATH:$(pnpm bin)
-export PATH=$PATH:$PNPM_HOME
+  grep -qF 'path+=("$(dirname $(command -v pnpm))")' ~/.zshrc || \
+    grep -qF 'export PATH=$PATH:$(dirname $(command -v pnpm))' ~/.zshrc || \
+    echo 'path+=("$(dirname $(command -v pnpm))")
+path+=("$(pnpm bin)")
+path+=("$PNPM_HOME")
 typeset -aU path    # dedupes path
 ' >> ~/.zshrc
 

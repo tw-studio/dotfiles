@@ -67,19 +67,19 @@ echo -e '\033[6 q'
 
 #   Set PATH
 #   ------------------------------------------------------------
-    export PATH=$PATH:/usr/bin
-    export PATH=$PATH:/usr/local/bin
-    export PATH=$PATH:/usr/sbin
-    export PATH=$PATH:/usr/local/sbin
+    path+=("/usr/bin")
+    path+=("/usr/local/bin")
+    path+=("/usr/sbin")
+    path+=("/usr/local/sbin")
     # typeset -aU path    # dedupes PATH ## PLACED AT END OF FILE
 
 #   Configure node
 #   ------------------------------------------------------------
     if command -v pnpm &> /dev/null; then
       export PNPM_HOME="$HOME/.local/share/pnpm"
-      export PATH=$PATH:$(dirname $(command -v pnpm))
-      export PATH=$PATH:$(pnpm bin)
-      export PATH=$PATH:$PNPM_HOME
+      path+=("$(dirname $(command -v pnpm))")
+      path+=("$(pnpm bin)")
+      path+=("$PNPM_HOME")
     fi
     if [[ -f $HOME/.nvm/nvm.sh && -s $HOME/.nvm/nvm.sh ]]; then
       export NVM_DIR="$HOME/.nvm"
@@ -87,7 +87,7 @@ echo -e '\033[6 q'
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
     fi
     if command -v yarn &> /dev/null; then
-      export PATH=$PATH:$(yarn global bin)
+      path+=("$(yarn global bin)")
     fi
 
 #   Export environment variables
@@ -141,7 +141,7 @@ echo -e '\033[6 q'
     alias ....='cd ..; cd ..; cd ..'
     alias ...='cd ..; cd ..'
     alias ..='cd ..'
-    alias addnode="curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | bash"
+    alias addnode="curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | zsh"
     alias bm="bookmark"                         # zshmarks plugin
     alias code='cd ~/codespace'
     alias codespace='cd ~/codespace'
