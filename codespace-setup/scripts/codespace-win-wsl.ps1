@@ -783,6 +783,20 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     if (-not ($wtSettings.schemes | Where-Object { $_.name -eq "tw" })) {
       $wtSettings.schemes += $twScheme
     }
+    
+    # Set the startingDirectory for Ubuntu to codespace
+    $wtUbuntuProfile = $wtSettings.profiles.list | Where-Object { $_.name -eq "Ubuntu" }
+    if (-not $wslUserName) {
+      Write-Error "Unexpected error. User name for wsl is not detected."
+      exit 1
+    }
+    $wtUbuntuProfile | ForEach-Object {
+      $_.startingDirectory = "$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\')
+    }
+
+    # Reorder profiles to put Ubuntu first
+    $wtOtherProfiles = $wtSettings.profiles.list | Where-Object { $_.name -ne "Ubuntu" }
+    $wtSettings.profiles.list = @($wtUbuntuProfile) + $wtOtherProfiles
 
     # Save the updated settings back to the file
     $wtSettings | ConvertTo-Json -Depth 100 | Set-Content -Path $windowsTerminalSettingsPath
