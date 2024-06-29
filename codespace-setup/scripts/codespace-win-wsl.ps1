@@ -741,23 +741,45 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     $wtSettings | Add-Member -NotePropertyName "tabWidthMode" -NotePropertyValue "equal" -Force
 
     # Update default profile settings, safely
-    if (-not $wtSettings.psobject.Properties.Match("profiles").Count) {
+    if (-not $wtSettings.PSObject.Properties.Match("profiles").Count) {
       $wtSettings | Add-Member -NotePropertyName "profiles" -NotePropertyValue @{} -Force
     }
-    if (-not $wtSettings.profiles.psobject.Properties.Match("defaults").Count) {
+    if (-not $wtSettings.profiles.PSObject.Properties.Match("defaults").Count) {
       $wtSettings.profiles | Add-Member -NotePropertyName "defaults" -NotePropertyValue @{} -Force
     }
-    if (-not $wtSettings.profiles.defaults.psobject.Properties.Match("font").Count) {
+    if (-not $wtSettings.profiles.defaults.PSObject.Properties.Match("font").Count) {
       $wtSettings.profiles.defaults | Add-Member -NotePropertyName "font" -NotePropertyValue @{} -Force
     }
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "colorScheme" -NotePropertyValue "tw" -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "historySize" -NotePropertyValue 9001 -Force
-    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "opacity" -NotePropertyValue 90 -Force
+    $wtSettings.profiles.defaults | Add-Member -NotePropertyName "opacity" -NotePropertyValue 98 -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "padding" -NotePropertyValue "8" -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "%USERPROFILE%\winspace" -Force
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "useAcrylic" -NotePropertyValue $true -Force
     $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "face" -NotePropertyValue "MesloLGLDZ Nerd Font Mono" -Force
-    $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "size" -NotePropertyValue 10 -Force
+    $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "size" -NotePropertyValue 10.0 -Force
+    
+    # Configure the Ubuntu profile
+    $wtUbuntuProfile = $wtSettings.profiles.list | Where-Object { $_.source -like "CanonicalGroupLimited.Ubuntu*" } | Select-Object -First 1
+    if ($wtUbuntuProfile) {
+      
+      # Set defaultProfile to Ubuntu profile's guid
+      $wtUbuntuGuid = $wtUbuntuProfile.guid
+      $wtSettings.defaultProfile = $wtUbuntuGuid
+
+      # Set the startingDirectory for Ubuntu to codespace
+      if (-not $wslUserName) {
+        Write-Error "Unexpected error. User name for wsl is not detected."
+        exit 1
+      }
+      if (-not $wtUbuntuProfile.PSObject.Properties.Name -contains "startingDirectory") {
+        $wtUbuntuProfile | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue ("$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\'))
+      }
+
+      # Reorder profiles to put Ubuntu first
+      $wtOtherProfiles = $wtSettings.profiles.list | Where-Object { $_.source -like "CanonicalGroupLimited.Ubuntu*" }
+      $wtSettings.profiles.list = @($wtUbuntuProfile) + $wtOtherProfiles
+    }
 
     # Add custom color scheme
     $twScheme = @{
@@ -788,20 +810,6 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
       $wtSettings.schemes += $twScheme
     }
     
-    # Set the startingDirectory for Ubuntu to codespace
-    $wtUbuntuProfile = $wtSettings.profiles.list | Where-Object { $_.name -eq "Ubuntu" }
-    if (-not $wslUserName) {
-      Write-Error "Unexpected error. User name for wsl is not detected."
-      exit 1
-    }
-    if ($wtUbuntuProfile -and -not $wtUbuntuProfile.PSObject.Properties.Name -contains "startingDirectory") {
-      $wtUbuntuProfile | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\')
-    }
-
-    # Reorder profiles to put Ubuntu first
-    $wtOtherProfiles = $wtSettings.profiles.list | Where-Object { $_.name -ne "Ubuntu" }
-    $wtSettings.profiles.list = @($wtUbuntuProfile) + $wtOtherProfiles
-
     # Save the updated settings back to the file
     $wtSettings | ConvertTo-Json -Depth 100 | Set-Content -Path $windowsTerminalSettingsPath
 
