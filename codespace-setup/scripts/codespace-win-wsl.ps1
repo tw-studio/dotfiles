@@ -773,7 +773,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
         exit 1
       }
       if (-not ($wtUbuntuProfile.PSObject.Properties.Name -contains "startingDirectory")) {
-        $wtUbuntuProfile | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue ("$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\'))
+        $wtUbuntuProfile | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "$wslUbuntuDrive\home\$wslUserName\codespace"
       }
 
       # Reorder profiles to put Ubuntu first
