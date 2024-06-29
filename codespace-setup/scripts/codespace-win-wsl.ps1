@@ -790,8 +790,8 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
       Write-Error "Unexpected error. User name for wsl is not detected."
       exit 1
     }
-    $wtUbuntuProfile | ForEach-Object {
-      $_.startingDirectory = "$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\')
+    if ($wtUbuntuProfile -and -not $wtUbuntuProfile.PSObject.Properties.Name -contains "startingDirectory") {
+      $wtUbuntuProfile | Add-Member -NotePropertyName "startingDirectory" -NotePropertyValue "$wslUbuntuDrive\home\$wslUserName\codespace".Replace('\', '\\')
     }
 
     # Reorder profiles to put Ubuntu first
