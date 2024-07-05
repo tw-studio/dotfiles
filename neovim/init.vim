@@ -60,6 +60,7 @@
 " Or in background, run: nvim --headless +PlugInstall +qall
 :call plug#begin('~/.local/share/nvim/plugged')
 if exists('g:vscode')
+  Plug 'godlygeek/tabular'            " :Tab cmds to align text (req for vim-markdown)
   Plug 'junegunn/vim-easy-align'      " aligns text with ga commands
   Plug 'Raimondi/delimitMate'         " auto closes quotes, parens, etc
   Plug 'tpope/vim-commentary'         " gc cmds to comment code
