@@ -829,34 +829,49 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
 ###
 ##
-# MARK: |I| Install NeoVim for Windows
+# MARK: |I| Download and install Mullvad VPN
 
-# $neovimId = "Neovim.Neovim"
-# $wingetListNeovimOutput = winget list -q $neovimId
-# if (-not $wingetListNeovimOutput) {
+# Continue only when Mullvad is not installed
+$isMullvadInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
+                      Where-Object { $_.DisplayName -like "*Mullvad*" }
+if (-not $isMullvadInstalled) {
+  
+  Write-Host "Mullvad VPN is not installed."
 
-#   Write-Host "Neovim for Windows is not installed."
-#   Write-Host "Installing Neovim with winget..."
-#   winget install Neovim.Neovim
-# } else {
+  Write-Host "Configuring download of Mullvad VPN installer..."
+  $mullvadInstallerUrl = "https://mullvad.net/en/download/app/exe/latest"
+  $mullvadInstallerHeadResponse = Invoke-WebRequest -Uri $mullvadInstallerUrl -Method Head -MaximumRedirection 5 -ErrorAction Stop
+  $mullvadInstallerFilename = [System.IO.Path]::GetFileName($mullvadInstallerHeadResponse.BaseResponse.ResponseUri.LocalPath)
+  $mullvadInstallerOutputPath = Join-Path -Path $winspaceSetupDir -ChildPath $mullvadInstallerFilename
+  
+  Write-Host "Downloading latest Mullvad VPN installer to $winspaceSetupDir..."
+  Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
+  
+  Write-Host "Installing Mullvad VPN silently..."
+  Start-Process -FilePath $mullvadInstallerOutputPath -Args "/S" -Wait
+  
+  Write-Host "Mullvad VPN is installed."
+  $didInstallMullvad = $true
 
-#   Write-Host "Neovim for Windows is already installed."
-# }
+} else {
+  Write-Host "Mullvad VPN is already installed."
+}
 
 ###
 ##
 # MARK: Suggested next steps
 
 # Only show suggested tasks related to modifications made in this script run.
-if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $didInstallVSCode) {
+if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $didInstallVSCode -or $didInstallMullvad) {
 
   Write-Host ""
   Write-Host "Suggested next steps:"
 
-  if ($didGenerateSSHKeys) { Write-Host "- Add the generated SSH public key to your GitHub account."}
-  if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar."}
+  if ($didGenerateSSHKeys)  { Write-Host "- Add the generated SSH public key to your GitHub account." }
+  if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar." }
   if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
-  if ($didInstallVSCode) { Write-Host "- Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification."}
+  if ($didInstallVSCode)    { Write-Host "- Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification." }
+  if ($didInstallMullvad)   { Write-Host "- Open Mullvad VPN" }
   Write-Host "- Clean up downloaded setup files from $winspaceSetupDir."
   Write-Host "- Set scaling to 175% in Display Settings."
 
