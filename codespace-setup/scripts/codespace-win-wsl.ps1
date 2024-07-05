@@ -396,7 +396,8 @@ if ($didGenerateSSHKeys) {
     wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#keychain#/c\eval \$\(keychain -q --eval --agents ssh $sshKeyName)' ~/.zshrc"
 
     # Update .zshrc to load identify in ssh-agent when sourced (disabled, keychain sufficient)
-    # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent#/c\zstyle :omz:plugins:ssh-agent identities $sshKeyName' ~/.zshrc"
+    # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent1#/c\zstyle :omz:plugins:ssh-agent identities $sshKeyName' ~/.zshrc"
+    # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent2#/c\plugins=(ssh-agent)' ~/.zshrc"
 
   } else {
     

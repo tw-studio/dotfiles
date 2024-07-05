@@ -19,10 +19,11 @@ DISABLE_AUTO_TITLE="true"
 
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-plugins=(git ssh-agent zshmarks)
+plugins=(git zshmarks)
 
 # Configure plugins
-#zsshagent# zstyle :omz:plugins:ssh-agent identities SSH_IDENTITY
+#zsshagent1# zstyle :omz:plugins:ssh-agent identities SSH_IDENTITY
+#zsshagent2# plugins=(ssh-agent)
 #keychain# eval $(keychain -q --eval --agents ssh SSH_IDENTITY)
 
 source $ZSH/oh-my-zsh.sh
