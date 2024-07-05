@@ -115,7 +115,7 @@ echo -e '\033[6 q'
     if command -v wslpath &> /dev/null; then
       export VS="$WINHOME/AppData/Local/Programs/Microsoft VS Code/bin/code"
     else
-      export VS=""
+      export VS="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
     fi
 
 #   Add color to terminal
