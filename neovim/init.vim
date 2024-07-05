@@ -6,38 +6,40 @@
 " ====================
 " General Vim settings
 " ====================
-":autocmd BufEnter * silent! normal! g`"zz      "centers on last known cursor position when entering buffer
+":autocmd BufEnter * silent! normal! g`"zz      " centers on last known cursor position when entering buffer
 :autocmd FileType *      set formatoptions=tcql nocindent comments&
 :set autoindent
 :set autoread
-":set clipboard+=unnamedplus            "ALWAYS use system clipboard for ALL operations
-:set clipboard=                         "NEVER use system clipboard; manually set below
+":set clipboard+=unnamedplus            " ALWAYS use system clipboard for ALL operations
+:set clipboard=                         " NEVER use system clipboard; manually set below
 :set confirm
 :set encoding=utf8
 :set expandtab
-:set gdefault                           "always use global substitutions, no 'g' in sed
+:set gdefault                           " always use global substitutions, no 'g' in sed
 :set hlsearch
-:set ignorecase                         "ignorecase in searches; also see smartcase
+:set ignorecase                         " ignorecase in searches; also see smartcase
 :set incsearch
-:set infercase                          "supposedly better than ignorecase
+:set infercase                          " supposedly better than ignorecase
 :set mouse=a
 :set nosol
-":set number                             "shows current line number
-":set numberwidth=4                      "set gutter to 4
-":set relativenumber                     "sets relative line numbers
-:set shiftround                         "rounds indents to multiple of shiftwidth
+if !exists('g:vscode')
+  :set number                             " shows current line number
+  :set numberwidth=4                      " set gutter to 4
+  :set relativenumber                     " sets relative line numbers
+endif
+:set shiftround                         " rounds indents to multiple of shiftwidth
 :set shiftwidth=2
-:set showcmd                            "shows when Leader is pressed
-":set smartcase                          "override ignorecase when search pattern has uppercase
-:set splitbelow                         "always open h splits below
-:set splitright                         "always open v splits on right
+:set showcmd                            " shows when Leader is pressed
+:set smartcase                          " override ignorecase when search pattern has uppercase
+:set splitbelow                         " always open h splits below
+:set splitright                         " always open v splits on right
 :set t_Co=256
 :set t_ut=
 :set tabstop=2
 :set textwidth=120
 :set whichwrap+=<,>,h,l,[,]
-:set wildmenu                           "use TAB with :e to autosuggest & autocomplete
-:set wildmode=full                      "use TAB with :e to autosuggest & autocomplete
+:set wildmenu                           " use TAB with :e to autosuggest & autocomplete
+:set wildmode=full                      " use TAB with :e to autosuggest & autocomplete
 
 " Wrap long lines with an indentation
 :set breakindent
@@ -60,30 +62,29 @@
 " Or in background, run: nvim --headless +PlugInstall +qall
 :call plug#begin('~/.local/share/nvim/plugged')
 if exists('g:vscode')
-  Plug 'godlygeek/tabular'            " :Tab cmds to align text (req for vim-markdown)
-  Plug 'junegunn/vim-easy-align'      " aligns text with ga commands
-  Plug 'Raimondi/delimitMate'         " auto closes quotes, parens, etc
-  Plug 'tpope/vim-commentary'         " gc cmds to comment code
-  Plug 'tpope/vim-surround'           " ys, cs, ds cmds to surround code
+  Plug 'godlygeek/tabular'              " :Tab cmds to align text (req for vim-markdown)
+  Plug 'junegunn/vim-easy-align'        " aligns text with ga commands
+  Plug 'Raimondi/delimitMate'           " auto closes quotes, parens, etc
+  Plug 'tpope/vim-commentary'           " gc cmds to comment code
+  Plug 'tpope/vim-surround'             " ys, cs, ds cmds to surround code
 else
-  Plug 'dbakker/vim-projectroot'      " guess project root directory
-  Plug 'godlygeek/tabular'            " :Tab cmds to align text (req for vim-markdown)
-  Plug 'junegunn/vim-easy-align'      " ga commands to align text
-  Plug 'kshenoy/vim-signature'        " m commands for marks
-  Plug 'mg979/vim-visual-multi'       " multiple cursors
-  Plug 'neoclide/vim-jsx-improve'     " support React jsx
-  Plug 'preservim/vim-markdown'       " Markdown support, z cmds for header folding
-  Plug 'Raimondi/delimitMate'         " auto closes quotes, parens, etc
-  Plug 'ryanoasis/vim-devicons'       " dependency for other plugins
-  Plug 'sheerun/vim-polyglot'         " collection of language packs
-  Plug 'tpope/vim-commentary'         " gc commands to comment code
-  Plug 'tpope/vim-fugitive'           " :G(it) cmds in vim
-  Plug 'tpope/vim-sensible'           " sensible defaults
-  Plug 'tpope/vim-surround'           " ys, cs, ds cmds to surround code
-  " Test without first:
-  "Plug 'dracula/vim'
-  "Plug 'vim-airline/vim-airline-themes'
-  "Plug 'vim-airline/vim-airline'
+  Plug 'dbakker/vim-projectroot'        " guess project root directory
+  Plug 'dracula/vim'                    " dracula theme
+  Plug 'godlygeek/tabular'              " :Tab cmds to align text (req for vim-markdown)
+  Plug 'junegunn/vim-easy-align'        " ga commands to align text
+  Plug 'kshenoy/vim-signature'          " m commands for marks
+  Plug 'mg979/vim-visual-multi'         " multiple cursors
+  Plug 'neoclide/vim-jsx-improve'       " support React jsx
+  Plug 'preservim/vim-markdown'         " Markdown support, z cmds for header folding
+  Plug 'Raimondi/delimitMate'           " auto closes quotes, parens, etc
+  Plug 'ryanoasis/vim-devicons'         " dependency for other plugins
+  Plug 'sheerun/vim-polyglot'           " collection of language packs
+  Plug 'tpope/vim-commentary'           " gc commands to comment code
+  Plug 'tpope/vim-fugitive'             " :G(it) cmds in vim
+  Plug 'tpope/vim-sensible'             " sensible defaults
+  Plug 'tpope/vim-surround'             " ys, cs, ds cmds to surround code
+  Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
+  Plug 'vim-airline/vim-airline'        " configurable status line for vim
 endif
 
 " ============
@@ -98,8 +99,6 @@ endif
 " Plug 'terryma/vim-multiple-cursors'
 " Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 " Plug 'tmux-plugins/vim-tmux-focus-events'
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
 " Plug 'Xuyuanp/nerdtree-git-plugin'
 " markdown-preview is very large and requires node and yarn
 " Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
@@ -154,7 +153,7 @@ if !exists('g:vscode')
   :let g:airline#extensions#whitespace#enabled = 0
   "
   " Show vim-devicons in airline
-  :let g:airline_powerline_fonts = 1                        " for vim-devicons
+  :let g:airline_powerline_fonts = 1                       " for vim-devicons
   :let g:webdevicons_enable_airline_statusline = 1
   :let g:webdevicons_enable_airline_tabline = 1
 endif
