@@ -856,7 +856,8 @@ if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $d
   if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar."}
   if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
   if ($didInstallVSCode) { Write-Host "- Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification."}
-  Write-Host "- (optional) Clean up the directory $winspaceSetupDir."
+  Write-Host "- Clean up downloaded setup files from $winspaceSetupDir."
+  Write-Host "- Set scaling to 175% in Display Settings."
 
   Write-Host "Complete."
 } else {
