@@ -176,7 +176,7 @@ ls -1dt $NVIM_DOWNLOADS_DIR/* | tail -n +3 | xargs -d '\n' rm -rf --
 echo "Configuring neovim..."
 mkdir -p $HOME/.config/nvim/colors \
  && mkdir -p $HOME/.local/share/nvim/site/autoload \
- && cp $HOME/.dotfiles/neovim/init-vscode.vim $HOME/.config/nvim/init.vim \
+ && cp $HOME/.dotfiles/neovim/init.vim $HOME/.config/nvim/init.vim \
  && cp $HOME/.dotfiles/neovim/monokai-fusion.vim $HOME/.config/nvim/colors/ \
  && cp $HOME/.dotfiles/neovim/plug.vim $HOME/.local/share/nvim/site/autoload/ \
  && cp $HOME/.dotfiles/neovim/dracula-airline.vim $HOME/.config/nvim/dracula.vim \

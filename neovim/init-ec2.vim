@@ -47,54 +47,54 @@
 " Run :PlugInstall in neovim to install
 " Or in background, run: nvim --headless +PlugInstall +qall
 :call plug#begin('~/.local/share/nvim/plugged')
-Plug 'tpope/vim-sensible'
-Plug 'tpope/vim-surround'
-Plug 'junegunn/vim-easy-align'
 Plug 'dracula/vim'
-Plug 'vim-airline/vim-airline'
+Plug 'junegunn/vim-easy-align'              " aligns text with ga commands
+Plug 'kshenoy/vim-signature'                " m commands for marks
+Plug 'neoclide/vim-jsx-improve'             " support React jsx
+Plug 'Raimondi/delimitMate'                 " auto closes quotes, parens, etc
+Plug 'ryanoasis/vim-devicons'               " dependency for other plugins
+Plug 'tmux-plugins/vim-tmux-focus-events'   " may no longer be needed
+Plug 'tpope/vim-commentary'                 " gc cmds to comment code
+Plug 'tpope/vim-sensible'                   " sensible defaults
+Plug 'tpope/vim-surround'                   " ys, cs, ds cmds to surround code
 Plug 'vim-airline/vim-airline-themes'
-Plug 'kshenoy/vim-signature'
-Plug 'tmux-plugins/vim-tmux-focus-events'     " may no longer be needed
-Plug 'tpope/vim-commentary'
-Plug 'ryanoasis/vim-devicons'         " dependency for other plugins
-Plug 'neoclide/vim-jsx-improve'
-Plug 'Raimondi/delimitMate'
+Plug 'vim-airline/vim-airline'
 :call plug#end()
 
 " Uninstalled plugins
 " ===================
-" Plug 'scrooloose/nerdtree' ", { 'on': 'NERDTreeToggle' }
-" Plug 'Xuyuanp/nerdtree-git-plugin'
-" Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-" Plug 'ajh17/VimCompletesMe'
-" Plug 'tomasr/molokai'
-" Plug 'rstacruz/sparkup'  "fast HTML completions
-" Plug 'crusoexia/vim-monokai'
-" Plug 'phanviet/vim-monokai-pro'
-" Plug 'ErichDonGubler/vim-sublime-monokai'
-" Plug 'patstockwell/vim-monokai-tasty'
-" Plug 'styled-components/vim-styled-components'
-" Plug 'pangloss/vim-javascript'
-" Plug 'MaxMEllon/vim-jsx-pretty'
-" Plug 'elzr/vim-json'
-" Plug 'jparise/vim-graphql'
-" Plug 'cakebaker/scss-syntax.vim'
-" Plug 'shmargum/vim-sass-colors'
-" Plug 'JulesWang/css.vim'
-" Plug 'sheerun/vim-polyglot'
-" Plug 'mg979/vim-visual-multi'
-" Plug 'terryma/vim-multiple-cursors'   " deprecated; use vim-visual-multi
-" Plug 'tpope/vim-fugitive'
-" Plug 'godlygeek/tabular'              " goes with vim-markdown
-" Plug 'plasticboy/vim-markdown'        " goes with tabular
 " Plug '/usr/local/opt/fzf'
-" Plug 'junegunn/fzf.vim'
-" Plug 'tmux-plugins/vim-tmux'
-" Plug 'lilydjwg/colorizer'
+" Plug 'ajh17/VimCompletesMe'
+" Plug 'cakebaker/scss-syntax.vim'
+" Plug 'crusoexia/vim-monokai'
 " Plug 'dbakker/vim-projectroot'
 " Plug 'dense-analysis/ale'
+" Plug 'elzr/vim-json'
+" Plug 'ErichDonGubler/vim-sublime-monokai'
+" Plug 'godlygeek/tabular'              " goes with vim-markdown
+" Plug 'jparise/vim-graphql'
+" Plug 'JulesWang/css.vim'
+" Plug 'junegunn/fzf.vim'
+" Plug 'lilydjwg/colorizer'
+" Plug 'MaxMEllon/vim-jsx-pretty'
+" Plug 'mg979/vim-visual-multi'
+" Plug 'pangloss/vim-javascript'
+" Plug 'patstockwell/vim-monokai-tasty'
+" Plug 'phanviet/vim-monokai-pro'
+" Plug 'plasticboy/vim-markdown'        " goes with tabular
+" Plug 'rstacruz/sparkup'  "fast HTML completions
+" Plug 'scrooloose/nerdtree' ", { 'on': 'NERDTreeToggle' }
+" Plug 'sheerun/vim-polyglot'
+" Plug 'shmargum/vim-sass-colors'
+" Plug 'styled-components/vim-styled-components'
+" Plug 'terryma/vim-multiple-cursors'   " deprecated; use vim-visual-multi
+" Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+" Plug 'tmux-plugins/vim-tmux'
+" Plug 'tomasr/molokai'
+" Plug 'tpope/vim-fugitive'
+" Plug 'Xuyuanp/nerdtree-git-plugin'
 " markdown-preview is very large and requires node and yarn
-"Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
+" Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
 
 " Configure plugins
 " =================
