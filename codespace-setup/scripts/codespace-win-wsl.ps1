@@ -532,6 +532,13 @@ if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
   $vscKeybindingsUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/win/keybindings.json"
   Invoke-WebRequest -Uri $vscSettingsUrl -OutFile $vscSettingsPath
   Invoke-WebRequest -Uri $vscKeybindingsUrl -OutFile $vscKeybindingsPath
+  
+  # |3.5| Modify username for linux in settings file
+  if ($wslUserName) {
+    $vscOldUserName = "/home/tomw"
+    $vscNewUserName = "/home/$wslUserName"
+    (Get-Content $vscSettingsPath) -replace $vscOldUserName, $vscNewUserName | Set-Content $vscSettingsPath
+  }
 } else {
   
   Write-Host "Backups for default settings and keybindings are found."
