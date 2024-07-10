@@ -924,6 +924,7 @@ if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $d
   Write-Host "- Clean up downloaded setup files from $winspaceSetupDir."
   Write-Host "- Set scaling to 175% in Display Settings."
 
+  Write-Host ""
   Write-Host "Complete."
 } else {
 
