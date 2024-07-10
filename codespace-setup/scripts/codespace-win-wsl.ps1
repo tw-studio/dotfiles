@@ -334,6 +334,11 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
   $readReadyForSSHKeygen = Read-Host "Do you want to generate a SSH key for use with GitHub in WSL now? (Y/n)"
   if ((-not $readReadyForSSHKeygen) -or $readReadyForSSHKeygen -eq 'y' -or $readReadyForSSHKeygen -eq 'Y') {
 
+    $sshHostName = Read-Host "Give this identity a Host name (id_ed25519)"
+    if (-not $sshHostName) {
+      $sshHostName = "id_ed25519"
+    }
+
     # TODO: Remove redundant logic
     if (-not $wslUserName) {
       
@@ -347,11 +352,48 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
         $readEmailForGitHub = Read-Host "Enter your optional email identifier to use with ssh-keygen"
 
         # Generate SSH keys with or without email identifier
+        $sshIdentityFilePath = "/home/$wslUserName/.ssh/$sshHostName"
         if ($readEmailForGitHub) {
-          wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-keygen -t ed25519 -C `"$readEmailForGitHub`""
+          wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-keygen -t ed25519 -C `"$readEmailForGitHub`" -f `"$sshIdentityFilePath`""
         } else {
-          wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-keygen -t ed25519"
+          wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-keygen -t ed25519 -f `"$sshIdentityFilePath`""
         }
+        
+        # Create .ssh/config file if doesn't exist
+        $wslSSHConfigPath = "$wslUserSSHDir\config"
+        if (-Not (Test-Path $wslSSHConfigPath)) {
+          New-Item -Path $wslSSHConfigPath -ItemType File
+          Write-Host "Creating SSH config file at $wslSSHConfigPath..."
+        } else {
+          Write-Host "SSH config file already exists."
+        }
+        
+        # Add the Host configuration to .ssh/config if doesn't exist
+        $sshConfigContent = Get-Content -Path $wslSSHConfigPath
+        if ($sshConfigContent -notcontains "Host $sshHostName") {
+          $sshHostConfig = @"
+Host $sshHostName
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/$sshHostName
+
+"@
+          Add-Content -Path $wslSSHConfigPath -Value $sshHostConfig
+          Write-Host "Added configuration to SSH config file for Host $sshHostName."
+        }
+        
+        # Add an AddKeysToAgent configuration to all Hosts
+        if ($sshConfigContent -notmatch 'Host \*') {
+          # Append the 'Host *' configuration
+          $sshGlobalConfig = @"
+Host *
+    AddKeysToAgent yes
+
+"@
+          Add-Content -Path $sshConfigPath -Value $sshGlobalConfig
+          Write-Host "Added AddKeysToAgent configuration for all Hosts."
+        }
+
         $didGenerateSSHKeys = $true
       } else {
         
