@@ -165,6 +165,10 @@ echo -e '\033[6 q'
     alias nv='nvim'
     alias nvz='nvim -o `fzf`'
     alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable Paths
+    if command -v xclip &> /dev/null; then
+      alias pbcopy='xclip -selection clipboard'
+      alias pbpaste='xclip -selection clipboard -o'
+    fi
     alias power='sudo powermetrics --samplers smc -i1 -n1'
     alias pn="pnpm"
     alias rg="rg --hidden --max-columns 200"
@@ -181,6 +185,7 @@ echo -e '\033[6 q'
     alias tmnp="~/.tmux/scripts/new-tmux-panes.zsh"
     alias tmns="~/.tmux/scripts/new-tmux-session-window-panes.zsh"
     alias tmnw="~/.tmux/scripts/new-tmux-window-panes.zsh"
+#   alias tmux="TERM=screen-256color-bce tmux"
     alias tmuxname='tmux display-message -p "#S"'
     alias tree='tree -a -I node_modules --noreport'
     alias vedit='vs ~/.zshrc'
@@ -191,7 +196,6 @@ echo -e '\033[6 q'
     alias znvim='$EDITOR ~/.config/nvim/init.vim'
     alias zreload='source ~/.zshrc'
     alias ztmux='$EDITOR ~/.tmux.conf'
-#   alias tmux="TERM=screen-256color-bce tmux"
 
 #   Set cursor style (https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands)
 #   ------------------------------------------

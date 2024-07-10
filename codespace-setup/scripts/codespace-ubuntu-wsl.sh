@@ -68,6 +68,7 @@ echo "Installing packages..." \
     tree \
     util-linux \
     wget \
+    xclip \
     zsh \
  && apt-get clean
 rm -rf /var/lib/apt/lists/*
