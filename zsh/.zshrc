@@ -72,6 +72,9 @@ echo -e '\033[6 q'
     path+=("/usr/local/bin")
     path+=("/usr/sbin")
     path+=("/usr/local/sbin")
+    if command -v wslpath &> /dev/null; then
+      path+=("/mnt/c/Windows/System32")
+    fi
     # typeset -aU path    # dedupes PATH ## PLACED AT END OF FILE
 
 #   Configure node
