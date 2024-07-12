@@ -882,22 +882,28 @@ $isMullvadInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentV
 if (-not $isMullvadInstalled) {
   
   Write-Host "Mullvad VPN is not installed."
+  
+  $readReadyForMullvadInstall = Read-Host "Do you want to install Mullvad VPN? (Y/n)"
+  if ((-not $readReadyForMullvadInstall) -or $readReadyForMullvadInstall -eq 'y' -or $readReadyForMullvadInstall -eq 'Y') {
 
-  Write-Host "Configuring download of Mullvad VPN installer..."
-  $mullvadInstallerUrl = "https://mullvad.net/en/download/app/exe/latest"
-  $mullvadInstallerHeadResponse = Invoke-WebRequest -Uri $mullvadInstallerUrl -Method Head -MaximumRedirection 5 -ErrorAction Stop
-  $mullvadInstallerFilename = [System.IO.Path]::GetFileName($mullvadInstallerHeadResponse.BaseResponse.ResponseUri.LocalPath)
-  $mullvadInstallerOutputPath = Join-Path -Path $winspaceSetupDir -ChildPath $mullvadInstallerFilename
-  
-  Write-Host "Downloading latest Mullvad VPN installer to $winspaceSetupDir..."
-  Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
-  
-  Write-Host "Installing Mullvad VPN..."
-  Start-Process -FilePath $mullvadInstallerOutputPath -Wait
-  
-  Write-Host "Mullvad VPN is installed."
-  $didInstallMullvad = $true
+    Write-Host "Configuring download of Mullvad VPN installer..."
+    $mullvadInstallerUrl = "https://mullvad.net/en/download/app/exe/latest"
+    $mullvadInstallerHeadResponse = Invoke-WebRequest -Uri $mullvadInstallerUrl -Method Head -MaximumRedirection 5 -ErrorAction Stop
+    $mullvadInstallerFilename = [System.IO.Path]::GetFileName($mullvadInstallerHeadResponse.BaseResponse.ResponseUri.LocalPath)
+    $mullvadInstallerOutputPath = Join-Path -Path $winspaceSetupDir -ChildPath $mullvadInstallerFilename
+    
+    Write-Host "Downloading latest Mullvad VPN installer to $winspaceSetupDir..."
+    Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
+    
+    Write-Host "Installing Mullvad VPN..."
+    Start-Process -FilePath $mullvadInstallerOutputPath -Wait
+    
+    Write-Host "Mullvad VPN is installed."
+    $didInstallMullvad = $true
+  } else {
 
+    Write-Host "Skipping install of Mullvad VPN."
+  }
 } else {
   Write-Host "Mullvad VPN is already installed."
 }
