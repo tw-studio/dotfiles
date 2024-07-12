@@ -635,7 +635,7 @@
   "workbench.editor.tabSizing": "shrink",
   "workbench.enableExperiments": false,
   "workbench.fontAliasing": "antialiased",
-  "workbench.panel.defaultLocation": "right",
+  "workbench.panel.defaultLocation": "bottom",
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
   "workbench.statusBar.visible": false,
