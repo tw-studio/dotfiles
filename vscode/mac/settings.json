@@ -52,7 +52,8 @@
       "comments": false,
       "other": false,
       "strings": false
-    }
+    },
+    "files.trimTrailingWhitespace": false
   },
   "[plaintext]": {
     "editor.parameterHints.enabled": false,
@@ -60,7 +61,8 @@
       "comments": false,
       "other": false,
       "strings": false
-    }
+    },
+    "files.trimTrailingWhitespace": false
   },
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
@@ -298,6 +300,8 @@
     "*.config": "shellscript",
     "*.mdx": "mdx"
   },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
   "git-graph.openToTheRepoOfTheActiveTextEditorDocument": true,
   "git.decorations.enabled": false,
   "git.openRepositoryInParentFolders": "never",
