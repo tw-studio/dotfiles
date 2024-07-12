@@ -898,7 +898,7 @@ if (-not $isMullvadInstalled) {
   Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
   
   Write-Host "Installing Mullvad VPN silently..."
-  Start-Process -FilePath $mullvadInstallerOutputPath -Args "/S" -Wait
+  Start-Process -FilePath $mullvadInstallerOutputPath -Wait
   
   Write-Host "Mullvad VPN is installed."
   $didInstallMullvad = $true
