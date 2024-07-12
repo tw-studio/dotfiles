@@ -297,7 +297,7 @@ fi
   # TODO: Test removing sudo
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f -i /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
-  wsl -d Ubuntu -u root -- bash -c "sudo sh -c `"echo 'nameserver 8.8.8.8' > /etc/resolv.conf`""
+  wsl -d Ubuntu -u root -- bash -c "sudo sh -c 'echo ''nameserver 8.8.8.8'' > /etc/resolv.conf'"
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f +i /etc/resolv.conf"
 }
 
