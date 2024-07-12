@@ -363,7 +363,7 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
         # Create .ssh/config file if doesn't exist
         $wslSSHConfigPath = "$wslUserSSHDir\config"
         if (-Not (Test-Path $wslSSHConfigPath)) {
-          New-Item -Path $wslSSHConfigPath -ItemType File
+          New-Item -Path $wslSSHConfigPath -ItemType File | Out-Null
           Write-Host "Creating SSH config file at $wslSSHConfigPath..."
         } else {
           Write-Host "SSH config file already exists."
