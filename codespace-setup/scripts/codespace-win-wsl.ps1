@@ -414,32 +414,22 @@ if ($didGenerateSSHKeys) {
 
   Write-Host "Adding SSH private key to ssh-agent..."
 
-  # Get SSH key name
-  $sshFiles = Get-ChildItem -Path $wslUserSSHDir
-  if ($sshFiles.Count -eq 2) {
-    $sshFile1BaseName = $sshFiles[0].BaseName
-    $sshFile2BaseName = $sshFiles[1].BaseName
-    if ($sshFile1BaseName -eq $sshFile2BaseName -and ($sshFiles[0].Extension -eq ".pub" -xor $sshFiles[1].Extension -eq ".pub")) {
-      $sshKeyName = $sshFile1BaseName
-    }
-  }
-
   # Take the opportunity to set private key permissions to 600
-  if ($sshKeyName) {
-    wsl -d Ubuntu -u $wslUserName -- bash -c "chmod 600 ~/.ssh/$sshKeyName"
+  if ($sshHostName) {
+    wsl -d Ubuntu -u $wslUserName -- bash -c "chmod 600 ~/.ssh/$sshHostName"
   }
 
   # Configure ssh-agent and funtoo/keychain with SSH key
-  if ($sshKeyName) {
+  if ($sshHostName) {
     
     # Careful syntax required to preserve environment for ssh-add
-    wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-agent bash -c 'ssh-add ~/.ssh/$sshKeyName'"
+    wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-agent bash -c 'ssh-add ~/.ssh/$sshHostName'"
     
     # Initialize funtoo/keychain with ssh key
-    wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#keychain#/c\eval \$\(keychain -q --eval --agents ssh $sshKeyName)' ~/.zshrc"
+    wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#keychain#/c\eval \$\(keychain -q --eval --agents ssh $sshHostName)' ~/.zshrc"
 
     # Update .zshrc to load identify in ssh-agent when sourced (disabled, keychain sufficient)
-    # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent1#/c\zstyle :omz:plugins:ssh-agent identities $sshKeyName' ~/.zshrc"
+    # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent1#/c\zstyle :omz:plugins:ssh-agent identities $sshHostName' ~/.zshrc"
     # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent2#/c\plugins=(ssh-agent)' ~/.zshrc"
 
   } else {
