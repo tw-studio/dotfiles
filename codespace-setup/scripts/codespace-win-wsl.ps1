@@ -380,6 +380,11 @@ Host $sshHostName
 
 "@
           Add-Content -Path $wslSSHConfigPath -Value $sshHostConfig
+          
+          # Converts line endings to Unix
+          $sshConfigPath = "/home/$wslUserName/.ssh/config"
+          wsl -d Ubuntu -u $wslUserName -- bash -c "[[ -x /usr/bin/dos2unix ]] && /usr/bin/dos2unix $sshConfigPath"
+
           Write-Host "Added configuration to SSH config file for Host $sshHostName."
         }
         
