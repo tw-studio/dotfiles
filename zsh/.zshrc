@@ -123,24 +123,28 @@ echo -e '\033[6 q'
 
 #   Add color to terminal
 #   ------------------------------------------------------------
-    export CLICOLOR=1                   # Ansi Colors for iTerm2   
-#   Set LS_COLORS to default LSCOLORS values for coreutils ls 
+    export CLICOLOR=1                   # Ansi Colors for iTerm2
+#   Set LS_COLORS to default LSCOLORS values for coreutils ls
     export LSCOLORS=Gxfxcxdxbxegedabagacad             # default
     export LS_COLORS='di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
 
-#   Configure iTerm2
+#   Configure TERM variable
 #   ------------------------------------------------------------
-    export TERM=screen-256color   # Match iTerm2 Terminal colors
+    if [[ "$OSTYPE" == "darwin"* || -n "$WT_SESSION" || -n "$TMUX" ]]; then
+      export TERM=screen-256color   # Desired for Mac (iTerm2), Windows Terminal, and tmux
+    else
+      export TERM=xterm-256color    # Better in more basic terminals like Ubuntu app on Windows
+    fi
 
 #   Configure neovim
 #   ------------------------------------------------------------
     set runtimepath^=~/.config/nvim
-    
+
 #   Autoloads
 #   ------------------------------------------------------------
     autoload zmv
 
-#   Personal Aliases 
+#   Personal Aliases
 #   ------------------------------------------------------------
     alias ....='cd ..; cd ..; cd ..'
     alias ...='cd ..; cd ..'
@@ -161,7 +165,7 @@ echo -e '\033[6 q'
     alias lsd='ls -Adh *(/) --color'            # list only directories
     alias m="fg"
     alias mkdir='mkdir -pv'                     # Preferred 'mkdir' implementation - doesn't clobber existing
-    alias mv='mv -iv'                           # Preferred 'mv' implementation - requires confirm 
+    alias mv='mv -iv'                           # Preferred 'mv' implementation - requires confirm
     alias nv='nvim'
     alias nvz='nvim -o `fzf`'
     alias path='echo -e ${PATH//:/\\n}'         # path:         Echo all executable Paths
@@ -209,7 +213,7 @@ echo -e '\033[6 q'
 #   Personal Functions
 #   ------------------------------------------
     # better cd
-    altercd(){ cd(){ unset -f cd ; cd $*; ls ; altercd; } } ; altercd 
+    altercd(){ cd(){ unset -f cd ; cd $*; ls ; altercd; } } ; altercd
     revertcd(){ cd(){ unset -f cd; cd $*; } }
     qcd(){ unset -f cd; cd $*; altercd; }
     cl() { cd "$@" && ls; }
@@ -217,17 +221,17 @@ echo -e '\033[6 q'
 
     # snap - archives files and dirs
     snap() {
-      cp -r "$1" "$1"_WORKING_COPY; 
+      cp -r "$1" "$1"_WORKING_COPY;
       # TODO: fix rename regex to also work with hidden files (ex: .env.js)
       rename 's/(.*)(\..*)_WORKING_COPY/$1_'$(date +"%Y-%m-%d-%H%M")'$2/' *_WORKING_COPY;
     }
-    snapm() { 
-      mv "$1" "$1"_WORKING_COPY >/dev/null; 
+    snapm() {
+      mv "$1" "$1"_WORKING_COPY >/dev/null;
       # TODO: fix rename regex to also work with hidden files (ex: .env.js)
       rename -v 's/(.*)(\..*)_WORKING_COPY/$1_'$(date +"%Y-%m-%d-%H%M")'$2/' *_WORKING_COPY;
     }
     snapdir() { cp -r "$1" "$1"-`date +%Y-%m-%d-%H%M` }
-    
+
     # vsr - starts given file or directory in vscode --remote wsl+Ubuntu mode
     # NOTE: not needed when invoking vs with bin/code instead of Code.exe
     vsr() {
@@ -261,7 +265,7 @@ echo -e '\033[6 q'
     key() {
       eval $(keychain -q --eval --agents ssh "$1")
     }
-    
+
     # winvar - echo value of Windows environment variable
     winvar() {
       echo $(wslpath $(cmd.exe /C "echo %$1%" 2>/dev/null | tr -d '\r'))
@@ -283,7 +287,7 @@ echo -e '\033[6 q'
     fi
     export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    
+
     # Source key bindings etc
     [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -292,7 +296,7 @@ echo -e '\033[6 q'
     if [[ -f $HOME/.ec2env ]]; then
       source $HOME/.ec2env
     fi
-    
+
 #   Final steps
 #   ------------------------------------------
     typeset -aU path    # dedupes path
