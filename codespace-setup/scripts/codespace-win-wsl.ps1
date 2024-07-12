@@ -87,10 +87,10 @@ function Get-WslUserName {
   param (
     [string]$WslUbuntuDrivePath = "\\wsl.localhost\Ubuntu"
   )
-  
+
   # Attempt to get WSL home directories
   $wslUserPSDirectory = Get-ChildItem -Path "$WslUbuntuDrivePath\home" -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
-  
+
   # If one WSL home directory exists, return its name
   if ($wslUserPSDirectory) {
     return $wslUserPSDirectory.Name
@@ -115,13 +115,13 @@ $wslUserName = Get-WslUserName
 # MARK: |A| Create a winspace directory in %USERPROFILE%
 
 if (-not (Test-Path -Path $winspaceDir)) {
-  
+
   Write-Host "winspace directory in $env:USERPROFILE doesn't exist."
   Write-Host "Creating winspace in $env:USERPROFILE..."
   New-Item -Path $winspaceSetupDir -ItemType Directory -Force | Out-Null
 
 } elseif (-not (Test-Path -Path $winspaceSetupDir)) {
-  
+
   Write-Host "setup directory in $winspaceDir doesn't exist."
   Write-Host "Creating setup directory in $winspaceDir..."
   New-Item -Path $winspaceSetupDir -ItemType Directory -Force | Out-Null
@@ -130,7 +130,7 @@ if (-not (Test-Path -Path $winspaceDir)) {
 
   Write-Host "winspace directory in $env:USERPROFILE already exists."
 }
-    
+
 
 ###
 ##
@@ -222,7 +222,7 @@ if ($mustInitializeUbuntu) {
   Write-Host "IMPORTANT: Ubuntu initialization may take several minutes without progress indication."
   Write-Host ""
   Write-Host "Once the bash prompt appears, please exit Ubuntu, return to this window, and press Enter to continue."
-  
+
   # Require confirmation of understanding
   $readReadyForUbuntu = Read-Host "Are you ready to proceed? (Y/n)"
   if (($readReadyForUbuntu -eq 'n') -or ($readReadyForUbuntu -eq 'N')) {
@@ -326,7 +326,7 @@ if (-not $wslUserName) {
   $wslUserName = Get-WslUserName
 }
 if ($wslUserName) {
-  $wslUserSSHDir = "$wslUbuntuDrive\home\$wslUserName\.ssh"  
+  $wslUserSSHDir = "$wslUbuntuDrive\home\$wslUserName\.ssh"
 }
 if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
 
@@ -342,11 +342,11 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
 
     # TODO: Remove redundant logic
     if (-not $wslUserName) {
-      
+
       $wslUserName = Read-Host "Enter the user name configured for WSL Ubuntu"
     }
     if ($wslUserName) {
-      
+
       $wslUserHome = "$wslUbuntuDrive\home\$wslUserName"
       if (Test-Path $wslUserHome) {
 
@@ -359,7 +359,7 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
         } else {
           wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-keygen -t ed25519 -f `"$sshIdentityFilePath`""
         }
-        
+
         # Create .ssh/config file if doesn't exist
         $wslSSHConfigPath = "$wslUserSSHDir\config"
         if (-Not (Test-Path $wslSSHConfigPath)) {
@@ -368,7 +368,7 @@ if (-not ($wslUserName -and (Test-Path $wslUserSSHDir\*))) {
         } else {
           Write-Host "SSH config file already exists."
         }
-        
+
         # Add the Host configuration to .ssh/config if doesn't exist
         $sshConfigContent = Get-Content -Path $wslSSHConfigPath
         if ($sshConfigContent -notcontains "Host $sshHostName") {
@@ -380,14 +380,14 @@ Host $sshHostName
 
 "@
           Add-Content -Path $wslSSHConfigPath -Value $sshHostConfig
-          
+
           # Converts line endings to Unix
           $sshConfigPath = "/home/$wslUserName/.ssh/config"
           wsl -d Ubuntu -u $wslUserName -- bash -c "[[ -x /usr/bin/dos2unix ]] && /usr/bin/dos2unix $sshConfigPath"
 
           Write-Host "Added configuration to SSH config file for Host $sshHostName."
         }
-        
+
         # Add an AddKeysToAgent configuration to all Hosts
         if ($sshConfigContent -notcontains "Host *") {
           # Append the 'Host *' configuration
@@ -402,11 +402,11 @@ Host *
 
         $didGenerateSSHKeys = $true
       } else {
-        
+
         Write-Host "$wslUserHome not found. Skipping."
       }
     } else {
-      
+
       Write-Host "No user name given. Skipping."
     }
   }
@@ -426,10 +426,10 @@ if ($didGenerateSSHKeys) {
 
   # Configure ssh-agent and funtoo/keychain with SSH key
   if ($sshHostName) {
-    
+
     # Careful syntax required to preserve environment for ssh-add
     wsl -d Ubuntu -u $wslUserName -- bash -c "ssh-agent bash -c 'ssh-add ~/.ssh/$sshHostName'"
-    
+
     # Initialize funtoo/keychain with ssh key
     wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#keychain#/c\eval \$\(keychain -q --eval --agents ssh $sshHostName)' ~/.zshrc"
 
@@ -438,7 +438,7 @@ if ($didGenerateSSHKeys) {
     # wsl -d Ubuntu -u $wslUserName -- bash -c "sed -i '/^#zsshagent2#/c\plugins=(ssh-agent)' ~/.zshrc"
 
   } else {
-    
+
     Write-Host "Unexpected error. SSH key not added to ssh-agent."
   }
 }
@@ -455,10 +455,10 @@ if (-not (Test-Path $vscodePath)) {
   Write-Host "Downloading installer for VSCode..."
   $installerPath = "$winspaceSetupDir\VSCodeSetup.exe"
   Invoke-WebRequest -Uri "https://update.code.visualstudio.com/latest/win32-x64-user/stable" -OutFile $installerPath
-  
+
   Write-Host "Running installer for VSCode..."
   Start-Process -FilePath $installerPath -Args "/silent /mergetasks=!runcode" -Wait
-  
+
   $didInstallVSCode = $true
 } else {
   Write-Host "VSCode is already installed."
@@ -527,7 +527,7 @@ if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
   # Download box-checker extension file into this directory
   $boxCheckerPath = Join-Path -Path $winspaceSetupDir -ChildPath "box-checker-0.0.1.vsix"
   if (-not (Test-Path $boxCheckerPath)) {
-    
+
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/box-checker-0.0.1.vsix" -OutFile $boxCheckerPath
   }
 
@@ -536,7 +536,7 @@ if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
     & $vscodeCLIPath --install-extension $boxCheckerPath
     $didInstallExtension = $true
 } else {
-  
+
   Write-Host "Extension $boxCheckerId is already installed."
 }
 
@@ -550,7 +550,7 @@ $hasSettingsBackup = Find-FilesMatchingPattern -path $winspaceSetupDir -pattern 
 $hasKeybindingsBackup = Find-FilesMatchingPattern -path $winspaceSetupDir -pattern $vscKeybindingsBackupPattern
 
 if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
-  
+
   # |3.2| Back up settings and keybindings only when not already backed up
   Write-Host "Backups for default settings and keybindings are not found."
   Write-Host "Backing up settings and keybindings files to $winspaceSetupDir..."
@@ -570,7 +570,7 @@ if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
   $vscKeybindingsUrl = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/win/keybindings.json"
   Invoke-WebRequest -Uri $vscSettingsUrl -OutFile $vscSettingsPath
   Invoke-WebRequest -Uri $vscKeybindingsUrl -OutFile $vscKeybindingsPath
-  
+
   # |3.5| Modify username for linux in settings file
   if ($wslUserName) {
     $vscOldUserName = "/home/tomw"
@@ -578,7 +578,7 @@ if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
     (Get-Content $vscSettingsPath) -replace $vscOldUserName, $vscNewUserName | Set-Content $vscSettingsPath
   }
 } else {
-  
+
   Write-Host "Backups for default settings and keybindings are found."
 }
 
@@ -664,7 +664,7 @@ if ($alreadyInstalledPowerToys) {
 
 # >> MARK: |1| Install NuGet CLI
 if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
-  
+
   Write-Host "NuGet CLI is not installed."
 
   # Download NuGet CLI to WindowsApps directory
@@ -741,7 +741,7 @@ if (-not $wingetListWindowsTerminalOutput -or ($wingetListWindowsTerminalOutput 
   Write-Host "Installing $windowsTerminalId..."
   winget install --id=Microsoft.WindowsTerminal -e --accept-source-agreements --accept-package-agreements
 } else {
-  
+
   Write-Host "$windowsTerminalId is already installed."
 }
 
@@ -774,7 +774,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
   if (-not ($wtSettings.schemes -and ($wtSettings.schemes | Where-Object { $_.name -eq "tw" }))) {
 
     Write-Host "Customizing settings for Windows Terminal..."
-    
+
     # Update global settings
     $wtSettings | Add-Member -NotePropertyName "alwaysShowTabs" -NotePropertyValue $false -Force
     $wtSettings | Add-Member -NotePropertyName "confirmCloseAllTabs" -NotePropertyValue $false -Force
@@ -804,11 +804,11 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     $wtSettings.profiles.defaults | Add-Member -NotePropertyName "useAcrylic" -NotePropertyValue $true -Force
     $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "face" -NotePropertyValue "MesloLGLDZ Nerd Font Mono" -Force
     $wtSettings.profiles.defaults.font | Add-Member -NotePropertyName "size" -NotePropertyValue 10.0 -Force
-    
+
     # Configure the Ubuntu profile
     $wtUbuntuProfile = $wtSettings.profiles.list | Where-Object { $_.source -like "CanonicalGroupLimited.Ubuntu*" } | Select-Object -First 1
     if ($wtUbuntuProfile) {
-      
+
       # Set defaultProfile to Ubuntu profile's guid
       $wtUbuntuGuid = $wtUbuntuProfile.guid
       $wtSettings.defaultProfile = $wtUbuntuGuid
@@ -857,7 +857,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     if (-not ($wtSettings.schemes | Where-Object { $_.name -eq "tw" })) {
       $wtSettings.schemes += $twScheme
     }
-    
+
     # Save the updated settings back to the file
     $wtSettings | ConvertTo-Json -Depth 100 | Set-Content -Path $windowsTerminalSettingsPath
 
@@ -867,7 +867,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
     Write-Host "Settings for Windows Terminal are already customized."
   }
 } else {
-  
+
   Write-Host "Error: settings.json for Windows Terminal was expected but not found."
   exit 1
 }
@@ -880,9 +880,9 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 $isMullvadInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
                       Where-Object { $_.DisplayName -like "*Mullvad*" }
 if (-not $isMullvadInstalled) {
-  
+
   Write-Host "Mullvad VPN is not installed."
-  
+
   $readReadyForMullvadInstall = Read-Host "Do you want to install Mullvad VPN? (Y/n)"
   if ((-not $readReadyForMullvadInstall) -or $readReadyForMullvadInstall -eq 'y' -or $readReadyForMullvadInstall -eq 'Y') {
 
@@ -891,20 +891,57 @@ if (-not $isMullvadInstalled) {
     $mullvadInstallerHeadResponse = Invoke-WebRequest -Uri $mullvadInstallerUrl -Method Head -MaximumRedirection 5 -ErrorAction Stop
     $mullvadInstallerFilename = [System.IO.Path]::GetFileName($mullvadInstallerHeadResponse.BaseResponse.ResponseUri.LocalPath)
     $mullvadInstallerOutputPath = Join-Path -Path $winspaceSetupDir -ChildPath $mullvadInstallerFilename
-    
+
     Write-Host "Downloading latest Mullvad VPN installer to $winspaceSetupDir..."
     Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
-    
+
     Write-Host "Installing Mullvad VPN..."
     Start-Process -FilePath $mullvadInstallerOutputPath -Wait
-    
+
     Write-Host "Mullvad VPN is installed."
     $didInstallMullvad = $true
+
+    $readReadyForMullvadAccount = Read-Host "Do you want to log in with your Mullvad account number now? (Y/n)"
+    if ((-not $readReadyForMullvadAccount) -or $readReadyForMullvadAccount -eq 'y' -or $readReadyForMullvadAccount -eq 'Y') {
+
+      $readMullvadAccountNumber = Read-Host "Enter your Mullvad account number"
+      if ($readMullvadAccountNumber -match "^\d{16}$") {
+
+        Write-Host "Logging in to Mullvad with $readMullvadAccountNumber..."
+        $outputMullvadAccountLogin = mullvad account login $readMullvadAccountNumber
+
+        if ($?) {
+
+          Write-Host "Login successful."
+
+          $readReadyForMullvadAutoConnect = Read-Host "Do you want to configure Mullvad to auto-connect on system startup? (Y/n)"
+          if ((-not $readReadyForMullvadAutoConnect) -or $readReadyForMullvadAutoConnect -eq 'y' -or $readReadyForMullvadAutoConnect -eq 'Y') {
+
+            Write-Host "Configuring Mullvad to auto-connect on system startup..."
+            mullvad auto-connect set on
+          }
+
+          $readReadyForMullvadLockdownMode = Read-Host "Do you want to configure Mullvad to enable Lockdown Mode? (Y/n)"
+          if ((-not $readReadyForMullvadLockdownMode) -or $readReadyForMullvadLockdownMode -eq 'y' -or $readReadyForMullvadLockdownMode -eq 'Y') {
+
+            Write-Host "Enabling Mullvad Lockdown Mode..."
+            mullvad lockdown-mode set on
+          }
+        } else {
+
+          Write-Host "Login unsuccessful: $outputMullvadAccountLogin"
+        }
+      } else {
+
+        Write-Host "Input not recognized as Mullvad account number. Skipping login."
+      }
+    }
   } else {
 
     Write-Host "Skipping install of Mullvad VPN."
   }
 } else {
+
   Write-Host "Mullvad VPN is already installed."
 }
 
@@ -917,19 +954,20 @@ if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $d
 
   Write-Host ""
   Write-Host "Suggested next steps:"
+  Write-Host "---------------------"
 
-  if ($didGenerateSSHKeys)  { Write-Host "- Add the generated SSH public key to your GitHub account." }
-  if ($didInstallExtension) { Write-Host "- Install VSCode extensions in WSL:Ubuntu from the VSCode Extensions sidebar." }
-  if ($didInstallPowerToys) { Write-Host "- Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
-  if ($didInstallVSCode)    { Write-Host "- Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification." }
-  if ($didInstallMullvad)   { Write-Host "- Open Mullvad VPN" }
-  Write-Host "- Clean up downloaded setup files from $winspaceSetupDir."
-  Write-Host "- Set scaling to 175% in Display Settings."
+  if ($didGenerateSSHKeys)  { Write-Host "» SSH key is generated. Add the generated SSH public key to your GitHub account." }
+  if ($didInstallVSCode)    { Write-Host "» VSCode is installed. Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification." }
+  if ($didInstallExtension) { Write-Host "» VSCode extensions are installed. Open the VSCode Extensions sidebar when in WSL mode, then click Install in WSL:Ubuntu for the listed extensions." }
+  if ($didInstallPowerToys) { Write-Host "» PowerToys is installed. Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
+  if ($didInstallMullvad)   { Write-Host "» Mullvad VPN is installed. Run Mullvad, and remember to adjust its settings, if not already done." }
+  Write-Host "» Clean up downloaded setup files from $winspaceSetupDir."
+  Write-Host "» Set scaling to 175% in Display Settings."
 
   Write-Host ""
   Write-Host "Complete."
 } else {
 
+  Write-Host ""
   Write-Host "Complete."
 }
-
