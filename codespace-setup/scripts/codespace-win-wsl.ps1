@@ -384,14 +384,14 @@ Host $sshHostName
         }
         
         # Add an AddKeysToAgent configuration to all Hosts
-        if ($sshConfigContent -notmatch 'Host \*') {
+        if ($sshConfigContent -notcontains "Host *") {
           # Append the 'Host *' configuration
           $sshGlobalConfig = @"
 Host *
     AddKeysToAgent yes
 
 "@
-          Add-Content -Path $sshConfigPath -Value $sshGlobalConfig
+          Add-Content -Path $wslSSHConfigPath -Value $sshGlobalConfig
           Write-Host "Added AddKeysToAgent configuration for all Hosts."
         }
 
