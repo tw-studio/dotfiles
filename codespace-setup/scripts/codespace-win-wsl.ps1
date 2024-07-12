@@ -275,7 +275,8 @@ if (-not (Test-Path $codespaceUbuntuSetupWinPath)) {
 }
 
 # >> MARK: |2| Fix nameserver in wsl.conf and resolv.conf
-if (wsl -d Ubuntu -u root -- bash -c "grep 'nameserver 8.8.8.8' /etc/resolv.conf") {
+$grepResolvConfOutput = wsl -d Ubuntu -u root -- bash -c "grep 'nameserver 8.8.8.8' /etc/resolv.conf"
+if ($grepResolvConfOutput) {
 
   Write-Host "wsl.conf and resolv.conf is already fixed."
 
@@ -296,7 +297,7 @@ fi
   # TODO: Test removing sudo
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f -i /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
-  wsl -d Ubuntu -u root -- bash -c "sudo echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+  wsl -d Ubuntu -u root -- bash -c "sudo sh -c `"echo 'nameserver 8.8.8.8' > /etc/resolv.conf`""
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f +i /etc/resolv.conf"
 }
 
