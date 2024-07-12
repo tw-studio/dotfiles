@@ -956,13 +956,13 @@ if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $d
   Write-Host "Suggested next steps:"
   Write-Host "---------------------"
 
-  if ($didGenerateSSHKeys)  { Write-Host "» SSH key is generated. Add the generated SSH public key to your GitHub account." }
-  if ($didInstallVSCode)    { Write-Host "» VSCode is installed. Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification." }
-  if ($didInstallExtension) { Write-Host "» VSCode extensions are installed. Open the VSCode Extensions sidebar when in WSL mode, then click Install in WSL:Ubuntu for the listed extensions." }
-  if ($didInstallPowerToys) { Write-Host "» PowerToys is installed. Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
-  if ($didInstallMullvad)   { Write-Host "» Mullvad VPN is installed. Run Mullvad, and remember to adjust its settings, if not already done." }
-  Write-Host "» Clean up downloaded setup files from $winspaceSetupDir."
-  Write-Host "» Set scaling to 175% in Display Settings."
+  if ($didGenerateSSHKeys)  { Write-Host "• SSH key is generated. Add the generated SSH public key to your GitHub account." }
+  if ($didInstallVSCode)    { Write-Host "• VSCode is installed. Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification." }
+  if ($didInstallExtension) { Write-Host "• VSCode extensions are installed. Open the VSCode Extensions sidebar when in WSL mode, then click Install in WSL:Ubuntu for the listed extensions." }
+  if ($didInstallPowerToys) { Write-Host "• PowerToys is installed. Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
+  if ($didInstallMullvad)   { Write-Host "• Mullvad VPN is installed. Run Mullvad, and remember to adjust its settings, if not already done." }
+  Write-Host "• Clean up downloaded setup files from $winspaceSetupDir."
+  Write-Host "• Set scaling to 175% in Display Settings."
 
   Write-Host ""
   Write-Host "Complete."
