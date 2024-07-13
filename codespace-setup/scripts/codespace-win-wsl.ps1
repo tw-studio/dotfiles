@@ -472,7 +472,7 @@ if (-not (Test-Path $vscodePath)) {
   }
 
   Write-Host "Running installer for VSCode..."
-  Start-Process -FilePath $vscodeInstallerPath -Args "/SILENT /MERGETASKS=!runcode" -Wait
+  Start-Process -FilePath $vscodeInstallerPath -Args "/VERYSILENT /MERGETASKS=!runcode" -Wait
 
   $didInstallVSCode = $true
 } else {
