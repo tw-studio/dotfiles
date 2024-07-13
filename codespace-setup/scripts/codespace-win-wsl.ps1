@@ -452,9 +452,17 @@ $vscodePath = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe"
 if (-not (Test-Path $vscodePath)) {
   Write-Host "VSCode is not installed."
 
-  Write-Host "Downloading installer for VSCode..."
-  $installerPath = "$winspaceSetupDir\VSCodeSetup.exe"
-  Invoke-WebRequest -Uri "https://update.code.visualstudio.com/latest/win32-x64-user/stable" -OutFile $installerPath
+  $vscodeInstallerPath = "$winspaceSetupDir\VSCodeSetup.exe"
+  if (-not (Test-Path $vscodeInstallerPath)) {
+
+    Write-Host "Installer for VSCode is not found."
+    Write-Host "Downloading installer for VSCode..."
+    $installerPath = "$winspaceSetupDir\VSCodeSetup.exe"
+    Invoke-WebRequest -Uri "https://update.code.visualstudio.com/latest/win32-x64-user/stable" -OutFile $installerPath
+  } else {
+
+    Write-Host "Installer for VSCode found in $winspaceSetupDir."
+  }
 
   Write-Host "Running installer for VSCode..."
   Start-Process -FilePath $installerPath -Args "/silent /mergetasks=!runcode" -Wait
@@ -524,20 +532,26 @@ if ($vscodeCLIPath) {
 }
 if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
 
-  # Download box-checker extension file into this directory
-  $boxCheckerPath = Join-Path -Path $winspaceSetupDir -ChildPath "box-checker-0.0.1.vsix"
+  Write-Host "Personal extension $boxCheckerId is not installed."
+
+  $boxCheckerFilename = "box-checker-0.0.1.vsix"
+  $boxCheckerPath = Join-Path -Path $winspaceSetupDir -ChildPath $boxCheckerFilename
   if (-not (Test-Path $boxCheckerPath)) {
 
-    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/box-checker-0.0.1.vsix" -OutFile $boxCheckerPath
+    Write-Host "Installer for $boxCheckerId is not found."
+    Write-Host "Downloading $boxCheckerFilename..."
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/tw-studio/dotfiles/main/vscode/$boxCheckerFilename" -OutFile $boxCheckerPath
+  } else {
+
+    Write-Host "Installer for $boxCheckerId found in $winspaceSetupDir."
   }
 
-  # Install box-checker extension from vsix
-    Write-Host "Installing extension: $boxCheckerId..."
-    & $vscodeCLIPath --install-extension $boxCheckerPath
-    $didInstallExtension = $true
+  Write-Host "Installing extension: $boxCheckerId..."
+  & $vscodeCLIPath --install-extension $boxCheckerPath
+  $didInstallExtension = $true
 } else {
 
-  Write-Host "Extension $boxCheckerId is already installed."
+  Write-Host "Personal extension $boxCheckerId is already installed."
 }
 
 # >> MARK: |3| Import personal settings and keybindings files
@@ -582,9 +596,11 @@ if (-not ($hasSettingsBackup -and $hasKeybindingsBackup)) {
   Write-Host "Backups for default settings and keybindings are found."
 }
 
-# >> MARK: |4| Install personal VSCode fonts if not already installed
+###
+##
+# MARK: |F| Install personal fonts
 
-# |4.1| Check if fonts are already installed
+# |1| Check if fonts are already installed
 $fontName1 = "MesloLGLDZNerdFontMono-Bold.ttf"
 $fontName2 = "RobotoMonoNerdFontMono-Medium.ttf"
 $fontsDirectory = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Microsoft\Windows\Fonts"
@@ -596,34 +612,38 @@ $fontFilePath2 = Join-Path -Path $fontsDirectory -ChildPath $fontName2
 
 if (-not ((Test-Path -Path $fontFilePath1) -and (Test-Path -Path $fontFilePath2))) {
 
-  Write-Host "Fonts for VSCode are not installed."
+  Write-Host "Personal fonts for code are not installed."
 
-  # |4.2| Download fonts only when not already installed
-  Write-Host "Downloading fonts for VSCode..."
-  $fontUrl1 = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/fonts/$fontName1"
-  $fontUrl2 = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/fonts/$fontName2"
-  $fontTempPath1 = Join-Path -Path $winspaceSetupDir -ChildPath $fontName1
-  $fontTempPath2 = Join-Path -Path $winspaceSetupDir -ChildPath $fontName2
-  Invoke-WebRequest -Uri $fontUrl1 -OutFile $fontTempPath1
-  Invoke-WebRequest -Uri $fontUrl2 -OutFile $fontTempPath2
+  # |2| Download fonts when not found
+  $fontDownloadPath1 = Join-Path -Path $winspaceSetupDir -ChildPath $fontName1
+  $fontDownloadPath2 = Join-Path -Path $winspaceSetupDir -ChildPath $fontName2
+  if (-not (Test-Path "$fontDownloadPath1") -and -not (Test-Path "$fontDownloadPath2")) {
+    Write-Host "Downloading personal fonts for code..."
+    $fontUrl1 = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/fonts/$fontName1"
+    $fontUrl2 = "https://raw.githubusercontent.com/tw-studio/dotfiles/main/fonts/$fontName2"
+    Invoke-WebRequest -Uri $fontUrl1 -OutFile $fontDownloadPath1
+    Invoke-WebRequest -Uri $fontUrl2 -OutFile $fontDownloadPath2
+  } else {
+    Write-Host "Font files are found in $winspaceSetupDir."
+  }
 
-  # |4.3| Guide users to installing fonts themselves
+  # |3| Guide users to installing fonts themselves
   Write-Host "Installing fonts requires completing the installations in the dialogs that appear."
   Write-Host "Installing $fontName1..."
-  Invoke-Item $fontTempPath1
+  Invoke-Item $fontDownloadPath1
   Read-Host "Press Enter after you have finished installing the font"
   Write-Host "Installing $fontName2..."
-  Invoke-Item $fontTempPath2
+  Invoke-Item $fontDownloadPath2
   Read-Host "Press Enter after you have finished installing the font"
 
 } else {
 
-  Write-Host "Fonts for VSCode are already installed."
+  Write-Host "Personal fonts for code are already installed."
 }
 
 ###
 ##
-# MARK: |F| Install PowerToys
+# MARK: |H| Install PowerToys
 
 # Continue only if PowerToys is not already installed
 $alreadyInstalledPowerToys = Get-CimInstance -ClassName Win32_Product |
@@ -641,11 +661,19 @@ if ($alreadyInstalledPowerToys) {
   $powerToysDownloadName = "PowerToysUserSetup-0.81.1-x64.exe"
   $powerToysDownloadUrl = "https://github.com/microsoft/PowerToys/releases/download/v0.81.1/$powerToysDownloadName"
   $powerToysDownloadPath = Join-Path -Path "$winspaceSetupDir" -ChildPath $powerToysDownloadName
-  Write-Host "Downloading $powerToysDownloadName from $powerToysRepo..."
-  Invoke-WebRequest -Uri "$powerToysDownloadUrl" -OutFile "$powerToysDownloadPath"
+
+  # Download PowerToys installer when not found
   if (-not (Test-Path "$powerToysDownloadPath")) {
-    Write-Error "Failed to download Microsoft PowerToys."
-    exit 1
+
+    Write-Host "Downloading $powerToysDownloadName from $powerToysRepo..."
+    Invoke-WebRequest -Uri "$powerToysDownloadUrl" -OutFile "$powerToysDownloadPath"
+    if (-not (Test-Path "$powerToysDownloadPath")) {
+      Write-Error "Failed to download Microsoft PowerToys."
+      exit 1
+    }
+  } else {
+
+    Write-Host "Installer for Microsoft PowerToys found in $winspaceSetupDir."
   }
 
   # Install PowerToys
@@ -712,11 +740,19 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
   $wingetCliDownloadName = "Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
   $wingetCliDownloadUrl = "https://github.com/microsoft/winget-cli/releases/download/v1.7.11261/$wingetCliDownloadName"
   $wingetCliDownloadPath = Join-Path -Path "$winspaceSetupDir" -ChildPath $wingetCliDownloadName
-  Write-Host "Downloading $wingetCliDownloadName from $wingetCliRepo..."
-  Invoke-WebRequest -Uri "$wingetCliDownloadUrl" -OutFile "$wingetCliDownloadPath"
+
+  # Download winget-cli installer when not found
   if (-not (Test-Path "$wingetCliDownloadPath")) {
-    Write-Error "Failed to download winget-cli."
-    exit 1
+
+    Write-Host "Downloading $wingetCliDownloadName from $wingetCliRepo..."
+    Invoke-WebRequest -Uri "$wingetCliDownloadUrl" -OutFile "$wingetCliDownloadPath"
+    if (-not (Test-Path "$wingetCliDownloadPath")) {
+      Write-Error "Failed to download winget-cli."
+      exit 1
+    }
+  } else {
+
+    Write-Host "Installer for winget-cli found in $winspaceSetupDir."
   }
 
   # Install winget
@@ -730,7 +766,7 @@ if (-not (Get-AppxPackage -Name $wingetPackageName)) {
 
 ###
 ##
-# MARK: |H| Install Windows Terminal
+# MARK: |I| Install Windows Terminal
 
 # >> MARK: |1| Install Windows Terminal via winget
 $windowsTerminalId = "Microsoft.WindowsTerminal"
@@ -874,7 +910,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
 ###
 ##
-# MARK: |I| Download and install Mullvad VPN
+# MARK: |J| Download and install Mullvad VPN
 
 # Continue only when Mullvad is not installed
 $isMullvadInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
@@ -892,8 +928,12 @@ if (-not $isMullvadInstalled) {
     $mullvadInstallerFilename = [System.IO.Path]::GetFileName($mullvadInstallerHeadResponse.BaseResponse.ResponseUri.LocalPath)
     $mullvadInstallerOutputPath = Join-Path -Path $winspaceSetupDir -ChildPath $mullvadInstallerFilename
 
-    Write-Host "Downloading latest Mullvad VPN installer to $winspaceSetupDir..."
-    Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
+    if (-not (Test-Path "$mullvadInstallerOutputPath")) {
+      Write-Host "Downloading latest Mullvad VPN installer to $winspaceSetupDir..."
+      Invoke-WebRequest -Uri $mullvadInstallerUrl -OutFile $mullvadInstallerOutputPath
+    } else {
+      Write-Host "Latest installer for Mullvad VPN found in $winspaceSetupDir."
+    }
 
     Write-Host "Installing Mullvad VPN..."
     Start-Process -FilePath $mullvadInstallerOutputPath -Wait
