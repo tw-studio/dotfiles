@@ -18,7 +18,7 @@ function git_repo_name() {
 
 # calibrated for these terminal colors:
 # green #7bd88f
-# cyan #5ad4e6
+# cyan #5fd7ff
 # blue #fd9353
 # red #fc618d
 # yellow #fce566
