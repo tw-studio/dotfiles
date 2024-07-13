@@ -293,8 +293,16 @@ if ! grep -q 'generateResolvConf = false' /etc/wsl.conf; then
 fi
 "@
   wsl -d Ubuntu -u root -- bash -c $appendWslConfCommand
+
+  # Restart WSL to apply wsl.conf changes
+  Write-Host "Shutting down WSL for good measure and waiting 3 seconds..."
+  wsl --shutdown
+  Start-Sleep -Seconds 3
+  Write-Host "Restarting WSL Ubuntu..."
+  wsl -d Ubuntu -u root -- bash -c "echo 'Ubuntu restarted successfully'"
+  Start-Sleep -Seconds 1
+
   Write-Host "Fixing resolv.conf in Ubuntu..."
-  # TODO: Test removing sudo
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f -i /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
   wsl -d Ubuntu -u root -- bash -c "sudo sh -c 'echo ''nameserver 8.8.8.8'' > /etc/resolv.conf'"
@@ -605,7 +613,7 @@ $fontName1 = "MesloLGLDZNerdFontMono-Bold.ttf"
 $fontName2 = "RobotoMonoNerdFontMono-Medium.ttf"
 $fontsDirectory = Join-Path -Path $env:LOCALAPPDATA -ChildPath "Microsoft\Windows\Fonts"
 if (-not (Test-Path -Path $fontsDirectory)) {
-  New-Item -Path $fontsDirectory -ItemType Directory
+  New-Item -Path $fontsDirectory -ItemType Directory | Out-Null
 }
 $fontFilePath1 = Join-Path -Path $fontsDirectory -ChildPath $fontName1
 $fontFilePath2 = Join-Path -Path $fontsDirectory -ChildPath $fontName2
