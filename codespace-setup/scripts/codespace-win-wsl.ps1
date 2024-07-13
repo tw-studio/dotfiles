@@ -940,7 +940,7 @@ if (-not $isMullvadInstalled) {
   $readReadyForMullvadInstall = Read-Host "Do you want to install Mullvad VPN? (Y/n)"
   if ((-not $readReadyForMullvadInstall) -or $readReadyForMullvadInstall -eq 'y' -or $readReadyForMullvadInstall -eq 'Y') {
 
-    Write-Host "Configuring download of Mullvad VPN installer..."
+    Write-Host "Checking latest version of Mullvad VPN installer..."
     $mullvadInstallerUrl = "https://mullvad.net/en/download/app/exe/latest"
     $mullvadInstallerHeadResponse = Invoke-WebRequest -Uri $mullvadInstallerUrl -Method Head -MaximumRedirection 5 -ErrorAction Stop
     $mullvadInstallerFilename = [System.IO.Path]::GetFileName($mullvadInstallerHeadResponse.BaseResponse.ResponseUri.LocalPath)
