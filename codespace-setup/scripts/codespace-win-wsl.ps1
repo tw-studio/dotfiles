@@ -958,8 +958,21 @@ if (-not $isMullvadInstalled) {
       Write-Host "Latest installer for Mullvad VPN found in $winspaceSetupDir."
     }
 
+    # Add 30 second timeout in case "Run now" checkbox is unchecked in the installer,
+    # which keeps script from recognizing when install is done
     Write-Host "Installing Mullvad VPN..."
-    Start-Process -FilePath $mullvadInstallerOutputPath -Wait
+    $mullvadInstallerProcess = Start-Process -FilePath $mullvadInstallerOutputPath -PassThru
+    $timeoutInSeconds = 30
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+    while ($mullvadInstallerProcess.HasExited -eq $false) {
+      Start-Sleep -Seconds 1
+      if ($stopwatch.Elapsed.TotalSeconds -gt $timeoutInSeconds) {
+        $mullvadInstallerProcess | Stop-Process -Force
+        Write-Host "Process for installing Mullvad VPN timed out at $timeoutInSeconds seconds and was killed."
+        break
+      }
+    }
+    $stopwatch.Stop()
 
     Write-Host "Mullvad VPN is installed."
     $didInstallMullvad = $true
