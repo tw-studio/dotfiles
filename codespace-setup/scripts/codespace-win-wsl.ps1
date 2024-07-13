@@ -304,7 +304,7 @@ fi
 
   Write-Host "Fixing resolv.conf in Ubuntu..."
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f -i /etc/resolv.conf"
-  wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf"
+  wsl -d Ubuntu -u root -- bash -c "sudo rm /etc/resolv.conf 2>/dev/null"
   wsl -d Ubuntu -u root -- bash -c "sudo sh -c 'echo ''nameserver 8.8.8.8'' > /etc/resolv.conf'"
   wsl -d Ubuntu -u root -- bash -c "sudo chattr -f +i /etc/resolv.conf"
 }
