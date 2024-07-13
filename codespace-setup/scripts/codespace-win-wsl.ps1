@@ -471,7 +471,7 @@ if (-not (Test-Path $vscodePath)) {
     Write-Host "Installer for VSCode found in $winspaceSetupDir."
   }
 
-  Write-Host "Running installer for VSCode..."
+  Write-Host "Running installer for VSCode silently (this may take a minute)..."
   Start-Process -FilePath $vscodeInstallerPath -Args "/VERYSILENT /MERGETASKS=!runcode" -Wait
 
   $didInstallVSCode = $true
@@ -498,8 +498,8 @@ if ($vscodeCLIPath) {
     )
     $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
     if ($baseExtensionId -notin $InstalledExtensions) {
-      # Write-Host "Installing extension: $ExtensionId..."
-      & $VscodeCLIPath --verbose --install-extension $ExtensionId
+      Write-Host "Installing extension: $ExtensionId..."
+      & $VscodeCLIPath --install-extension $ExtensionId
       $didInstallExtension = $true
     } else {
       Write-Host "Extension $ExtensionId is already installed."
