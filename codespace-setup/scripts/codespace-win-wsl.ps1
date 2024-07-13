@@ -487,14 +487,19 @@ if (-not (Test-Path $vscodeCLIPath)) { $vscodeCLIPath = "C:\Program Files\Micros
 
 if ($vscodeCLIPath) {
 
+  $vscodeInstalledExtensions = & $vscodeCLIPath --list-extensions
+
   # >>>> MARK: |2.1| Install-VSCodeExtension function installs a VSCode extension by id only when not already installed
   function Install-VSCodeExtension {
-    Param([string]$ExtensionId)
+    Param(
+      [string]$ExtensionId,
+      [string[]]$InstalledExtensions,
+      [string]$VscodeCLIPath
+    )
     $baseExtensionId = $ExtensionId -split '@' | Select-Object -First 1
-    $installedExtensions = & $vscodeCLIPath --list-extensions
-    if ($baseExtensionId -notin $installedExtensions) {
+    if ($baseExtensionId -notin $InstalledExtensions) {
       # Write-Host "Installing extension: $ExtensionId..."
-      & $vscodeCLIPath --install-extension $ExtensionId
+      & $VscodeCLIPath --verbose --install-extension $ExtensionId
       $didInstallExtension = $true
     } else {
       Write-Host "Extension $ExtensionId is already installed."
@@ -524,7 +529,7 @@ if ($vscodeCLIPath) {
     "tyriar.sort-lines",
     "wayou.vscode-todo-highlight"
   ) | ForEach-Object {
-    Install-VSCodeExtension $_
+    Install-VSCodeExtension -ExtensionId $_ -InstalledExtensions $vscodeInstalledExtensions -VscodeCLIPath $vscodeCLIPath
   }
 } else {
 
@@ -535,9 +540,9 @@ if ($vscodeCLIPath) {
 
 $boxCheckerId = "tw.box-checker"
 if ($vscodeCLIPath) {
-  $installedExtensions = & $vscodeCLIPath --list-extensions
+  $vscodeInstalledExtensions = & $vscodeCLIPath --list-extensions
 }
-if ($vscodeCLIPath -and $boxCheckerId -notin $installedExtensions) {
+if ($vscodeCLIPath -and $boxCheckerId -notin $vscodeInstalledExtensions) {
 
   Write-Host "Personal extension $boxCheckerId is not installed."
 
