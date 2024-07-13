@@ -465,15 +465,14 @@ if (-not (Test-Path $vscodePath)) {
 
     Write-Host "Installer for VSCode is not found."
     Write-Host "Downloading installer for VSCode..."
-    $installerPath = "$winspaceSetupDir\VSCodeSetup.exe"
-    Invoke-WebRequest -Uri "https://update.code.visualstudio.com/latest/win32-x64-user/stable" -OutFile $installerPath
+    Invoke-WebRequest -Uri "https://update.code.visualstudio.com/latest/win32-x64-user/stable" -OutFile $vscodeInstallerPath
   } else {
 
     Write-Host "Installer for VSCode found in $winspaceSetupDir."
   }
 
   Write-Host "Running installer for VSCode..."
-  Start-Process -FilePath $installerPath -Args "/silent /mergetasks=!runcode" -Wait
+  Start-Process -FilePath $vscodeInstallerPath -Args "/silent /mergetasks=!runcode" -Wait
 
   $didInstallVSCode = $true
 } else {
@@ -703,16 +702,27 @@ if (-not (Get-Command "nuget" -ErrorAction SilentlyContinue)) {
 
   Write-Host "NuGet CLI is not installed."
 
-  # Download NuGet CLI to WindowsApps directory
   $nugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
-  $nugetDir = "$windowsAppsDir"
-  $nugetPath = "$nugetDir\nuget.exe"
-  if (-not (Test-Path -Path "$nugetPath")) {
-    Write-Host "nuget.exe is not downloaded."
-    Write-Host "Downloading NuGet to $nugetDir..."
-    Invoke-WebRequest -Uri $nugetUrl -OutFile "$nugetPath"
+  $nugetDownloadPath = "$winspaceSetupDir\nuget.exe"
+  $nugetInstallDir = "$windowsAppsDir"
+  $nugetInstallPath = "$nugetInstallDir\nuget.exe"
+
+  if (-not (Test-Path "$nugetInstallPath")) {
+
+    # Download NuGet CLI first to winspace setup before copying to WindowsApps
+    if (-not (Test-Path "$nugetDownloadPath")) {
+      Write-Host "NuGet CLI is not downloaded."
+      Write-Host "Downloading NuGet CLI to $winspaceSetupDir..."
+      Invoke-WebRequest -Uri $nugetUrl -OutFile "$nugetDownloadPath"
+    } else {
+      Write-Host "NuGet CLI found in $winspaceSetupDir."
+    }
+
+    Write-Host "Installing (copying) NuGet CLI to $nugetInstallDir..."
+    Copy-Item -Path $nugetDownloadPath -Destination $nugetInstallPath
   } else {
-    Write-Host "nuget.exe is already downloaded."
+
+    Write-Host "NuGet CLI is already installed."
   }
 
   # Verify installation
