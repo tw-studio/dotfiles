@@ -962,11 +962,13 @@ if (-not $isMullvadInstalled) {
     $readReadyForMullvadAccount = Read-Host "Do you want to log in with your Mullvad account number now? (Y/n)"
     if ((-not $readReadyForMullvadAccount) -or $readReadyForMullvadAccount -eq 'y' -or $readReadyForMullvadAccount -eq 'Y') {
 
+      $mullvadCLIPath = "C:\Program Files\Mullvad VPN\resources\mullvad.exe"
+
       $readMullvadAccountNumber = Read-Host "Enter your Mullvad account number"
       if ($readMullvadAccountNumber -match "^\d{16}$") {
 
         Write-Host "Logging in to Mullvad with $readMullvadAccountNumber..."
-        $outputMullvadAccountLogin = mullvad account login $readMullvadAccountNumber
+        $outputMullvadAccountLogin = & $mullvadCLIPath account login $readMullvadAccountNumber
 
         if ($?) {
 
@@ -976,14 +978,14 @@ if (-not $isMullvadInstalled) {
           if ((-not $readReadyForMullvadAutoConnect) -or $readReadyForMullvadAutoConnect -eq 'y' -or $readReadyForMullvadAutoConnect -eq 'Y') {
 
             Write-Host "Configuring Mullvad to auto-connect on system startup..."
-            mullvad auto-connect set on
+            & $mullvadCLIPath auto-connect set on
           }
 
           $readReadyForMullvadLockdownMode = Read-Host "Do you want to configure Mullvad to enable Lockdown Mode? (Y/n)"
           if ((-not $readReadyForMullvadLockdownMode) -or $readReadyForMullvadLockdownMode -eq 'y' -or $readReadyForMullvadLockdownMode -eq 'Y') {
 
             Write-Host "Enabling Mullvad Lockdown Mode..."
-            mullvad lockdown-mode set on
+            & $mullvadCLIPath lockdown-mode set on
           }
         } else {
 
