@@ -1038,15 +1038,23 @@ if (-not $isMullvadInstalled) {
 
 # Steps:
 # 0) (optional) Set up personal PowerShell profile
-# 1) Install neovim via winget: winget install Neovim.Neovim
-# 2) Make nvim config directory: New-Item -Path $env:LOCALAPPDATA -Name "nvim" -ItemType "directory" -Force
+# 1) Install neovim via winget: winget install Neovim.Neovim -e
+# 2) Make nvim config directory: New-Item -ItemType "directory" -Path "$env:LOCALAPPDATA\nvim" -Force
 # 3) Download personal init.vim to nvim config directory
-# 4) Make nvim/colors directory: New-Item -Path $env:LOCALAPPDATA\nvim -Name "colors" -ItemType "directory" -Force
+# 4) Make nvim/colors directory: New-Item -ItemType "directory" -Path "$env:LOCALAPPDATA\nvim\colors" -Force
 # 5) Download color theme files to nvim/colors
 # 6) Force create this directory path: $env:LOCALAPPDATA\nvim-data\site\autoload
 # 7) Download plug.vim to this autoload directory
 # 8) (troubleshoot why vim-plug isn't working on Windows)
 # 9) (if vim-plug can't work on Windows, set up dracula theme with file instead)
+
+###
+##
+# MARK: Set up git for Windows (incomplete)
+
+# Steps:
+# 1) Install git with winget: winget install --id Git.Git -e --source winget
+# ...) Set up git stuff like for Ubuntu
 
 ###
 ##
