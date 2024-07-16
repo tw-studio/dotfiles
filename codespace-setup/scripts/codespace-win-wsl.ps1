@@ -1025,7 +1025,7 @@ if (-not $isMullvadInstalled) {
 
 ###
 ##
-# MARK: Configure personal PowerShell profile (incomplete)
+# MARK: Configure personal PowerShell profile (placeholder)
 
 # Steps:
 # 1) Download personal PowerShell profile
@@ -1034,7 +1034,7 @@ if (-not $isMullvadInstalled) {
 
 ###
 ##
-# MARK: Install Neovim for Windows (incomplete)
+# MARK: Install Neovim for Windows (placeholder)
 
 # Steps:
 # 0) (optional) Set up personal PowerShell profile
@@ -1050,11 +1050,21 @@ if (-not $isMullvadInstalled) {
 
 ###
 ##
-# MARK: Set up git for Windows (incomplete)
+# MARK: Set up git for Windows (placeholder)
 
 # Steps:
 # 1) Install git with winget: winget install --id Git.Git -e --source winget
 # ...) Set up git stuff like for Ubuntu
+
+###
+##
+# MARK: Set up node (placeholder)
+
+# Steps:
+# 1) (from nodejs site) Install node with fnm::
+#      winget install Schniz.fnm
+#      fnm use --install-if-missing 20
+# ...) Set up other stuff I like, such as pnpm
 
 ###
 ##
