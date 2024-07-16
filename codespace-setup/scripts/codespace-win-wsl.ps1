@@ -1058,12 +1058,23 @@ if (-not $isMullvadInstalled) {
 
 ###
 ##
+# MARK: Set up oh-my-posh (placeholder)
+
+# Steps:
+# 1) Install oh-my-posh: winget install JanDeDobbeleer.OhMyPosh -s winget
+# 2) Reload path
+# -> (check whether antivirus acts up)
+# ...) Follow next steps at https://ohmyposh.dev 
+
+###
+##
 # MARK: Set up node (placeholder)
 
 # Steps:
 # 1) (from nodejs site) Install node with fnm::
 #      winget install Schniz.fnm
 #      fnm use --install-if-missing 20
+# 2) (troubleshoot why fnm isn't working)
 # ...) Set up other stuff I like, such as pnpm
 
 ###
