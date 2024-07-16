@@ -1025,6 +1025,31 @@ if (-not $isMullvadInstalled) {
 
 ###
 ##
+# MARK: Configure personal PowerShell profile (incomplete)
+
+# Steps:
+# 1) Download personal PowerShell profile
+# 2) Copy to $HOME\Documents\WindowsPowerShell\Profile.ps1 (PowerShell 5.1 or earlier)
+# 3) Source with `. <path>`
+
+###
+##
+# MARK: Install Neovim for Windows (incomplete)
+
+# Steps:
+# 0) (optional) Set up personal PowerShell profile
+# 1) Install neovim via winget: winget install Neovim.Neovim
+# 2) Make nvim config directory: New-Item -Path $env:LOCALAPPDATA -Name "nvim" -ItemType "directory" -Force
+# 3) Download personal init.vim to nvim config directory
+# 4) Make nvim/colors directory: New-Item -Path $env:LOCALAPPDATA\nvim -Name "colors" -ItemType "directory" -Force
+# 5) Download color theme files to nvim/colors
+# 6) Force create this directory path: $env:LOCALAPPDATA\nvim-data\site\autoload
+# 7) Download plug.vim to this autoload directory
+# 8) (troubleshoot why vim-plug isn't working on Windows)
+# 9) (if vim-plug can't work on Windows, set up dracula theme with file instead)
+
+###
+##
 # MARK: Suggested next steps
 
 # Only show suggested tasks related to modifications made in this script run.
