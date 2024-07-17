@@ -154,8 +154,9 @@ echo -e '\033[6 q'
     alias code='cd ~/codespace'
     alias codespace='cd ~/codespace'
     alias cp='cp -iv'                           # Preferred 'cp' implementation - requires confirm
+    alias ddss='find . -type f -name ".DS_Store" -delete'
     alias dm="deletemark"                       # zshmarks plugin
-    alias dzi="find . -name \"*:Zone.Identifier\" -type f -delete"
+    alias dzi="find . -type f -name \"*:Zone.Identifier\" -delete"
     alias fd='fdfind --hidden'
     # Fix git when wsl corrupts and empties object
     alias gitfix="find .git/objects/ -type f -empty | xargs rm; git fetch -p; git fsck --full"
@@ -180,6 +181,7 @@ echo -e '\033[6 q'
     alias rm='rm -i'                            # Preferred 'rm' implementation - requires confirm
     alias rmhio='rm -f *.hi && rm -f *.o'       # haskell
     alias sm="showmarks"                        # zshmarks plugin
+    alias temp="cd $CODESPACE/tempspace"
     alias timeout90="timeout --preserve-status --kill-after=90s 90s"
     alias tm="tmux ls"
     alias tm#="tmux attach #"
@@ -218,6 +220,17 @@ echo -e '\033[6 q'
     qcd(){ unset -f cd; cd $*; altercd; }
     cl() { cd "$@" && ls; }
     cs() { cd "$@" && ls; }
+
+    # dall - delete all silly things
+    dall() {
+      ddss    # .DS_Store
+      dzi     # Zone.Identifier
+    }
+
+    # key - add identity to funtoo/keychain
+    key() {
+      eval $(keychain -q --eval --agents ssh "$1")
+    }
 
     # snap - archives files and dirs
     snap() {
@@ -261,19 +274,9 @@ echo -e '\033[6 q'
       vs --remote wsl+Ubuntu "$path_arg"
     }
 
-    # key - add identity to funtoo/keychain
-    key() {
-      eval $(keychain -q --eval --agents ssh "$1")
-    }
-
     # winvar - echo value of Windows environment variable
     winvar() {
       echo $(wslpath $(cmd.exe /C "echo %$1%" 2>/dev/null | tr -d '\r'))
-    }
-
-    # fh - search in your command history and execute selected command
-    fh() {
-      eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
     }
 
 #   fzf configuration
@@ -290,6 +293,11 @@ echo -e '\033[6 q'
 
     # Source key bindings etc
     [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+    # fh - search in your command history and execute selected command
+    fh() {
+      eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
+    }
 
 #   Source ec2 environment if exists
 #   ------------------------------------------
