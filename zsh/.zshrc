@@ -181,6 +181,8 @@ echo -e '\033[6 q'
     alias rm='rm -i'                            # Preferred 'rm' implementation - requires confirm
     alias rmhio='rm -f *.hi && rm -f *.o'       # haskell
     alias sm="showmarks"                        # zshmarks plugin
+    alias sshc="nv ~/.ssh/config"
+    alias ssho="ssh -o \"IdentitiesOnly=yes\""
     alias temp="cd $CODESPACE/tempspace"
     alias timeout90="timeout --preserve-status --kill-after=90s 90s"
     alias tm="tmux ls"
@@ -231,6 +233,39 @@ echo -e '\033[6 q'
     key() {
       eval $(keychain -q --eval --agents ssh "$1")
     }
+
+    # open - mimics Mac open in Ubuntu WSL
+    if command -v wslpath &> /dev/null; then
+      open() {
+        # Require only one argument
+        if [[ $# -ne 1 ]]; then
+            echo "Usage: open <path>"
+            return 1
+        fi
+
+        # Check if the path is valid
+        if [[ ! -e "$1" ]]; then
+            echo "Invalid path: $1"
+            return 1
+        fi
+
+        # Convert the path to a Windows path
+        local win_path=$(wslpath -w "$1")
+
+        # Determine if the path is a file or a directory
+        if [[ -d "$1" ]]; then
+            # It's a directory, open in File Explorer
+            cmd.exe /C start "" "$win_path" > /dev/null 2>&1
+        elif [[ -f "$1" ]]; then
+            # It's a file, open with the default application
+            cmd.exe /C start "" "$win_path" > /dev/null 2>&1
+        else
+            # Unsupported file type or URL/URI
+            echo "Unsupported file type or not a local file/directory path."
+            return 1
+        fi
+      }
+    fi
 
     # snap - archives files and dirs
     snap() {
@@ -308,3 +343,4 @@ echo -e '\033[6 q'
 #   Final steps
 #   ------------------------------------------
     typeset -aU path    # dedupes path
+
