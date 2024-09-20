@@ -3,7 +3,7 @@
     <h1 align="center">dotfiles</h2>
 </p>
 
-<p align="center">Dotfiles and scripts to set up zsh, tmux, and neovim on Ubuntu and Alpine Linux.</p>
+<p align="center">Dotfiles and scripts to set up zsh, tmux, neovim, vscode, wsl, and more.</p>
 
 <br />
 

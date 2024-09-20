@@ -1,8 +1,6 @@
 #!/bin/bash
-# Compatibility across Ubuntu and Ubuntu WSL
 MD5=$(command -v md5 || command -v md5sum)
 SESSION="vscode`pwd | $MD5 | cut -d' ' -f1`"
-
 #if ! command -v tmux > /dev/null; then
 if [[ ! -f "/usr/bin/tmux" && ! -f "/usr/local/bin/tmux" ]]; then
   echo "tmux not found. Starting zsh in 3 seconds..."

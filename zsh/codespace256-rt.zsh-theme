@@ -18,7 +18,7 @@ function git_repo_name() {
 
 # calibrated for these terminal colors:
 # green #7bd88f
-# cyan #5ad4e6
+# cyan #5fd7ff
 # blue #fd9353
 # red #fc618d
 # yellow #fce566
@@ -32,11 +32,11 @@ function git_repo_name() {
 #ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%})"
 
 # closest approximation with 256 colors
-eval _green='$FG[079]'
-eval _cyan='$FG[081]'
-eval _blue='$FG[209]'   # actually orange
-eval _red='$FG[204]'
-eval _yellow='$FG[228]'
+eval _green='$FG[079]'    # #5fd7af Aquamarine3
+eval _cyan='$FG[081]'     # #5fd7ff SteelBlue1
+eval _blue='$FG[209]'     # #ff875f Salmon1
+eval _red='$FG[204]'      # #ff5f87 IndianRed1
+eval _yellow='$FG[228]'   # #ffff87 Khaki1
 #eval tw_yellow='$FG[221]'
 PROMPT="%{$FX[bold]$_green%} # "
 PROMPT+='%{$_cyan%}%c %{$reset_color%}'
