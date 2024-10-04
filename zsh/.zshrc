@@ -69,6 +69,9 @@ echo -e '\033[6 q'
 #   Set general environment variables
 #   -----------------------------------------------------------
     export CODESPACE=$HOME/codespace
+    if command -v brew &>/dev/null; then
+      export HOMEBREW_PREFIX="$(HOMEBREW_NO_AUTO_UPDATE=1 brew --prefix)"
+    fi
     export LANG=en_US.UTF-8
     export LANGUAGE=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
@@ -85,10 +88,14 @@ echo -e '\033[6 q'
     [[ -d "$HOME/.local/bin" ]] && path+=("$HOME/.local/bin")
     [[ -d "$CODESPACE/scripts/global-scripts" ]] && path+=("$CODESPACE/scripts/global-scripts")
     [[ -d "/Applications/Docker.app/Contents/Resources/bin" ]] && path+=("/Applications/Docker.app/Contents/Resources/bin")
+    if [[ -n "$HOMEBREW_PREFIX" ]] && [[ -d "$HOMEBREW_PREFIX/opt/gawk/libexec/gnubin" ]]; then
+      path=("$HOMEBREW_PREFIX/opt/gawk/libexec/gnubin" $path[@])
+    fi
     if command -v wslpath &> /dev/null; then
       path+=("/mnt/c/Windows/System32")
     fi
-    # typeset -aU path    # dedupes PATH ## PLACED AT END OF FILE
+    # typeset -aU path                    # dedupes PATH ## PLACED AT END OF FILE
+    # path=("/usr/local/bin" $path[@])    # JFYI: this is how to prepend
 
 #   Configure editors
 #   ------------------------------------------------------------
