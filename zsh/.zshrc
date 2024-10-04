@@ -101,7 +101,7 @@ echo -e '\033[6 q'
       path+=("$WINHOME/AppData/Local/Microsoft/WindowsApps")
     fi
     # typeset -aU path                    # dedupes PATH ## PLACED AT END OF FILE
-    # path=("/usr/local/bin" $path[@])    # JFYI: this is how to prepend
+    # path=("/usr/local/bin" $path[@])    # method to prepend
 
 #   Configure editors
 #   ------------------------------------------------------------
