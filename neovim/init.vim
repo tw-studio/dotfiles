@@ -7,11 +7,30 @@
 " General Vim settings
 " ====================
 ":autocmd BufEnter * silent! normal! g`"zz      " centers on last known cursor position when entering buffer
-:autocmd FileType *      set formatoptions=tcql nocindent comments&
+:autocmd FileType * set formatoptions=tcql nocindent comments&
 :set autoindent
 :set autoread
-":set clipboard+=unnamedplus            " ALWAYS use system clipboard for ALL operations
 :set clipboard=                         " NEVER use system clipboard; manually set below
+":set clipboard+=unnamedplus            " ALWAYS use system clipboard for ALL operations
+:if has('wsl')                          " also requires win32yank
+  :set clipboard+=unnamedplus
+
+  " requires installing win32yank:
+  "   `winget install --id=equalsraf.win32yank -e`
+  "   must be on PATH
+  :let g:clipboard = {
+      \ 'name': 'win32yank-wsl',
+      \ 'copy': {
+      \   '+': 'win32yank.exe -i --crlf',
+      \   '*': 'win32yank.exe -i --crlf',
+      \ },
+      \ 'paste': {
+      \   '+': 'win32yank.exe -o --lf',
+      \   '*': 'win32yank.exe -o --lf',
+      \ },
+      \ 'cache_enabled': 0,
+      \ }
+:endif
 :set confirm
 :set encoding=utf8
 :set expandtab
@@ -22,11 +41,11 @@
 :set infercase                          " supposedly better than ignorecase
 :set mouse=a
 :set nosol
-if !exists('g:vscode')
+:if !exists('g:vscode')
   :set number                             " shows current line number
   :set numberwidth=4                      " set gutter to 4
   :set relativenumber                     " sets relative line numbers
-endif
+:endif
 :set shiftround                         " rounds indents to multiple of shiftwidth
 :set shiftwidth=2
 :set showcmd                            " shows when Leader is pressed
