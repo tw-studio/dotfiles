@@ -71,6 +71,10 @@
 
     { "key": "ctrl+shift+alt+i",     "command": "insertDateString.insertDate",
                                         "when": "editorTextFocus" },
+    { "key": "ctrl+]",               "command": "editor.action.indentLines",
+                                        "when": "editorTextFocus && !editorReadonly" },
+    { "key": "ctrl+[",               "command": "editor.action.outdentLines",
+                                        "when": "editorTextFocus && !editorReadonly" },
 
     { "key": "alt+v tab",          "command": "type",
                                        "args": { "text": "\t" },
