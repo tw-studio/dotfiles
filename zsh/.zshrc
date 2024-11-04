@@ -83,6 +83,9 @@ echo -e '\033[6 q'
     if [[ -z "$OS_NAME" ]] && [[ -f /etc/os-release ]]; then
       export OS_NAME=$(awk -F= '$1=="NAME" {gsub(/"/, "", $s); print $2}' /etc/os-release)
     fi
+    if [[ -z "$OS_NAME" ]] && [[ -f /etc/os-release ]]; then
+      export OS_NAME=$(awk -F= '$1=="NAME" {gsub(/"/, "", $s); print $2}' /etc/os-release)
+    fi
 
 #   Set PATH
 #   ------------------------------------------------------------
