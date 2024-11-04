@@ -11,7 +11,18 @@
 - [ ] (P1.5) Fix VSCode settings not backing up on initial install
 - [ ] (P2) Configure personal PowerShell profile
 - [ ] (P2) Install NeoVim for Windows (for PowerShell)
+- [ ] (P2) Install 'trash' on Windows
 - [ ] (P3) Add "simple" flag to pass in via command line that skips optional installs
+
+**.zshrc**:
+- [ ] (P1.5) Fix snapm bug with hidden files
+- [ ] (P1.5) Add tesseract for Windows:
+
+    ```
+    # tesseract - ocr (Mac)
+    
+    
+    ```
 
 ### Done
 
