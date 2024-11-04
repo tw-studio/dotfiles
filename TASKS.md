@@ -9,14 +9,14 @@
 - [ ] (P1.5) Fix VSCode settings not backing up on initial install
 - [ ] (P2) Configure personal PowerShell profile
 - [ ] (P2) Install NeoVim for Windows (for PowerShell)
-- [ ] (P2) Install 'trash' on Windows
 - [ ] (P3) Add "simple" flag to pass in via command line that skips optional installs
 
 **.zshrc**:
-- [ ] (P1.5) Fix snapm bug with hidden files
+- [ ] (P3) Fix snapm bug with hidden files
 
 ### Done
 
+- [x] (P2) [codespace-win]: Install 'trash-cli' on Windows (2024-11-03 20:20)
 - [x] (P2) [vscode]: Adds win keybinding ctrl+shift+alt+m to toggle editor widths (11/03/24 08:03 PM)
 - [x] (P1) [nvim]: Add new keybinding shift+U in init.vim: `nnoremap U <C-r>`
 - [x] (P1) [zshrc]: Update WSL_INTEROP in tmux for when value changes due to WSL restart (11/03/24 07:22 PM)
