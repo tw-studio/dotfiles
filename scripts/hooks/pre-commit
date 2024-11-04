@@ -2,17 +2,22 @@
 #
 # pre-commit (dotfiles)
 
-# |1| Exclude TASKS.md from public branch
+# |1| Sanitize TASKS.md with placeholder content when committing to public branch
 
-FILE_TO_EXCLUDE="TASKS.md"
-EXCLUDE_BRANCH="public"
+FILE_TO_SANITIZE="TASKS.md"
+PUBLIC_BRANCH="public"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# Unstage TASKS.md when committing to branch `public`
-if [[ "$CURRENT_BRANCH" == "$EXCLUDE_BRANCH" ]]; then
-  if git diff --cached --name-only | grep -q "^$FILE_TO_EXCLUDE$"; then
-    git reset HEAD -- "$FILE_TO_EXCLUDE"
-    echo "Warning: '$FILE_TO_EXCLUDE' has been unstaged on branch '$EXCLUDE_BRANCH' and will not be committed."
+if [[ "$CURRENT_BRANCH" == "$PUBLIC_BRANCH" ]]; then
+
+  if git diff --cached --name-only | grep -q "^$FILE_TO_SANITIZE$"; then
+
+    echo "# Tasks" > "$FILE_TO_SANITIZE"
+    echo "" >> "$FILE_TO_SANITIZE"
+    echo "_This file is intentionally left blank in the public repository._" >> "$FILE_TO_SANITIZE"
+
+    git add "$FILE_TO_SANITIZE"
+    echo "Info: '$FILE_TO_SANITIZE' has been sanitized on branch '$PUBLIC_BRANCH'."
   fi
 fi
 
