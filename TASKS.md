@@ -19,6 +19,7 @@
 
 ### Done
 
+- [x] (P1) [zshrc]: Fix WSL interop (11/03/24 07:22 PM)
 - [x] (P1.5) [zshrc]: Fix fzf Ctrl+T use of $OS_NAME (11/03/24 07:14 PM)
 - [x] (P1.5) [codespace-win]: Add using AutoHotkey to map shortcut to Em Dash (11/03/24 07:06 PM)
 - [x] (P1.5) [zshrc]: Add tesseract for Windows (11/03/24 06:09 PM)
