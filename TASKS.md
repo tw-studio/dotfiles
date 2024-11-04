@@ -10,6 +10,7 @@
 - [ ] (P2) Configure personal PowerShell profile
 - [ ] (P2) Install NeoVim for Windows (for PowerShell)
 - [ ] (P3) Add "simple" flag to pass in via command line that skips optional installs
+- [ ] (P3) Consider switching install orders so all optional installs are at the end
 
 **.zshrc**:
 - [ ] (P3) Fix snapm bug with hidden files
