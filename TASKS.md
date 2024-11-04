@@ -15,7 +15,6 @@
 **.zshrc**:
 - [ ] (P1.5) Fix snapm bug with hidden files
 
-
 ### Done
 
 - [x] (P2) [vscode]: Adds win keybinding ctrl+shift+alt+m to toggle editor widths (11/03/24 08:03 PM)
