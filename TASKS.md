@@ -15,10 +15,11 @@
 **.zshrc**:
 - [ ] (P1.5) Fix snapm bug with hidden files
 
-- [ ] (P1) [nvim]: Add new keybinding shift+U in init.vim: `nnoremap U <C-r>`
 
 ### Done
 
+- [x] (P2) [vscode]: Adds win keybinding ctrl+shift+alt+m to toggle editor widths (11/03/24 08:03 PM)
+- [x] (P1) [nvim]: Add new keybinding shift+U in init.vim: `nnoremap U <C-r>`
 - [x] (P1) [zshrc]: Update WSL_INTEROP in tmux for when value changes due to WSL restart (11/03/24 07:22 PM)
 - [x] (P1.5) [zshrc]: Fix fzf Ctrl+T use of $OS_NAME (11/03/24 07:14 PM)
 - [x] (P1.5) [codespace-win]: Add using AutoHotkey to map shortcut to Em Dash (11/03/24 07:06 PM)
