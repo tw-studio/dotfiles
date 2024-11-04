@@ -6,8 +6,7 @@
 ### Tasks
 
 **Codespace Win**:
-- [ ] (P1.5) Add optional setup for VeraCrypt
-- [ ] (P1.5) Use AutoHotkey to map shortcut to Em Dash
+- [ ] (P1.5) Add using AutoHotkey to map shortcut to Em Dash
 - [ ] (P1.5) Fix VSCode settings not backing up on initial install
 - [ ] (P2) Configure personal PowerShell profile
 - [ ] (P2) Install NeoVim for Windows (for PowerShell)
@@ -16,15 +15,21 @@
 
 **.zshrc**:
 - [ ] (P1.5) Fix snapm bug with hidden files
-- [ ] (P1.5) Add tesseract for Windows:
+- [ ] (P1.5) [zshrc]: Change the if check in fzf configuration in .zshrc to: `if [[ "$WSL_DISTRO_NAME" == "ubuntu" ]]; then`
 
-    ```
-    # tesseract - ocr (Mac)
-    
-    
-    ```
+- [ ] (P1) [nvim]: Add new keybinding shift+U in init.vim: `nnoremap U <C-r>`
 
 ### Done
 
+- [x] (P1.5) [zshrc]: Add tesseract for Windows (11/03/24 06:09 PM)
+- [x] (P1.5) [codespace-win]: Add optional install of VeraCrypt (11/03/24 05:10 PM)
 - [x] Adding pre-commit hooks to sanitize TASKS.md in public branch (11/03/24 04:48 PM)
+
+
+
+
+
+- [ ] Fix dotfiles PowerShell script to not redownload settings files in second pass (backups aren't found after first pass)
+
+- [ ] Add fix in dotfiles for outdated WSL_INTEROP in .zshrc and .tmux.conf;
 
