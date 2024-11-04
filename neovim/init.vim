@@ -362,6 +362,9 @@ endif
 :vnoremap <A-j> :m '>+1<CR>gv=gv
 :vnoremap <A-k> :m '<-2<CR>gv=gv
 "
+" Redo with U
+:nnoremap U <C-r>
+"
 " Substitute word under cursor, use gn for next, and dot repeat
 :nnoremap <silent> <Leader>c :let @/='\<'.expand('<cword>').'\>'<CR>cgn
 :xnoremap <silent> <Leader>c "sy:let @/=@s<CR>cgn

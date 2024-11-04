@@ -32,6 +32,8 @@
     { "key": "alt+h",                 "command": "workbench.action.previousEditorInGroup"},
     { "key": "ctrl+shift+alt+right",  "command": "workbench.action.moveEditorRightInGroup"},
     { "key": "ctrl+shift+alt+left",   "command": "workbench.action.moveEditorLeftInGroup"},
+    { "key": "ctrl+shift+alt+m",      "command": "workbench.action.toggleEditorWidths"},
+
     
     { "key": "alt+k",           "command": "editor.action.moveLinesUpAction",
                                 "when": "editorTextFocus && !editorReadonly" },

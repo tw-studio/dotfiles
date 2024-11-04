@@ -933,7 +933,7 @@ if (Test-Path -Path $windowsTerminalSettingsPath) {
 
 ###
 ##
-# MARK: |J| Download and install Mullvad VPN
+# MARK: |J| Download and install Mullvad VPN (optional)
 
 # Continue only when Mullvad is not installed
 $isMullvadInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
@@ -1025,6 +1025,180 @@ if (-not $isMullvadInstalled) {
 
 ###
 ##
+# MARK: |K| Install VeraCrypt (optional)
+
+$veraCryptInstallerUrl = "https://launchpad.net/veracrypt/trunk/1.26.15/+download/VeraCrypt_Setup_x64_1.26.15.msi"
+$veraCryptInstallerFilename = "VeraCrypt_Setup_x64_1.26.15.msi"
+$veraCryptInstallerOutputPath = Join-Path -Path $winspaceSetupDir -ChildPath $veraCryptInstallerFilename
+
+# Continue only when VeraCrypt is not installed
+$isVeraCryptInstalled = Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\* |
+                        Where-Object { $_.DisplayName -like "*VeraCrypt*" }
+if (-not $isVeraCryptInstalled) {
+
+  Write-Host "VeraCrypt is not installed."
+
+  # Ask user to choose to install
+  $readReadyForVeraCryptInstall = Read-Host "Do you want to install VeraCrypt? (Y/n)"
+  if ((-not $readReadyForVeraCryptInstall) -or $readReadyForVeraCryptInstall -eq 'y' -or $readReadyForVeraCryptInstall -eq 'Y') {
+
+    # Download VeraCrypt
+    if (-not (Test-Path "$veraCryptInstallerOutputPath")) {
+      Write-Host "Downloading $veraCryptInstallerFilename to $winspaceSetupDir..."
+      Invoke-WebRequest -Uri $veraCryptInstallerUrl -OutFile $veraCryptInstallerOutputPath
+    } else {
+      Write-Host "Installer for VeraCrypt found in $winspaceSetupDir."
+    }
+
+    # Start VeraCrypt installation
+    Write-Host "Installing VeraCrypt..."
+    Start-Process -FilePath "$veraCryptInstallerOutputPath" -Wait
+
+    # Wait for user to install VeraCrypt
+    Read-Host "Press Enter after you have finished installing VeraCrypt"
+    $didInstallVeraCrypt = $true
+
+  } else {
+
+    Write-Host "Skipping install of VeraCrypt."
+  }
+} else {
+
+  Write-Host "VeraCrypt is already installed."
+}
+
+###
+##
+# MARK: |L| Install win32yank (needed for Neovim)
+
+$win32YankZipUrl = "https://github.com/equalsraf/win32yank/releases/download/v0.1.1/win32yank-x64.zip"
+$win32YankZipDownloadPath = "$winspaceSetupDir\win32yank-x64.zip"
+$win32YankZipExtractDir = "$winspaceSetupDir\win32yank"
+$win32YankExtractPath = "$win32YankZipExtractDir\win32yank.exe"
+$win32YankInstallDir = "$windowsAppsDir"
+$win32YankInstallPath = "$win32YankInstallDir\win32yank.exe"
+  
+if (-not (Test-Path "$win32YankInstallPath")) {
+
+  Write-Host "win32yank is not installed."
+
+  # Download win32yank to winspace setup before copying to WindowsApps
+  if (-not (Test-Path "$win32YankZipDownloadPath")) {
+    Write-Host "win32yank is not downloaded."
+    Write-Host "Downloading win32yank to $winspaceSetupDir..."
+    Invoke-WebRequest -Uri $win32YankZipUrl -OutFile "$win32YankZipDownloadPath"
+  } else {
+    Write-Host "win32yank found in $winspaceSetupDir."
+  }
+  
+  # Extract win32yank.exe from zip
+  Expand-Archive -Path "$win32YankZipDownloadPath" -DestinationPath "$win32YankZipExtractDir" -Force
+
+  # Install (copy) win32yank to WindowsApps
+  Write-Host "Installing (copying) win32yank to $win32YankInstallDir..."
+  Copy-Item -Path $win32YankExtractPath -Destination $win32YankInstallPath
+} else {
+
+  Write-Host "win32yank is already installed."
+}
+
+###
+##
+# MARK: |M| Install AutoHotkey and map shortcut to Em Dash
+
+# > MARK: [1] Install AutoHotkey
+
+$autoHotkeyInstallDir = "$env:ProgramFiles\AutoHotkey"
+$autoHotkeyExePath = "$autoHotkeyInstallDir\V2\AutoHotkey64.exe"
+$autoHotkeyUrl = "https://www.autohotkey.com/download/ahk-v2.exe"
+$autoHotkeyDownloadPath = "$winspaceSetupDir\AutoHotkey_v2_setup.exe"
+$autoHotkeyScriptsDir = "$autoHotkeyInstallDir\scripts"
+$autoHotkeyEmDashScriptName = "MapEmDash"
+$autoHotkeyEmDashScriptPath = Join-Path $autoHotkeyScriptsDir "$autoHotkeyEmDashScriptName.ahk"
+$winStartupFolder = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
+$autoHotkeyEmDashShortcutPath = Join-Path $winStartupFolder "$autoHotkeyEmDashScriptName.lnk"
+
+if (-not (Test-Path "$autoHotkeyExePath")) {
+
+  Write-Host "AutoHotkey is not installed."
+
+  # Download AutoHotkey first to winspace setup before copying to WindowsApps
+  if (-not (Test-Path "$autoHotkeyDownloadPath")) {
+    Write-Host "Downloading AutoHotkey to $winspaceSetupDir..."
+    Invoke-WebRequest -Uri $autoHotkeyUrl -OutFile "$autoHotkeyDownloadPath"
+  } else {
+    Write-Host "AutoHotkey found in $winspaceSetupDir."
+  }
+
+  # Install AutoHotkey to Program Files
+  if (Test-Path "$autoHotkeyDownloadPath") {
+    Write-Host "Installing AutoHotkey to Program Files..."
+    Start-Process -FilePath $autoHotkeyDownloadPath -ArgumentList "/silent", "/installto", "`"$autoHotkeyInstallDir`"" -Wait
+  } else {
+    Write-Error "Error: AutoHotkey unexpectedly not found."
+  }
+
+  # Verify installation
+  if (-not (Test-Path "$autoHotkeyExePath")) {
+    Write-Error "Failed to install AutoHotkey."
+    exit 1
+  }
+} else {
+  Write-Host "AutoHotkey is already installed."
+}
+
+# > MARK: |2| Create script to map shortcut to Em Dash
+
+if (-not (Test-Path "$autoHotkeyScriptsDir")) {
+  Write-Host "AutoHotkey scripts directory not found."
+  Write-Host "Creating scripts directory at $autoHotkeyScriptsDir..."
+  New-Item -ItemType Directory -Path "$autoHotkeyScriptsDir" | Out-Null
+} else {
+  Write-Host "AutoHotkey scripts directory already exists."
+}
+
+if (-not (Test-Path "$autoHotkeyEmDashScriptPath")) {
+  Write-Host "AutoHotkey script $autoHotkeyEmDashScriptName is not found."
+  Write-Host "Creating $autoHotkeyEmDashScriptPath..."
+  $autoHotkeyEmDashScriptContent = @"
+^+!-::SendText(Chr(0x2014))
+"@
+  $autoHotkeyEmDashScriptContent | Out-File -FilePath "$autoHotkeyEmDashScriptPath" -Encoding ASCII
+} else {
+  Write-Host "AutoHotkey script $autoHotkeyEmDashScriptName already exists."
+}
+
+# > MARK: |3| Configure script to run at startup
+
+if (-not (Test-Path "$autoHotkeyEmDashShortcutPath")) {
+  Write-Host "Shortcut to AutoHotkey script $autoHotkeyEmDashScriptName is not found in the Startup folder."
+  Write-Host "Creating shortcut at $autoHotkeyEmDashShortcutPath..."
+  $winShellObject = New-Object -ComObject WScript.Shell
+  $autoHotkeyEmDashShortcut = $winShellObject.CreateShortcut($autoHotkeyEmDashShortcutPath)
+  $autoHotkeyEmDashShortcut.TargetPath = $autoHotkeyExePath
+  $autoHotkeyEmDashShortcut.Arguments = "`"$autoHotkeyEmDashScriptPath`""
+  $autoHotkeyEmDashShortcut.WorkingDirectory = $autoHotkeyInstallDir
+  $autoHotkeyEmDashShortcut.IconLocation = $autoHotkeyExePath
+  $autoHotkeyEmDashShortcut.Save()
+} else {
+  Write-Host "Shortcut to $autoHotkeyEmDashScriptName already exists."
+}
+
+# > MARK: [4] Activate the script now
+
+$isEmDashScriptRunning = Get-CimInstance Win32_Process -Filter "name = 'AutoHotkey64.exe'" |
+                         Where-Object { $_.CommandLine -like "*$autoHotkeyEmDashScriptPath*" }
+if (-not ($isEmDashScriptRunning)) {
+  Write-Host "AutoHotkey script $autoHotkeyEmDashScriptName is not running."
+  Write-Host "Starting the $autoHotkeyEmDashScriptName script..."
+  Start-Process -FilePath "$autoHotkeyExePath" -ArgumentList "`"$autoHotkeyEmDashScriptPath`""
+} else {
+  Write-Host "$autoHotkeyEmDashScriptName is already running."
+}
+
+
+###
+##
 # MARK: Configure personal PowerShell profile (placeholder)
 
 # Steps:
@@ -1091,7 +1265,7 @@ if ($didInstallPowerToys -or $didGenerateSSHKeys -or $didInstallExtension -or $d
   if ($didGenerateSSHKeys)  { Write-Host "SSH key is generated. Add the generated SSH public key to your GitHub account." }
   if ($didInstallVSCode)    { Write-Host "VSCode is installed. Open VSCode in a WSL folder, then click 'Reopen folder in WSL' in notification." }
   if ($didInstallExtension) { Write-Host "VSCode extensions are installed. Open the VSCode Extensions sidebar when in WSL mode, then click Install in WSL:Ubuntu for the listed extensions." }
-  if ($didInstallPowerToys) { Write-Host "PowerToys is installed. Remap Caps Lock to Esc with the Keyboard Manager PowerToy." }
+  if ($didInstallPowerToys) { Write-Host "PowerToys is installed. Remap Caps Lock to Esc with the Keyboard Manager PowerToy, and disable 'Enable Find My Mouse'." }
   if ($didInstallMullvad)   { Write-Host "Mullvad VPN is installed. Run Mullvad, and remember to adjust its settings, if not already done." }
   Write-Host "Clean up downloaded setup files from $winspaceSetupDir."
   Write-Host "Set scaling to 175% in Display Settings."

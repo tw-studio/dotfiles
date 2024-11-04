@@ -65,6 +65,7 @@ echo "Installing packages..." \
     ripgrep \
     sudo \
     tmux \
+    trash-cli \
     tree \
     util-linux \
     wget \

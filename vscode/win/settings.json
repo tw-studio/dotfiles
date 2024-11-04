@@ -327,7 +327,7 @@
   "gitlens.hovers.enabled": false,
   "gitlens.menus": false,
   "haskell.hlint.executablePath": "/usr/local/Cellar/hlint/2.2.11/bin/hlint",
-  "insertDateString.format": "M/DD/YY HH:mm A",
+  "insertDateString.format": "YYYY-MM-DD hh:mm",
   "insertDateString.formatDate": "YYYY-MM-DD",
   "insertDateString.formatTime": "hh:mm:ss",
   "javascript.format.enable": true,

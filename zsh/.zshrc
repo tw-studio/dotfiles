@@ -78,6 +78,9 @@ echo -e '\033[6 q'
     if command -v wslpath &>/dev/null; then
       export WINHOME=$(wslpath $(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r'))
     fi
+    if [[ -z "$OS_NAME" ]] && [[ -f /etc/os-release ]]; then
+      export OS_NAME=$(awk -F= '$1=="NAME" {gsub(/"/, "", $s); print $2}' /etc/os-release)
+    fi
 
 #   Set PATH
 #   ------------------------------------------------------------
@@ -93,6 +96,7 @@ echo -e '\033[6 q'
     fi
     if command -v wslpath &> /dev/null; then
       path+=("/mnt/c/Windows/System32")
+      path+=("$WINHOME/AppData/Local/Microsoft/WindowsApps")
     fi
     # typeset -aU path                    # dedupes PATH ## PLACED AT END OF FILE
     # path=("/usr/local/bin" $path[@])    # JFYI: this is how to prepend
@@ -437,7 +441,7 @@ echo -e '\033[6 q'
         rename 's/ /-/g' *;
       }
       
-      # tesseract - ocr
+      # tesseract - ocr (Mac)
       if command -v tesseract &> /dev/null; then
         tesso() {
           tesseract "$1" stdout
@@ -459,8 +463,9 @@ echo -e '\033[6 q'
     
 #   Personal Functions - for Windows
 #   ------------------------------------------
-    # open - mimics Mac open in Ubuntu WSL
     if command -v wslpath &> /dev/null; then
+
+      # open - mimics Mac open in Ubuntu WSL
       function open {
 
         # Require only one argument
@@ -491,6 +496,42 @@ echo -e '\033[6 q'
           return 1
         fi
       }
+
+      # winvar - echo value of Windows environment variable
+      winvar() {
+        echo $(wslpath $(cmd.exe /C "echo %$1%" 2>/dev/null | tr -d '\r'))
+      }
+
+      # tesseract - ocr (Win)
+      if command -v tesseract &> /dev/null; then
+        tesso() {
+          tesseract "$1" stdout
+        }
+        tessoshot() {
+
+          # Check for Screenshots directory
+          SCREENSHOTS_DIR="$WINHOME/Desktop/Screenshots"
+          if [[ ! -d "$SCREENSHOTS_DIR" ]]; then
+            echo "Screenshots directory not found at '$SCREENSHOTS_DIR'."
+            return 1
+          fi
+
+          # Copy the latest screenshot file to the current directory
+          LATEST_SCREENSHOT=$(find "$SCREENSHOTS_DIR" -type f -printf '%T@ %p\n' | sort -nr | head -1 | cut -d' ' -f2-)
+          if [[ -z "$LATEST_SCREENSHOT" ]]; then
+            echo "No screenshot files found in '$SCREENSHOTS_DIR'."
+            return 1
+          fi
+          /bin/cp -p "$LATEST_SCREENSHOT" . || { echo "Failed to copy '$LATEST_SCREENSHOT'."; return 1; }
+
+          # Run tesseract OCR on the copied screenshot
+          SCREENSHOT_FILENAME=$(basename "$LATEST_SCREENSHOT")
+          tesseract "$SCREENSHOT_FILENAME" stdout || { echo "Tesseract OCR failed on '$SCREENSHOT_FILENAME'."; return 1; }
+
+          # Clean up
+          rm -f "$SCREENSHOT_FILENAME"
+        }
+      fi
     fi
 
     # vsr - starts given file or directory in vscode --remote wsl+Ubuntu mode
@@ -522,13 +563,6 @@ echo -e '\033[6 q'
       vs --remote wsl+Ubuntu "$path_arg"
     }
 
-    # winvar - echo value of Windows environment variable
-    if command -v wslpath &> /dev/null; then
-      winvar() {
-        echo $(wslpath $(cmd.exe /C "echo %$1%" 2>/dev/null | tr -d '\r'))
-      }
-    fi
-    
 #   AWS Helpers
 #   ------------------------------------------
     # generate a s3 friendly hash string (25 characters)
@@ -623,7 +657,7 @@ echo -e '\033[6 q'
 
 #   fzf configuration
 #   ------------------------------------------
-    if [[ $OS_NAME == "ubuntu" ]]; then
+    if [[ "${(L)OS_NAME}" == "ubuntu" ]]; then
       export FZF_DEFAULT_COMMAND="fdfind --hidden --type f --exclude node_modules --exclude .git"
       export FZF_ALT_C_COMMAND="fdfind --hidden --type d . $HOME"
     else
@@ -640,6 +674,38 @@ echo -e '\033[6 q'
     fh() {
       eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
     }
+
+#   Update WSL_INTEROP in tmux for when value changes due to WSL restart
+#   ------------------------------------------
+    if command -v wslpath >/dev/null; then
+
+      # update_tmux_wsl_interop - Updates WSL_INTEROP in tmux sessions on Windows
+      function update_tmux_wsl_interop {
+        if tmux info &>/dev/null; then
+          current_wsl_interop="$WSL_INTEROP"
+          # Update WSL_INTEROP in tmux server environment
+          tmux set-environment -g WSL_INTEROP "$current_wsl_interop"
+          # Update WSL_INTEROP in all existing tmux sessions
+          tmux list-sessions -F "#{session_name}" | while read session; do
+            tmux set-environment -t "$session" WSL_INTEROP "$current_wsl_interop"
+          done
+        fi
+      }
+
+      # check_wsl_interop_change - Detect changes in WSL_INTEROP
+      function check_wsl_interop_change {
+        if [[ "$WSL_INTEROP" != "$PREV_WSL_INTEROP" ]]; then
+          update_tmux_wsl_interop
+          export PREV_WSL_INTEROP="$WSL_INTEROP"
+        fi
+      }
+
+      # Initialize PREV_WSL_INTEROP
+      export PREV_WSL_INTEROP="$WSL_INTEROP"
+
+      # Call the check function whenever a new shell starts
+      check_wsl_interop_change
+    fi
     
 #   SSH
 #   ------------------------------------------
