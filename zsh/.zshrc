@@ -77,6 +77,8 @@ echo -e '\033[6 q'
     export LC_ALL=en_US.UTF-8
     if command -v wslpath &>/dev/null; then
       export WINHOME=$(wslpath $(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r'))
+      export WINSPACE=$WINHOME/winspace
+      export POWERSHELL_PROFILE=$WINHOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
     fi
     if [[ -z "$OS_NAME" ]] && [[ -f /etc/os-release ]]; then
       export OS_NAME=$(awk -F= '$1=="NAME" {gsub(/"/, "", $s); print $2}' /etc/os-release)
@@ -233,7 +235,8 @@ echo -e '\033[6 q'
     alias power='sudo powermetrics --samplers smc -i1 -n1'
     alias rg='rg --hidden --max-columns 200'
     alias rgni='\rg --hidden --no-ignore -g '!{.git,node_modules}' --max-columns 200'
-    # https://github.com/ali-rantakari/trash
+    # https://github.com/ali-rantakari/trash (Mac)
+    # https://github.com/andreafrancia/trash-cli (Ubuntu)
     if command -v trash &>/dev/null; then
       alias rm='trash'
     else
@@ -260,6 +263,7 @@ echo -e '\033[6 q'
     alias vnvtheme='$VS ~/.config/nvim/colors/monokai-fusion-tw.vim'
     alias vs='$VS'
     alias vtmux='$VS ~/.tmux.conf'
+    alias winspace='cd $WINSPACE'
     alias youtube-m4a='youtube-dl -x --no-mtime --audio-format m4a --audio-quality 64K -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
     alias youtube-mp3='youtube-dl -x --no-mtime --audio-format mp3 -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
     alias zedit='$EDITOR ~/.zshrc'
