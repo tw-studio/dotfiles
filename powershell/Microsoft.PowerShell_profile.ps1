@@ -10,6 +10,8 @@
 $global:WSLHOME = Get-ChildItem -Path "\\wsl$\Ubuntu\home" -Directory | Select-Object -First 1
 $global:BUILDSPACE = "$WSLHOME\buildspace"
 $global:CODESPACE = "$WSLHOME\codespace"
+$global:ONEDRIVE = "$HOME\OneDrive"
+# $global:ONEDRIVE = "$HOME\OneDrive - Microsoft"
 $global:ONESPACE = "$ONEDRIVE\onespace"
 $global:WINSPACE = "$HOME\winspace"
 $global:ONEDRIVE = "$HOME\OneDrive"
