@@ -166,6 +166,265 @@ echo -e '\033[6 q'
 #   ------------------------------------------------------------
     export HOMEBREW_AUTO_UPDATE_SECS=2592000 # 30 days
 
+#   runscript: safe remote script runner
+#   ------------------------------------------------------------
+#   Usage:
+#     runscript [-f] [-u] [-n] [-c <sha256>] [-g <expected_keyid>] [-s <sig_url>] URL [-- args...]
+#   Options:
+#     -f    Force (skip confirm if domain allowlisted)
+#     -u    Update cache (re-download even if cached)
+#     -n    Dry run (download/verify/show but don't execute)
+#     -c    Expected SHA-256 checksum (hex)
+#     -g    GPG expected key ID (long or fingerprint) to trust signature
+#     -s    Signature URL (defaults to URL+".asc" if -g is set)
+#
+#   Domain allowlist file: ~/.config/runscript/allowlist.txt (one domain per line)
+#   Cache dir: ~/.cache/runscript/
+
+    runscript() {
+      emulate -L zsh
+      setopt nounset pipefail
+      local OPTIND opt force=0 update=0 dry=0 sha256="" gpg_id="" sig_url=""
+
+      while getopts ":f unc:g:s:" opt; do
+        case "$opt" in
+          f) force=1 ;;
+          u) update=1 ;;
+          n) dry=1 ;;
+          c) sha256="$OPTARG" ;;
+          g) gpg_id="$OPTARG" ;;
+          s) sig_url="$OPTARG" ;;
+          \?) print -u2 -- "runscript: invalid option -$OPTARG"; return 2 ;;
+          :)  print -u2 -- "runscript: option -$OPTARG requires an argument"; return 2 ;;
+        esac
+      done
+      shift $((OPTIND-1))
+
+      if (( $# < 1 )); then
+        print -u2 -- "Usage: runscript [-f] [-u] [-n] [-c sha256] [-g keyid] [-s sig_url] URL [-- args...]"
+        return 2
+      fi
+
+      local url="$1"; shift
+
+      # Basic URL validation
+      if [[ "$url" != https://* ]]; then
+        print -u2 -- "runscript: only https:// URLs are allowed"; return 2
+      fi
+
+      # Extract domain
+      local domain="${${url#https://}%%/*}"
+      # Allowlist setup
+      local cfg_dir="${XDG_CONFIG_HOME:-$HOME/.config}/runscript"
+      local allowlist="$cfg_dir/allowlist.txt"
+      mkdir -p "$cfg_dir"
+      touch "$allowlist"
+
+      local allowed=0
+      if grep -Eiq "^${domain//./\\.}\$" "$allowlist"; then
+        allowed=1
+      fi
+
+      # HTTP client
+      local have_curl= have_wget=
+      command -v curl >/dev/null 2>&1 && have_curl=1 || have_curl=0
+      command -v wget >/dev/null 2>&1 && have_wget=1 || have_wget=0
+      if (( ! have_curl && ! have_wget )); then
+        print -u2 -- "runscript: need curl or wget installed"; return 2
+      fi
+
+      # Cache paths
+      local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/runscript"
+      mkdir -p "$cache_dir"
+      local url_hash
+      url_hash=$(printf "%s" "$url" | openssl dgst -sha256 -r | awk '{print $1}') || { print -u2 -- "runscript: cannot hash URL"; return 2; }
+      local cache_file="$cache_dir/$url_hash.script"
+      local etag_file="$cache_dir/$url_hash.etag"
+      local lm_file="$cache_dir/$url_hash.lastmod"
+
+      # Download function (respects update flag; saves ETag/Last-Modified when possible)
+      local download_script
+      download_script() {
+        local tmpfile
+        tmpfile=$(mktemp -t runscript.XXXXXX) || return 1
+        if (( have_curl )); then
+          local hdrs=()
+          (( update == 0 && -f "$etag_file" )) && hdrs+=(-H "If-None-Match: $(<"$etag_file")")
+          (( update == 0 && -f "$lm_file" )) && hdrs+=(-H "If-Modified-Since: $(<"$lm_file")")
+          # Download
+          if ! curl --fail --location --proto '=https' --tlsv1.2 \
+            --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
+            -A "runscript/1.0" "${hdrs[@]}" \
+            -D "$tmpfile.headers" -o "$tmpfile.body" "$url" ; then
+            rm -f "$tmpfile" "$tmpfile.headers" "$tmpfile.body"
+            return 2
+          fi
+          # Handle 304
+          if grep -qE "^HTTP/.* 304 " "$tmpfile.headers" 2>/dev/null; then
+            rm -f "$tmpfile" "$tmpfile.headers" "$tmpfile.body"
+            return 304
+          fi
+          # Save headers
+          awk -F': ' 'BEGIN{IGNORECASE=1} /^ETag:/{print $2} /^etag:/{print $2}' "$tmpfile.headers" | tr -d '\r' >| "$etag_file" || true
+          awk -F': ' 'BEGIN{IGNORECASE=1} /^Last-Modified:/{print $2} /^last-modified:/{print $2}' "$tmpfile.headers" | tr -d '\r' >| "$lm_file" || true
+          mv -f "$tmpfile.body" "$cache_file"
+          rm -f "$tmpfile" "$tmpfile.headers"
+        else
+          # wget path
+          local hdrtmp
+          hdrtmp=$(mktemp -t runscript.hdr.XXXXXX) || return 1
+          local ims_args=()
+          (( update == 0 && -f "$lm_file" )) && ims_args+=(--header="If-Modified-Since: $(<"$lm_file")")
+          if ! wget --https-only --timeout=60 --tries=3 --user-agent="runscript/1.0" \
+            "${ims_args[@]}" --server-response -O "$cache_file.tmp" "$url" 2>"$hdrtmp"; then
+            rm -f "$cache_file.tmp" "$hdrtmp"; return 2
+          fi
+          if grep -q " 304 Not Modified" "$hdrtmp"; then
+            rm -f "$cache_file.tmp" "$hdrtmp"; return 304
+          fi
+          # Extract headers
+          awk -F': ' 'BEGIN{IGNORECASE=1} /^  ETag:/{print $2}' "$hdrtmp" | tr -d '\r' >| "$etag_file" || true
+          awk -F': ' 'BEGIN{IGNORECASE=1} /^  Last-Modified:/{print $2}' "$hdrtmp" | tr -d '\r' >| "$lm_file" || true
+          mv -f "$cache_file.tmp" "$cache_file"
+          rm -f "$hdrtmp"
+        fi
+        chmod 600 "$cache_file" || true
+        return 0
+      }
+
+      # Fetch or use cache
+      if (( update == 1 || ! -f "$cache_file" )); then
+        local rc=0; download_script || rc=$?
+        if (( rc == 2 )); then
+          print -u2 -- "runscript: failed to download $url"; return 2
+        fi
+      else
+        # try conditional revalidation; ignore 304 code handling here since already cached
+        download_script >/dev/null 2>&1 || true
+      fi
+
+      # Optional checksum verification
+      if [[ -n "$sha256" ]]; then
+        local got
+        got=$(openssl dgst -sha256 -r "$cache_file" | awk '{print $1}') || { print -u2 -- "runscript: checksum failed to compute"; return 2; }
+        if [[ "${got:l}" != "${sha256:l}" ]]; then
+          print -u2 -- "runscript: SHA-256 mismatch!"
+          print -u2 -- " expected: $sha256"
+          print -u2 -- "      got: $got"
+          return 2
+        fi
+      fi
+
+      # Optional GPG verification
+      if [[ -n "$gpg_id" ]]; then
+        command -v gpg >/dev/null 2>&1 || { print -u2 -- "runscript: gpg not found but -g provided"; return 2; }
+        local sig="${sig_url:-$url.asc}"
+        local sig_tmp
+        sig_tmp=$(mktemp -t runscript.sig.XXXXXX) || return 2
+        # Fetch signature
+        if (( have_curl )); then
+          if ! curl --fail --location --proto '=https' --tlsv1.2 \
+              --connect-timeout 10 --max-time 30 -A "runscript/1.0" -o "$sig_tmp" "$sig"; then
+            rm -f "$sig_tmp"; print -u2 -- "runscript: failed to fetch signature $sig"; return 2
+          fi
+        else
+          if ! wget --https-only --timeout=30 --tries=2 --user-agent="runscript/1.0" -O "$sig_tmp" "$sig"; then
+            rm -f "$sig_tmp"; print -u2 -- "runscript: failed to fetch signature $sig"; return 2
+          fi
+        fi
+        # Verify signature
+        local verify_out
+        verify_out=$(gpg --status-fd=1 --keyid-format=long --verify "$sig_tmp" "$cache_file" 2>&1) || {
+          print -u2 -- "runscript: GPG signature verification FAILED"
+          print -u2 -- "$verify_out"
+          rm -f "$sig_tmp"
+          return 2
+        }
+        rm -f "$sig_tmp"
+        # Ensure signer matches expected key id
+        local signer_id
+        signer_id=$(print -- "$verify_out" | awk '/^\[GNUPG:\] VALIDSIG /{print $3; exit}')
+        if [[ -z "$signer_id" || "${signer_id:l}" != "${gpg_id:l}" ]]; then
+          print -u2 -- "runscript: GPG signer key mismatch"
+          print -u2 -- " expected key: $gpg_id"
+          print -u2 -- "    found key: ${signer_id:-unknown}"
+          return 2
+        fi
+      fi
+
+      # Show head and confirm if not forced or not allowlisted
+      local preview_lines=20
+      if (( force == 0 )); then
+        print -- "——— Preview ($preview_lines lines) ———"
+        head -n $preview_lines "$cache_file" | sed -e 's/^/| /'
+        print -- "——————————————"
+        if (( allowed == 0 )); then
+          print -u2 -- "Domain '$domain' is NOT in your allowlist: $allowlist"
+        fi
+        printf "Proceed to run this script from '%s'? [y/N/a=always allow domain] " "$domain" >&2
+        local reply
+        read -r reply
+        case "${reply:l}" in
+          y|yes) ;;
+          a|allow)
+            print -- "$domain" >> "$allowlist"
+            print -- "Added '$domain' to allowlist."
+            ;;
+          *) print -- "Aborted."; return 1 ;;
+        esac
+      fi
+
+      if (( dry == 1 )); then
+        print -- "Dry run: verified and cached at $cache_file"
+        return 0
+      fi
+
+      # Determine interpreter from shebang; fallback to bash -euo pipefail
+      local first_line
+      IFS= read -r first_line < "$cache_file" || true
+      local exec_cmd=()
+      if [[ "$first_line" == '#!'* ]]; then
+        # Strip "#!" and split
+        local sheb="${first_line#\#!}"
+        # shellcheck disable=SC2206
+        exec_cmd=(${=sheb})
+      else
+        if command -v bash >/dev/null 2>&1; then
+          exec_cmd=(/usr/bin/env bash -euo pipefail)
+        else
+          exec_cmd=(/usr/bin/env sh -e)
+        fi
+      fi
+
+      # Execute in a temp copy with strict perms
+      local runfile
+      runfile=$(mktemp -t runscript.exec.XXXXXX) || return 2
+      cp "$cache_file" "$runfile"
+      chmod 700 "$runfile" || true
+
+      # Separate args after optional --
+      local args=()
+      if (( $# > 0 )); then
+        if [[ "$1" == "--" ]]; then shift; fi
+        args=("$@")
+      fi
+
+      # Run
+      local rc=0
+      "${exec_cmd[@]}" "$runfile" "${args[@]}" || rc=$?
+      rm -f "$runfile"
+      return $rc
+    }
+
+    # runscript cache cleanup (keep last 60 days)
+    runscript_cache_cleanup() {
+      local dir="${XDG_CACHE_HOME:-$HOME/.cache}/runscript"
+      [[ -d $dir ]] || return 0
+      find "$dir" -type f -mtime +60 -delete
+    }
+    # run once per shell startup
+    runscript_cache_cleanup
+
 #   Navigate to codespace
 #   ------------------------------------------------------------
     export START=$CODESPACE
@@ -205,6 +464,7 @@ echo -e '\033[6 q'
     # Fix git when wsl corrupts and empties object
     alias gitfix='find .git/objects/ -type f -empty | xargs rm; git fetch -p; git fsck --full'
     alias gm='jump'                             # zshmarks plugin
+    alias gpp2p='runscript https://raw.githubusercontent.com/tw-studio/dotfiles/refs/heads/main/scripts/git-push-private-to-public.sh'
     alias install-node='curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | zsh'
     alias lad='du -sh {.,}*'                    # list size of directories and files
     alias lr="ls -Rlp | awk '{ if (NF==1) print \$0; } { if (NF>2) print \$NF; } { if (NF==0) print \$0; }'"
