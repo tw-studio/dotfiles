@@ -13,7 +13,11 @@
 - [ ] (P3) Consider switching install orders so all optional installs are at the end
 
 **.zshrc**:
+- [ ] (P2) Add MARKs for Mark Jump
 - [ ] (P3) Fix snapm bug with hidden files
+
+**git-push-private-to-public**:
+- [ ] (P3) Switch back to initial branch at end of script
 
 ### Done
 
