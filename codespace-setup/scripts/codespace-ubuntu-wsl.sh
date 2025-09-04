@@ -140,7 +140,7 @@ TIMESTAMP=$(date +%Y%m%d%H%M%S)
 NVIM_DOWNLOAD_DIR="${NVIM_DOWNLOADS_DIR}/nvim-$TIMESTAMP"
 NVIM_INSTALL_DIR="/opt/nvim"
 NVIM_BIN_DIR="/usr/local/bin"
-NVIM_RELEASE_FILE="nvim-linux64.tar.gz"
+NVIM_RELEASE_FILE="nvim-linux-x86_64.tar.gz"
 
 # |2| Retrieve URL to latest neovim release
 echo "Retrieving URL to latest neovim release..."
