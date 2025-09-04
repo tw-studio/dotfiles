@@ -144,7 +144,7 @@ NVIM_RELEASE_FILE="nvim-linux-x86_64.tar.gz"
 
 # |2| Retrieve URL to latest neovim release
 echo "Retrieving URL to latest neovim release..."
-NVIM_URL=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep 'browser_download_url.*nvim-linux64.tar.gz"$' | cut -d '"' -f 4)
+NVIM_URL=$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest | grep "browser_download_url.*${NVIM_RELEASE_FILE}\"$" | cut -d '"' -f 4)
 if [ -z "$NVIM_URL" ]; then
     echo "Error: Failed to retrieve url to latest neovim release. Aborting."
     exit 1
