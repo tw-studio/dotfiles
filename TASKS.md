@@ -5,12 +5,51 @@
 
 ### Tasks
 
+#### Codespace
+
+**Codespace Ubuntu**:
+- [ ] (P2) `sudo apt install poppler-utils` (installs pdftocairo, pdftotext, and other common utilities used by packages)
+
+**Codespace Ubuntu+WSL2**:
+- [ ] (P1) Set WSL2's git credential.helper to use Windows's Git Credential Manager (must first be installed): `git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"`
+- [ ] (P1) Fix neovim url grep installer file name to `linux-x86_64` from `linux64`
+
 **Codespace Win**:
 - [ ] (P1.5) Fix VSCode settings not backing up on initial install
 - [ ] (P2) Configure personal PowerShell profile
 - [ ] (P2) Install NeoVim for Windows (for PowerShell)
 - [ ] (P3) Add "simple" flag to pass in via command line that skips optional installs
 - [ ] (P3) Consider switching install orders so all optional installs are at the end
+
+**pdm setup**:
+- [ ] (P1) Add global config file to *~/.config/pdm/config.toml*:
+
+    ```
+    [python]
+    use_pyenv = false
+    use_venv = false
+
+    [global_project]
+    fallback = true
+    user_site = true
+
+    [install]
+    cache = true
+    cache_method = "symlink"
+    ```
+
+- [ ] (P3) Set up pdm completions
+    - [ ] Add to script:
+
+        ```
+        mkdir -p "ZSH_CUSTOM/plugins/pdm"
+        pdm completion zsh > "ZSH_CUSTOM/plugins/pdm/_pdm"
+        ```
+    
+    - [ ] Enable pdm plugin: `plugins=(... pdm ...)
+
+
+#### Other
 
 **.zshrc**:
 - [ ] (P2) Add MARKs for Mark Jump
