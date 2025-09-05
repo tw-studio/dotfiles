@@ -15,9 +15,27 @@
 - [ ] (P1) Fix neovim url grep installer file name to `linux-x86_64` from `linux64`
 
 **Codespace Win**:
+- [ ] (P1) Install Git for Windows (unless using Springboard)
+- [ ] (P1) Install oh-my-posh
+- [ ] (P1) Install Groupy
+- [ ] (P1) Install and configure NeoVim for Windows (for PowerShell)
+  - Install via winget
+  - Confirm nvim config location via `nvim --headless +"echo stdpath('config')" +qa` (should be *$env:LOCALAPPDATA\nvim*)
+  - Create config location directory if it doesn't already exist:
+    - `mkdir $env:LOCALAPPDATA\nvim\colors -Force`
+    - `mkdir $env:LOCALAPPDATA\nvim-data\site\autoload -Force`
+  - Copy desired contents from dotfiles nvim directory into config location:
+    - `cp init.vim $env:LOCALAPPDATA\nvim`
+    - `cp monokai-fusion.vim $env:LOCALAPPDATA\nvim\colors`
+    - `cp dracula.vim $env:LOCALAPPDATA\nvim\colors`
+    - `cp dracula-airline.vim $env:LOCALAPPDATA\nvim\dracula.vim`
+    - `cp plug.vim $env:LOCALAPPDATA\nvim-data\site\autoload`
+  - Install: `nvim --headless +PlugInstall +qall`
+- [ ] (P1.1) Install GitHub CLI and GitHub CLI Copilot
+- [ ] (P1.2) Fix win32yank download error: *InvalidOperation: Unable to find type [System.IO.Compression.ZipFileExtensions]* (may be specific to Dev Box environment not having all .NET libraries)
+- [ ] (P1.2) Fix AutoHotkey download error.. very strange error message, which appeared at: `1128 Invoke-WebRequest -Uri $autoHotkeyUrl...` (may be specific to Dev Box environment not having all .NET libraries)
 - [ ] (P1.5) Fix VSCode settings not backing up on initial install
 - [ ] (P2) Configure personal PowerShell profile
-- [ ] (P2) Install NeoVim for Windows (for PowerShell)
 - [ ] (P3) Add "simple" flag to pass in via command line that skips optional installs
 - [ ] (P3) Consider switching install orders so all optional installs are at the end
 
