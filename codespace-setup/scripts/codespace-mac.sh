@@ -275,7 +275,6 @@ if [[ ! -d "$TPM" ]]; then
 else
   echo "tmux already configured."
 fi
-
 TMUXSCRIPTS=$HOME/.tmux/scripts
 if [[ ! -d "$TMUXSCRIPTS" ]]; then
   echo "Configuring tmux scripts..."
@@ -295,7 +294,10 @@ else
   echo "vsc-tmux already accessible."
 fi
 
+###
+##
 # MARK: Install node, pnpm, and pm2
+
 if ! command -v pnpm &>/dev/null; then
   echo "Installing node, pnpm, and pm2..."
   trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
@@ -305,9 +307,25 @@ fi
 
 ###
 ##
-# MARK: Housekeeping
+# MARK: Install personal fonts
 
-# echo "Cleaning up..."
+FONT_DIR="$HOME/Library/Fonts"
+FONT1="MesloLGLDZNerdFontMono-Bold.ttf"
+FONT2="RobotoMonoNerdFontMono-Medium.ttf"
+
+if [[ ! -f "$FONT_DIR/$FONT1" ]]; then
+  echo "Installing personal fonts..."
+  trace curl -fsSL -o "$FONT_DIR/$FONT1" "https://raw.githubusercontent.com/tw-studio/dotfiles/main/assets/fonts/$FONT1"
+  echo "Installed $FONT1."
+  trace curl -fsSL -o "$FONT_DIR/$FONT2" "https://raw.githubusercontent.com/tw-studio/dotfiles/main/assets/fonts/$FONT2"
+  echo "Installed $FONT2."
+else
+  echo "Personal fonts already installed."
+fi
+
+###
+##
+# MARK: Housekeeping
 
 echo "Giving user ownership of their directory..."
 chown -R $USER $HOME
