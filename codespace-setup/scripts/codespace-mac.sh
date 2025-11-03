@@ -116,11 +116,9 @@ trace() {
 ##
 # MARK: Global configuration and prechecks
 
-if [[ -z "$CODESPACE" ]]; then
-  echo "Setting environment variables..."
-  export CODESPACE=$HOME/codespace
-  export DOTFILES=$CODESPACE/dotfiles
-fi
+echo "Setting environment variables..."
+[[ -z "$CODESPACE" ]] && export CODESPACE=$HOME/codespace
+[[ -z "$DOTFILES" ]] && export DOTFILES=$CODESPACE/dotfiles
 
 if ! command -v curl &>/dev/null; then
   echo "Error: curl is not installed or not in PATH." >&2
@@ -218,26 +216,13 @@ else
   echo "Directory '$OMZ' found, oh-my-zsh already installed."
 fi
 
-# MARK: Install zshmarks
+# Install zshmarks
 ZSHMARKS=$ZSH/custom/plugins/zshmarks
 if [[ ! -d "$ZSHMARKS" ]]; then
   echo "Installing zshmarks..."
   trace git clone https://github.com/jocelynmallon/zshmarks $ZSHMARKS
 else
   echo "Directory '$ZSHMARKS' already exists, zshmarks already installed."
-fi
- 
-###
-##
-# MARK: Install fzf and remove .bashrc
-
-if ! command -v fzf &>/dev/null; then
-  echo "Installing fzf..."
-  trace git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
-  trace $HOME/.fzf/install --all || true
-  trace rm -f $HOME/.bashrc $HOME/.fzf.bash
-else
-  echo "fzf already installed."
 fi
 
 ###
@@ -284,25 +269,15 @@ else
   echo "tmux scripts already configured."
 fi
 
-# MARK: Make vsc-tmux startup script accessible
-if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
-  echo "Making vsc-tmux accessible..."
-  mkdir -p $CODESPACE/scripts
-  cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
-  chmod +x $CODESPACE/scripts/vsc-tmux.sh
-else
-  echo "vsc-tmux already accessible."
-fi
-
 ###
 ##
-# MARK: Install node, pnpm, and pm2
+# MARK: Configure git
 
-if ! command -v pnpm &>/dev/null; then
-  echo "Installing node, pnpm, and pm2..."
-  trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
+if [[ -f ~/.gitconfig ]] && grep -q "main" "~/.gitconfig"; then
+  echo "gitconfig already configured."
 else
-  echo "pnpm already installed."
+  echo "Configuring git with personal .gitconfig..."
+  cp $DOTFILES/git/.gitconfig $HOME/
 fi
 
 ###
@@ -321,6 +296,43 @@ if [[ ! -f "$FONT_DIR/$FONT1" ]]; then
   echo "Installed $FONT2."
 else
   echo "Personal fonts already installed."
+fi
+ 
+###
+##
+# MARK: Install fzf and remove .bashrc
+
+if ! command -v fzf &>/dev/null; then
+  echo "Installing fzf..."
+  trace git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
+  trace $HOME/.fzf/install --all || true
+  trace rm -f $HOME/.bashrc $HOME/.fzf.bash
+else
+  echo "fzf already installed."
+fi
+
+###
+##
+# MARK: Make vsc-tmux startup script accessible
+
+if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
+  echo "Making vsc-tmux accessible..."
+  mkdir -p $CODESPACE/scripts
+  cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
+  chmod +x $CODESPACE/scripts/vsc-tmux.sh
+else
+  echo "vsc-tmux already accessible."
+fi
+
+###
+##
+# MARK: Install node, pnpm, and pm2
+
+if ! command -v pnpm &>/dev/null; then
+  echo "Installing node, pnpm, and pm2..."
+  trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
+else
+  echo "pnpm already installed."
 fi
 
 ###
