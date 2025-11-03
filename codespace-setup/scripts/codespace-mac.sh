@@ -10,10 +10,10 @@ set -e
 # !!! All steps must be idempotent
 
 # [ ] Set global variables
-# [ ] Create codespace directory in $HOME
+# [x] Create codespace directory in $HOME
 # [ ] Clone private codespace directory
-# [ ] Install homebrew
-# [ ] Install packages from homebrew
+# [x] Install homebrew
+# [x] Install packages from homebrew
       # P1
           # coreutils
           # fd
@@ -42,14 +42,14 @@ set -e
           # postgresql
           # woff2
           # youtube-dl
-# [ ] Change default shell to zsh installed by Homebrew
-# [ ] Clone dotfiles from public repo
-# [ ] Install and configure oh-my-zsh
-# [ ] Install and configure neovim
+# [x] Change default shell to zsh installed by Homebrew
+# [x] Clone dotfiles from public repo
+# [x] Install and configure oh-my-zsh
+# [x] Install and configure neovim
 # [ ] Associate caps lock key with Esc
-# [ ] Configure tmux
+# [x] Configure tmux
 # [ ] Make vsc-tmux startup script accessible
-# [ ] Install fzf
+# [x] Install fzf
 # [ ] Generate SSH keys for GitHub and add to SSH agent
 # [ ] Configure git global config
 # [ ] Install VSCode
@@ -57,7 +57,7 @@ set -e
       # [ ] Install VSCode extensions
       # [ ] Import personal settings and keybindings files
 # [ ] Install personal fonts
-# [ ] Install and configure iTerm2
+# [x] Install and configure iTerm2
 # [ ] Install Mullvad VPN
 # [ ] Install Malwarebytes
 # [ ] Install VeraCrypt
@@ -93,105 +93,230 @@ set -e
 
 ###
 ##
-# MARK: Global variables
+# MARK: Parse args for verbose and define trace helper
 
-echo "Configuring variables..."
-export CODESPACE=$HOME/codespace
+for arg in "$@"; do
+  if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
+    VERBOSE=true
+  fi
+done
+
+trace() {
+  if [[ "$VERBOSE" == true ]]; then
+    set -x
+    "$@"
+    { set +x; } 2>/dev/null
+  else
+    "$@"
+  fi
+}
+  
+
+###
+##
+# MARK: Global configuration and prechecks
+
+if [[ -z "$CODESPACE" ]]; then
+  echo "Setting environment variables..."
+  export CODESPACE=$HOME/codespace
+  export DOTFILES=$CODESPACE/dotfiles
+fi
+
+if ! command -v curl &>/dev/null; then
+  echo "Error: curl is not installed or not in PATH." >&2
+  exit 1
+fi
+
 
 ###
 ##
 # MARK: Create codespace directory
 
-if [[ -d $CODESPACE ]]; then
-  echo "Directory '$CODESPACE' already exists."
-else
+if [[ ! -d $CODESPACE ]]; then
   echo "Creating '$CODESPACE' directory..."
   mkdir -p $CODESPACE
+else
+  echo "Directory '$CODESPACE' already exists."
 fi
 
+###
+##
+# MARK: Set up Homebrew
 
-# |2| Install Homebrew and packages only if sole user on Mac (otherwise expect most packages already installed)
+# > MARK: Install Homebrew
+if ! command -v brew &>/dev/null; then
+  echo "Installing Homebrew..." 
+  trace /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+  echo "Homebrew already installed."
+fi
 
-# TODO: add prompt for user input
+# > MARK: Ensure brew is available
+if ! command -v brew &>/dev/null; then
+  if [[ -d "/opt/homebrew/bin" ]]; then
+    trace eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [[ -d "/usr/local/bin" ]]; then
+    trace eval "$(/usr/local/bin/brew shellenv)"
+  else
+    echo "Error: could not find brew executable after installation." >&2
+    exit 1
+  fi
+fi
 
-# # |a| Install Homebrew
-#
-# echo "Installing Homebrew..." 
-# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# 
-# # |b| Install packages
-# 
-# echo "Installing packages..." \
-#  && set -x \
-#  && brew install \
-#      ca-certificates \
-#      coreutils \
-#      fd-find \
-#      locales \
-#      ncurses-base \
-#      neovim \
-#      ripgrep \
-#      tmux \
-#      tree \
-#      util-linux \
-#      zsh \
-#  && set +x
+# > MARK: Install packages
+echo "Installing Homebrew packages..."
+trace brew install \
+  coreutils \
+  fd \
+  fzf \
+  gawk \
+  git \
+  n \
+  neovim \
+  pdm \
+  perl \
+  pnpm \
+  rename \
+  ripgrep \
+  tesseract \
+  tmux \
+  tree \
+  typescript \
+  util-linux \
+  wget \
+  zsh
+trace brew install --cask iterm2
+if ! command -v git &>/dev/null; then
+  echo "Error: git not properly installed." >&2
+  exit 1
+fi
 
-# |3| Clone dotfiles from public repo
+###
+##
+# MARK: Clone dotfiles
 
-echo "Cloning dotfiles..."
-git clone https://github.com/tw-space/dotfiles $HOME/.dotfiles
+if [[ ! -d "$DOTFILES" ]]; then
+  echo "Cloning dotfiles..."
+  trace git clone https://github.com/tw-studio/dotfiles $DOTFILES
+else
+  echo "Directory '$DOTFILES' already exists."
+fi
 
-# |4| Install oh-my-zsh
+###
+##
+# MARK: Install oh-my-zsh
 
-echo "Installing oh-my-zsh..."
-export ZSH=$HOME/.oh-my-zsh
-export SHELL=/bin/zsh
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-cp $HOME/.dotfiles/zsh/.zshrc $HOME/
-cp $HOME/.dotfiles/zsh/codespace*.zsh-theme $ZSH/themes/
-git clone https://github.com/jocelynmallon/zshmarks $ZSH/custom/plugins/zshmarks
+OMZ=$HOME/.oh-my-zsh
+if [[ ! -d "$OMZ" ]]; then
+  echo "Installing oh-my-zsh..."
+  export ZSH=$OMZ
+  export SHELL=/bin/zsh
+  trace sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  trace cp $DOTFILES/zsh/.zshrc $HOME/
+  trace cp $DOTFILES/zsh/codespace*.zsh-theme $ZSH/themes/
+else
+  echo "Directory '$OMZ' found, oh-my-zsh already installed."
+fi
+
+# MARK: Install zshmarks
+ZSHMARKS=$ZSH/custom/plugins/zshmarks
+if [[ ! -d "$ZSHMARKS" ]]; then
+  echo "Installing zshmarks..."
+  trace git clone https://github.com/jocelynmallon/zshmarks $ZSHMARKS
+else
+  echo "Directory '$ZSHMARKS' already exists, zshmarks already installed."
+fi
  
-# |5| Install fzf
+###
+##
+# MARK: Install fzf and remove .bashrc
 
-echo "Installing fzf..."
-git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
-$HOME/.fzf/install --all || true
-rm -f $HOME/.bashrc $HOME/.fzf.bash
+if ! command -v fzf &>/dev/null; then
+  echo "Installing fzf..."
+  trace git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
+  trace $HOME/.fzf/install --all || true
+  trace rm -f $HOME/.bashrc $HOME/.fzf.bash
+else
+  echo "fzf already installed."
+fi
 
-# |6| Configure neovim
+###
+##
+# MARK: Configure neovim
 
-echo "Configuring neovim..."
-mkdir -p $HOME/.config/nvim/colors \
- && mkdir -p $HOME/.local/share/nvim/site/autoload \
- && cp $HOME/.dotfiles/neovim/init.vim $HOME/.config/nvim/ \
- && cp $HOME/.dotfiles/neovim/monokai-fusion.vim $HOME/.config/nvim/colors/ \
- && cp $HOME/.dotfiles/neovim/plug.vim $HOME/.local/share/nvim/site/autoload/ \
- && cp $HOME/.dotfiles/neovim/dracula-airline.vim $HOME/.config/nvim/dracula.vim \
- && cp $HOME/.dotfiles/neovim/dracula.vim $HOME/.config/nvim/colors/
-nvim --headless +PlugInstall +qall
+if [[ ! -d "$HOME/.config/nvim/colors" ]]; then
+  echo "Configuring neovim..."
+  trace mkdir -p $HOME/.config/nvim/colors \
+   && mkdir -p $HOME/.local/share/nvim/site/autoload \
+   && cp $DOTFILES/neovim/init.vim $HOME/.config/nvim/ \
+   && cp $DOTFILES/neovim/monokai-fusion.vim $HOME/.config/nvim/colors/ \
+   && cp $DOTFILES/neovim/plug.vim $HOME/.local/share/nvim/site/autoload/ \
+   && cp $DOTFILES/neovim/dracula-airline.vim $HOME/.config/nvim/dracula.vim \
+   && cp $DOTFILES/neovim/dracula.vim $HOME/.config/nvim/colors/
+  trace nvim --headless +PlugInstall +qall
+else
+  echo "neovim already configured."
+fi
 
-# |7| Configure tmux
+###
+##
+# MARK: Configure tmux
 
-echo "Configuring tmux..."
-cp $HOME/.dotfiles/tmux/.tmux.conf $HOME/
-git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
-tmux start-server \
- && tmux new-session -d \
- && sleep 1 \
- && $HOME/.tmux/plugins/tpm/scripts/install_plugins.sh \
- && tmux kill-server
-mkdir -p $HOME/.tmux/scripts \
- && cp -r $HOME/.dotfiles/tmux/scripts $HOME/.tmux/
+TPM=$HOME/.tmux/plugins/tpm
+if [[ ! -d "$TPM" ]]; then
+  echo "Configuring tmux..."
+  cp $DOTFILES/tmux/.tmux.conf $HOME/
+  git clone https://github.com/tmux-plugins/tpm $TPM
+  tmux start-server \
+   && tmux new-session -d \
+   && sleep 1 \
+   && $HOME/.tmux/plugins/tpm/scripts/install_plugins.sh \
+   && tmux kill-server
+else
+  echo "tmux already configured."
+fi
 
-# |8| Cleanup
+TMUXSCRIPTS=$HOME/.tmux/scripts
+if [[ ! -d "$TMUXSCRIPTS" ]]; then
+  echo "Configuring tmux scripts..."
+  mkdir -p $TMUXSCRIPTS \
+   && cp -r $DOTFILES/tmux/scripts $HOME/.tmux/
+else
+  echo "tmux scripts already configured."
+fi
 
-echo "Cleaning up..."
-rm -rf $HOME/.dotfiles
+# MARK: Make vsc-tmux startup script accessible
+if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
+  echo "Making vsc-tmux accessible..."
+  mkdir -p $CODESPACE/scripts
+  cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
+  chmod +x $CODESPACE/scripts/vsc-tmux.sh
+else
+  echo "vsc-tmux already accessible."
+fi
 
-# |9| Start zsh in codespace
+# MARK: Install node, pnpm, and pm2
+if ! command -v pnpm &>/dev/null; then
+  echo "Installing node, pnpm, and pm2..."
+  trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
+else
+  echo "pnpm already installed."
+fi
 
-mkdir -p $HOME/$CODESPACE
-cd $HOME/$CODESPACE
+###
+##
+# MARK: Housekeeping
+
+# echo "Cleaning up..."
+
+echo "Giving user ownership of their directory..."
+chown -R $USER $HOME
+
+###
+##
+# MARK: Start zsh in codespace
+
+echo "Starting in codespace..."
+cd $CODESPACE
 zsh
 
