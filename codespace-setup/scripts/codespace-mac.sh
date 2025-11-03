@@ -339,8 +339,8 @@ fi
 ##
 # MARK: Housekeeping
 
-echo "Giving user ownership of their directory..."
-chown -R $USER $HOME
+echo "Giving user ownership of their codespace directory..."
+chown -R $USER $CODESPACE
 
 ###
 ##
