@@ -274,7 +274,7 @@ fi
 # MARK: Configure git
 
 # > MARK: .gitconfig
-if [[ -f ~/.gitconfig ]] && grep -q "main" "~/.gitconfig"; then
+if [[ -f ~/.gitconfig ]] && grep -q "main" ~/.gitconfig; then
   echo "gitconfig already configured."
 else
   echo "Configuring git with personal .gitconfig..."
