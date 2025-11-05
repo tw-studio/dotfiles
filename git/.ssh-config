@@ -1,0 +1,22 @@
+# ~/.ssh/config
+
+# tw-studio
+# remember: git remote add origin git@tw-studio:tw-studio/<repo>
+Host tw-studio
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/tw-studio
+
+## ec2
+#Host ec2
+#    HostName 0.0.0.0
+#    User ubuntu
+#    IdentifyFile ~/.ssh/ec2.pem
+#    ServerAliveInterval 60
+#    ServerAliveCountMax 10
+
+# quit asking for passwords
+Host *
+    AddKeysToAgent yes
+    UseKeychain yes
+

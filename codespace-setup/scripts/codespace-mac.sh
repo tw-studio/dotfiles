@@ -273,11 +273,21 @@ fi
 ##
 # MARK: Configure git
 
+# > MARK: .gitconfig
 if [[ -f ~/.gitconfig ]] && grep -q "main" "~/.gitconfig"; then
   echo "gitconfig already configured."
 else
   echo "Configuring git with personal .gitconfig..."
   cp $DOTFILES/git/.gitconfig $HOME/
+fi
+
+# > MARK: git authentication
+if [[ ! ( -d "~/.ssh" && -f "~/.ssh/config" ) ]]; then
+  echo "Configuring .ssh config (keys must be downloaded manually)..."
+  mkdir -p ~/.ssh
+  cp $DOTFILES/git/.ssh-config $HOME/.ssh/config
+else
+  echo ".ssh config already configured."
 fi
 
 ###
