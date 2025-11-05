@@ -274,7 +274,7 @@ fi
 # MARK: Configure git
 
 # > MARK: .gitconfig
-if [[ -f ~/.gitconfig ]] && grep -q "main" ~/.gitconfig; then
+if [[ -f $HOME/.gitconfig ]] && grep -q "main" $HOME/.gitconfig; then
   echo "gitconfig already configured."
 else
   echo "Configuring git with personal .gitconfig..."
@@ -282,13 +282,22 @@ else
 fi
 
 # > MARK: git authentication
-if [[ ! ( -d "~/.ssh" && -f "~/.ssh/config" ) ]]; then
-  echo "Configuring .ssh config (keys must be downloaded manually)..."
-  mkdir -p ~/.ssh
+# ~/.ssh/config
+if [[ ! ( -d "$HOME/.ssh" && -f "$HOME/.ssh/config" ) ]]; then
+  echo "Configuring .ssh config..."
+  mkdir -p $HOME/.ssh
   cp $DOTFILES/git/.ssh-config $HOME/.ssh/config
 else
   echo ".ssh config already configured."
 fi
+# ~/.ssh/tw-studio
+if [[ ! ( -f "$HOME/.ssh/tw-studio" && -f "$HOME/.ssh/tw-studio.pub" ) ]]; then
+  echo "Creating keys for tw-studio (upload public key to GitHub)..."
+  ssh-keygen -t ed25519 -f "$HOME/.ssh/tw-studio" -C "<>"
+else
+  echo "Keys for tw-studio already created."
+fi
+
 
 ###
 ##
