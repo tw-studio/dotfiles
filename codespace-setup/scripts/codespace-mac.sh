@@ -9,9 +9,9 @@ set -e
 
 # !!! All steps must be idempotent
 
-# [ ] Set global variables
+# [x] Set global variables
 # [x] Create codespace directory in $HOME
-# [ ] Clone private codespace directory
+# [-] Clone private codespace directory
 # [x] Install homebrew
 # [x] Install packages from homebrew
       # P1
@@ -35,23 +35,23 @@ set -e
           # wget
           # zsh
       # P2 
-          # jq
-          # mkcert
+          # [x] jq
+          # [x] mkcert
           # pandoc
-          # pngquant
+          # [x] pngquant
           # postgresql
           # woff2
-          # youtube-dl
+          # [x] youtube-dl
 # [x] Change default shell to zsh installed by Homebrew
 # [x] Clone dotfiles from public repo
 # [x] Install and configure oh-my-zsh
 # [x] Install and configure neovim
-# [ ] Associate caps lock key with Esc
+# [-] Associate caps lock key with Esc
 # [x] Configure tmux
-# [ ] Make vsc-tmux startup script accessible
+# [x] Make vsc-tmux startup script accessible
 # [x] Install fzf
-# [ ] Generate SSH keys for GitHub and add to SSH agent
-# [ ] Configure git global config
+# [x] Generate SSH keys for GitHub and add to SSH agent
+# [x] Configure git global config
 # [ ] Install VSCode
       # [ ] Download and install VSCode
       # [ ] Install VSCode extensions
@@ -65,16 +65,16 @@ set -e
 # [ ] Set wallpaper
 # [ ] Set system color
 ##### P2
-# [ ] Install node, pnpm, and pm2 (does it need n installed earlier?) (P2)
+# [x] Install node, pnpm, and pm2 (does it need n installed earlier?) (P2)
 # [ ] Install Parallels and Windows (P2)
 # [ ] Install Hand Mirror (P2)
 ##### P3
 # [ ] Install Quick Shade (P3)
 # [ ] Install and configure pdm and python (P3)
 ##### Clean up
-# [ ] Clean up dotfiles
-# [ ] Give user their stuff
-# [ ] Start zsh in codespace
+# [-] Clean up dotfiles
+# [x] Give user their stuff
+# [x] Start zsh in codespace
 
 # Scratch from before:
 
@@ -169,10 +169,13 @@ trace brew install \
   fzf \
   gawk \
   git \
+  jq \
+  mkcert \
   n \
   neovim \
   pdm \
   perl \
+  pngquant \
   pnpm \
   rename \
   ripgrep \
@@ -282,7 +285,7 @@ else
 fi
 
 # > MARK: git authentication
-# ~/.ssh/config
+# Copy to ~/.ssh/config
 if [[ ! ( -d "$HOME/.ssh" && -f "$HOME/.ssh/config" ) ]]; then
   echo "Configuring .ssh config..."
   mkdir -p $HOME/.ssh
@@ -290,14 +293,15 @@ if [[ ! ( -d "$HOME/.ssh" && -f "$HOME/.ssh/config" ) ]]; then
 else
   echo ".ssh config already configured."
 fi
-# ~/.ssh/tw-studio
+# Create tw-studio keys
 if [[ ! ( -f "$HOME/.ssh/tw-studio" && -f "$HOME/.ssh/tw-studio.pub" ) ]]; then
   echo "Creating keys for tw-studio (upload public key to GitHub)..."
   ssh-keygen -t ed25519 -f "$HOME/.ssh/tw-studio" -C "<>"
 else
   echo "Keys for tw-studio already created."
 fi
-
+# Add to keychain (idempotent)
+ssh-add --apple-use-keychain $HOME/.ssh/tw-studio
 
 ###
 ##
