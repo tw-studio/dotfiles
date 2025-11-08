@@ -41,7 +41,7 @@ set -e
           # [x] pngquant
           # postgresql
           # woff2
-          # [x] youtube-dl
+          # [-] youtube-dl
 # [x] Change default shell to zsh installed by Homebrew
 # [x] Clone dotfiles from public repo
 # [x] Install and configure oh-my-zsh
@@ -53,11 +53,32 @@ set -e
 # [x] Generate SSH keys for GitHub and add to SSH agent
 # [x] Configure git global config
 # [ ] Install VSCode
-      # [ ] Download and install VSCode
+      # [x] Download and install VSCode
       # [ ] Install VSCode extensions
+        # # Most Important
+        # [ ] "alefragnani.project-manager"
+        # [ ] "asvetliakov.vscode-neovim"
+        # [ ] "ms-vscode-remote.remote-wsl"
+        # [ ] "tw.monokai-accent"
+        # # Nice to Have
+        # [ ] "dbaeumer.vscode-eslint"
+        # [ ] "dunstontc.viml"
+        # [ ] "geddski.macros"
+        # [ ] "huntertran.auto-markdown-toc"
+        # [ ] "jebbs.markdown-extended"
+        # [ ] "jsynowiec.vscode-insertdatestring"
+        # [ ] "mhutchie.git-graph"
+        # [ ] "ms-python.black-formatter"
+        # [ ] "naumovs.color-highlight"
+        # [ ] "redhat.vscode-yaml"
+        # [ ] "hoovercj.vscode-settings-cycler"
+        # [ ] "spywhere.mark-jump"
+        # [ ] "tyriar.sort-lines"
+        # [ ] "wayou.vscode-todo-highlight"
       # [ ] Import personal settings and keybindings files
 # [ ] Install personal fonts
-# [x] Install and configure iTerm2
+# [x] Install iTerm2
+# [ ] Configure iTerm2
 # [ ] Install Mullvad VPN
 # [ ] Install Malwarebytes
 # [ ] Install VeraCrypt
@@ -187,6 +208,7 @@ trace brew install \
   wget \
   zsh
 trace brew install --cask iterm2
+trace brew install --cask visual-studio-code
 if ! command -v git &>/dev/null; then
   echo "Error: git not properly installed." >&2
   exit 1
@@ -320,10 +342,100 @@ if [[ ! -f "$FONT_DIR/$FONT1" ]]; then
 else
   echo "Personal fonts already installed."
 fi
- 
+
 ###
 ##
-# MARK: Install fzf and remove .bashrc
+# MARK: Configure VSCode
+
+# > MARK: Ensure VS Code has been opened once
+# if ! pgrep -xq "Visual Studio Code"; then
+#   echo "Opening VS Code once to complete macOS trust setup..."
+#   trace open -a "Visual Studio Code"
+#   echo "Waiting 3 seconds..."
+#   sleep 3  # give it time to launch
+#   echo "Closing VS Code and waiting 2 seconds..."
+#   trace osascript -e 'tell application "Visual Studio Code" to quit'
+#   trace osascript -e 'tell application "Code Helper" to quit'
+#   sleep 2
+# fi
+
+# > MARK: Ensure VS Code is fully closed before continuing
+if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
+  echo "VS Code appears to be running. It must be fully closed before setup continues."
+  read -r -p "Quit all VS Code processes now? (y/N): " RESP
+  case "$RESP" in
+    [Yy]* )
+      echo "Closing VS Code..."
+      pkill -f "Visual Studio Code" 2>/dev/null
+      pkill -f "Code Helper" 2>/dev/null
+      sleep 1
+      echo "VS Code is closed."
+      ;;
+    * )
+      echo "Setup aborted. Please close VS Code manually and re-run this script."
+      exit 1
+      ;;
+  esac
+else
+  echo "VS Code is already not running."
+fi
+
+# > MARK: Configure $CODE to use in this script
+CODE="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+if [[ ! -x "$CODE" ]]; then
+  echo "Error: Could not find VSCode CLI at: $CODE"
+  echo "If VSCode is installed, run in VSCode:"
+  echo "   Command Palette → Shell Command: Install 'code' command in PATH"
+  exit 1
+fi
+
+# > MARK: Install extensions
+EXTENSIONS=(
+  "alefragnani.project-manager"
+  "asvetliakov.vscode-neovim"
+  "ms-vscode-remote.remote-wsl"
+  "tw.monokai-accent"
+  "dbaeumer.vscode-eslint"
+  "dunstontc.viml"
+  "geddski.macros"
+  "huntertran.auto-markdown-toc"
+  "jebbs.markdown-extended"
+  "jsynowiec.vscode-insertdatestring"
+  "mhutchie.git-graph"
+  "ms-python.black-formatter"
+  "naumovs.color-highlight"
+  "redhat.vscode-yaml"
+  "hoovercj.vscode-settings-cycler"
+  "spywhere.mark-jump"
+  "tyriar.sort-lines"
+  "wayou.vscode-todo-highlight"
+)
+INSTALLED_EXTENSIONS="$("$CODE" --list-extensions)"
+echo "Installing VS Code extensions..."
+for EXT in "${EXTENSIONS[@]}"; do
+  if ! echo "$INSTALLED_EXTENSIONS" | grep -q "^$EXT$"; then
+    # Doesn't need explicit status; already reported by code
+    sleep 0.5
+    "$CODE" --install-extension "$EXT"
+  else
+    sleep 0.5
+    echo "Already installed: $EXT"
+  fi
+done
+
+# > MARK: Make vsc-tmux startup script accessible
+if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
+  echo "Making vsc-tmux accessible..."
+  mkdir -p $CODESPACE/scripts
+  cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
+  chmod +x $CODESPACE/scripts/vsc-tmux.sh
+else
+  echo "vsc-tmux already accessible."
+fi
+
+###
+##
+# MARK: Install fzf
 
 if ! command -v fzf &>/dev/null; then
   echo "Installing fzf..."
@@ -332,19 +444,6 @@ if ! command -v fzf &>/dev/null; then
   trace rm -f $HOME/.bashrc $HOME/.fzf.bash
 else
   echo "fzf already installed."
-fi
-
-###
-##
-# MARK: Make vsc-tmux startup script accessible
-
-if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
-  echo "Making vsc-tmux accessible..."
-  mkdir -p $CODESPACE/scripts
-  cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
-  chmod +x $CODESPACE/scripts/vsc-tmux.sh
-else
-  echo "vsc-tmux already accessible."
 fi
 
 ###

@@ -523,7 +523,9 @@ echo -e '\033[6 q'
     alias vnvtheme='$VS ~/.config/nvim/colors/monokai-fusion-tw.vim'
     alias vs='$VS'
     alias vtmux='$VS ~/.tmux.conf'
-    alias winspace='cd $WINSPACE'
+    if command -v wslpath &>/dev/null; then
+      alias winspace='cd $WINSPACE'
+    fi
     alias youtube-m4a='youtube-dl -x --no-mtime --audio-format m4a --audio-quality 64K -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
     alias youtube-mp3='youtube-dl -x --no-mtime --audio-format mp3 -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
     alias zedit='$EDITOR ~/.zshrc'
