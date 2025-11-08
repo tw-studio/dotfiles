@@ -295,6 +295,9 @@
   "explorer.confirmDragAndDrop": false,
   "explorer.openEditors.visible": 9,
   "extensions.autoUpdate": false,
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
   "extensions.ignoreRecommendations": true,
   "files.associations": {
     "*.config": "shellscript",
@@ -601,13 +604,10 @@
   ],
   "update.mode": "manual",
   "update.showReleaseNotes": false,
-  "vscode-neovim.logLevel": "info",
-  "vscode-neovim.neovimExecutablePaths.darwin": "/Users/tomw/codespace/.vscode/nvim-osx64/bin/nvim",
+  "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
   "vscode-neovim.neovimExecutablePaths.linux": "/usr/local/bin/nvim",
-  "vscode-neovim.neovimInitPath": "/Users/tomw/.config/nvim/init-vscode.vim",
   "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init-vscode.vim",
   "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
-  "vscode-neovim.neovimPath": "/Users/tomw/codespace/.vscode/nvim-osx64/bin/nvim",
   "vscode-neovim.useWSL": false,
   "window.newWindowDimensions": "maximized",
   "workbench.activityBar.location": "hidden",
