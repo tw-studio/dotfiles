@@ -34,13 +34,14 @@ set -e
           # typescript
           # wget
           # zsh
-      # P2 
+      # P2 (small)
           # [x] jq
           # [x] mkcert
-          # pandoc
           # [x] pngquant
-          # postgresql
           # woff2
+      # P2 (big)
+          # pandoc
+          # postgresql
           # [-] youtube-dl
 # [x] Change default shell to zsh installed by Homebrew
 # [x] Clone dotfiles from public repo
@@ -54,31 +55,11 @@ set -e
 # [x] Configure git global config
 # [ ] Install VSCode
       # [x] Download and install VSCode
-      # [ ] Install VSCode extensions
-        # # Most Important
-        # [ ] "alefragnani.project-manager"
-        # [ ] "asvetliakov.vscode-neovim"
-        # [ ] "ms-vscode-remote.remote-wsl"
-        # [ ] "tw.monokai-accent"
-        # # Nice to Have
-        # [ ] "dbaeumer.vscode-eslint"
-        # [ ] "dunstontc.viml"
-        # [ ] "geddski.macros"
-        # [ ] "huntertran.auto-markdown-toc"
-        # [ ] "jebbs.markdown-extended"
-        # [ ] "jsynowiec.vscode-insertdatestring"
-        # [ ] "mhutchie.git-graph"
-        # [ ] "ms-python.black-formatter"
-        # [ ] "naumovs.color-highlight"
-        # [ ] "redhat.vscode-yaml"
-        # [ ] "hoovercj.vscode-settings-cycler"
-        # [ ] "spywhere.mark-jump"
-        # [ ] "tyriar.sort-lines"
-        # [ ] "wayou.vscode-todo-highlight"
+      # [x] Install VSCode extensions
       # [ ] Import personal settings and keybindings files
 # [ ] Install personal fonts
 # [x] Install iTerm2
-# [ ] Configure iTerm2
+# [ ] Set iTerm2 font to Meslo
 # [ ] Install Mullvad VPN
 # [ ] Install Malwarebytes
 # [ ] Install VeraCrypt
@@ -206,6 +187,7 @@ trace brew install \
   typescript \
   util-linux \
   wget \
+  woff2 \
   zsh
 trace brew install --cask iterm2
 trace brew install --cask visual-studio-code
@@ -347,18 +329,6 @@ fi
 ##
 # MARK: Configure VSCode
 
-# > MARK: Ensure VS Code has been opened once
-# if ! pgrep -xq "Visual Studio Code"; then
-#   echo "Opening VS Code once to complete macOS trust setup..."
-#   trace open -a "Visual Studio Code"
-#   echo "Waiting 3 seconds..."
-#   sleep 3  # give it time to launch
-#   echo "Closing VS Code and waiting 2 seconds..."
-#   trace osascript -e 'tell application "Visual Studio Code" to quit'
-#   trace osascript -e 'tell application "Code Helper" to quit'
-#   sleep 2
-# fi
-
 # > MARK: Ensure VS Code is fully closed before continuing
 if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
   echo "VS Code appears to be running. It must be fully closed before setup continues."
@@ -412,13 +382,14 @@ EXTENSIONS=(
 )
 INSTALLED_EXTENSIONS="$("$CODE" --list-extensions)"
 echo "Installing VS Code extensions..."
+sleep 0.5
 for EXT in "${EXTENSIONS[@]}"; do
   if ! echo "$INSTALLED_EXTENSIONS" | grep -q "^$EXT$"; then
     # Doesn't need explicit status; already reported by code
     sleep 0.5
     "$CODE" --install-extension "$EXT"
   else
-    sleep 0.5
+    sleep 0.1
     echo "Already installed: $EXT"
   fi
 done
@@ -431,6 +402,29 @@ if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
   chmod +x $CODESPACE/scripts/vsc-tmux.sh
 else
   echo "vsc-tmux already accessible."
+fi
+
+# > MARK: Copy personal keybindings and settings
+VSC_USER_DIR="$HOME/Library/Application Support/Code/User"
+VSC_SETTINGS="$VSC_USER_DIR/settings.json"
+VSC_KEYBINDINGS="$VSC_USER_DIR/keybindings.json"
+TS=$(date +"%Y%m%d-%H%M%S")
+mkdir -p "$VSC_USER_DIR"
+# Check if settings was already copied
+if [[ -f "$SETTINGS_FILE" ]] && grep -q 'Monokai +' "$SETTINGS_FILE"; then
+  echo "Personal VS Code settings and keybindings already configured."
+else
+  if [[ -f "$VSC_SETTINGS" ]]; then
+    echo "Backing up existing settings.json..."
+    mv "$VSC_SETTINGS" "$VSC_USER_DIR/settings-$TS.json"
+  fi
+  if [[ -f "$VSC_KEYBINDINGS" ]]; then
+    echo "Backing up existing keybindings.json..."
+    mv "$VSC_KEYBINDINGS" "$VSC_USER_DIR/keybindings-$TS.json"
+  fi
+  echo "Copying in personal VS Code settings and keybindings..."
+  cp "$DOTFILES/vscode/mac/settings.json" "$VSC_SETTINGS"
+  cp "$DOTFILES/vscode/mac/keybindings.json" "$VSC_KEYBINDINGS"
 fi
 
 ###
