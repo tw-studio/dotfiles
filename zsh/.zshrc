@@ -59,7 +59,6 @@ zle -N zle-keymap-select
 # Use beam shape cursor on startup.
 echo -e '\033[6 q'
 
-
 ################################################################
 #
 #   Personal configuration
@@ -130,7 +129,7 @@ echo -e '\033[6 q'
     if command -v defaults &>/dev/null && ! defaults read com.googlecode.iterm2 AlternateMouseScroll &>/dev/null; then
       defaults write com.googlecode.iterm2 AlternateMouseScroll -bool true
     fi
-    
+
 #   Configure node
 #   ------------------------------------------------------------
     if command -v pnpm &> /dev/null; then
@@ -155,14 +154,14 @@ echo -e '\033[6 q'
     # export AWS_PROFILE=just-learning
     export AWS_PROFILE=codespace-24
     export SAM_CLI_TELEMETRY=0      # opt-out of AWS SAM telemetry
-    
+
 #   Enable PEP 582 for pdm
 #   ------------------------------------------------------------
     # eval "$(pdm --pep582)"
     # pdm_path='/usr/local/Cellar/pdm/2.8.0/libexec/lib/python3.11/site-packages/pdm/pep582'
     # Add to PYTHONPATH only when not already there
     # [[ ":$PYTHONPATH:" != *":$pdm_path:"* ]] && export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$pdm_path"
-    
+
 #   Miscellaneous configuration values
 #   ------------------------------------------------------------
     export HOMEBREW_AUTO_UPDATE_SECS=2592000 # 30 days
@@ -450,7 +449,8 @@ echo -e '\033[6 q'
     alias bx='bundle exec'
     alias cdkd='\time cdk deploy --require-approval never --no-rollback'
     alias cdks='\time cdk synth --path-metadata false --report-versioning false --quiet'
-    alias code='cd $CODESPACE'
+    alias Code='cd $CODESPACE'
+    alias codes='cd $CODESPACE'
     alias codespace='cd $CODESPACE'
     alias cp='cp -iv'                           # Preferred 'cp' implementation - requires confirm
     alias create-pdm='bash <(curl -fsSo- https://raw.githubusercontent.com/tw-studio/pdm-env-starter/main/scripts/create_pdm_app.sh)'
@@ -460,7 +460,8 @@ echo -e '\033[6 q'
     alias dockrl='docker rm -f $(docker ps -aq | head -1)'
     alias dus='du -sh .[^.]* *'
     alias dzi="find . -type f -name \"*:Zone.Identifier\" -delete"
-    alias fd='fdfind --hidden'
+    [[ "${(L)OS_NAME}" == "ubuntu" ]] && FD_CMD='fdfind' || FD_CMD='fd'
+    alias fd='$FD_CMD --hidden --no-ignore --exclude .git --exclude node_modules --exclude .cache'
     alias fde='fd --hidden --no-ignore --exclude .git --exclude node_modules --exclude .cache'
     # Fix git when wsl corrupts and empties object
     alias gitfix='find .git/objects/ -type f -empty | xargs rm; git fetch -p; git fsck --full'
@@ -469,9 +470,11 @@ echo -e '\033[6 q'
     alias install-node='curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/misc-scripts/install-node-pnpm.sh | zsh'
     alias lad='du -sh {.,}*'                    # list size of directories and files
     alias lr="ls -Rlp | awk '{ if (NF==1) print \$0; } { if (NF>2) print \$NF; } { if (NF==0) print \$0; }'"
-    alias ls='ls -Ahv --color --group-directories-first'
-    alias lsd='ls -Adh *(/) --color'            # list only directories
-    alias lss='gls -A --color -h --group-directories-first -s'      # list sizes
+    LS_CMD=$(command -v gls 2>/dev/null || echo ls)
+    LS_FLAGS=$([[ "$LS_CMD" == *gls ]] && echo "--color --group-directories-first" || echo "-G")
+    alias ls="$LS_CMD -Ahv $LS_FLAGS"
+    alias lsd="$LS_CMD -Adh $LS_FLAGS */"
+    alias lss="$LS_CMD -Ahs $LS_FLAGS"
     alias m='fg'
     if command -v sw_vers &> /dev/null; then
       alias macosver="sw_vers | sed -n '2p' | cut -f 2"
@@ -553,7 +556,7 @@ echo -e '\033[6 q'
     qcd(){ unset -f cd; cd $*; altercd; }
     cl() { cd "$@" && ls; }
     cs() { cd "$@" && ls; }
-    
+
     # snap* - archives files and dirs
     snapc() {
       if [[ $# -ne 1 ]]; then
@@ -573,26 +576,26 @@ echo -e '\033[6 q'
       else
         new_name="${file}_${timestamp}"
       fi
-      
+
       # Make a copy with the new hash-based name
-      cp -r "$file" "$new_name" >/dev/null; 
+      cp -r "$file" "$new_name" >/dev/null;
       if [[ $? -ne 0 ]]; then
         echo "Error copying '$file' to '$new_name'"
         return 2
       fi
-      
+
       echo "'$file' copied to '$new_name'"
     }
     # only use 'snap' when /usr/bin/snap not installed (such as on ec2)
     if [[ ! -f /usr/bin/snap ]]; then
       alias snap="snapc"
     fi
-    function snapm { 
+    function snapm {
       if [[ $# -ne 1 ]]; then
         echo "Usage: snapm <file>"
         return 1
       fi
-        
+
       local file="$1"
       local base="${file%.*}"
       local extension="${file##*.}"
@@ -605,17 +608,17 @@ echo -e '\033[6 q'
       else
         new_name="${file}_${timestamp}"
       fi
-      
+
       # Make a copy with the new hash-based name
-      mv "$file" "$new_name" >/dev/null; 
+      mv "$file" "$new_name" >/dev/null;
       if [[ $? -ne 0 ]]; then
         echo "Error renaming '$file' to '$new_name'"
         return 2
       fi
-      
+
       echo "'$file' renamed to '$new_name'"
     }
-    
+
     # gcp - git cherry-pick helper
     alias gcp &>/dev/null && unalias gcp # set by git plugin
     function gcp {
@@ -636,7 +639,7 @@ echo -e '\033[6 q'
     key() {
       eval $(keychain -q --eval --agents ssh "$1")
     }
-    
+
     # minipng - compress all pngs in current directory (pngquant)
     if command -v pngquant &> /dev/null && command -v rename &> /dev/null; then
       minipng() {
@@ -645,14 +648,14 @@ echo -e '\033[6 q'
         rename 's/-fs8//g' *;
       }
     fi
-    
+
     # b62-9 - generate a base62 string (9 characters)
     function b62-9 {
       local DIGITS=9
       local BASE62_9=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w $DIGITS | head -n 1)
       echo "$BASE62_9"
     }
-    
+
     # ffmpeg - compress m4a
     if command -v ffmpeg &>/dev/null; then
       ffmpeg-64k() {
@@ -672,13 +675,13 @@ echo -e '\033[6 q'
       }
     fi
 
-    # pandoctw - 
+    # pandoctw -
     if command -v pandocm &>/dev/null; then
       pandoctw() {
         pandocm "$1" -t markdown-smart-simple_tables --wrap=none -o "$1".md
       }
       pandoctwo() {
-        pandocm "$1" -t markdown-smart-simple_tables --wrap=none -o "$2" 
+        pandocm "$1" -t markdown-smart-simple_tables --wrap=none -o "$2"
       }
     fi
 
@@ -701,13 +704,13 @@ echo -e '\033[6 q'
         cp -p "`ls -1t ~/Desktop/Screenshots/* | head -1`" .;
         rename 's/ /-/g' *;
       }
-      
+
       # copy latest download
       cpdl() {
         cp -p "`ls -1t ~/Downloads/* | head -1`" .;
         rename 's/ /-/g' *;
       }
-      
+
       # tesseract - ocr (Mac)
       if command -v tesseract &> /dev/null; then
         tesso() {
@@ -718,7 +721,7 @@ echo -e '\033[6 q'
           && ls -tp . | grep '^Screen' | head -n 1 | xargs -I{} tesseract "{}" stdout;
         }
       fi
-      
+
       list_xcode_provisioning_profiles() {
         while IFS= read -rd '' f; do
           2> /dev/null /usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' /dev/stdin \
@@ -727,7 +730,7 @@ echo -e '\033[6 q'
         done < <(find "$HOME/Library/MobileDevice/Provisioning Profiles" -name '*.mobileprovision' -print0)
       }
     fi
-    
+
 #   Personal Functions - for Windows
 #   ------------------------------------------
     if command -v wslpath &> /dev/null; then
@@ -839,14 +842,14 @@ echo -e '\033[6 q'
       echo "$HASH"
     }
 
-    # rename a copy of the given file with a s3 friendly hash name 
+    # rename a copy of the given file with a s3 friendly hash name
     function s3hashcp {
       # Require only one argument
       if [[ $# -ne 1 ]]; then
         echo "Usage: s3hashcp <filename>"
         return 1
       fi
-      
+
       local filename="$1"
       local new_hash=$(s3hash)
       local base="${filename%.*}"
@@ -859,9 +862,9 @@ echo -e '\033[6 q'
       else
         new_name="${filename}_${new_hash}"
       fi
-      
+
       # Make a copy with the new hash-based name
-      cp -r "$filename" "$new_name" >/dev/null; 
+      cp -r "$filename" "$new_name" >/dev/null;
       if [[ $? -ne 0 ]]; then
         echo "Error copying file."
         return 2
@@ -877,7 +880,7 @@ echo -e '\033[6 q'
         echo "Usage: hashrename <filename>"
         return 1
       fi
-      
+
       local filename="$1"
       local new_hash=$(s3hash)
       local base="${filename%.*}"
@@ -890,14 +893,14 @@ echo -e '\033[6 q'
       else
         new_name="${filename}_${new_hash}"
       fi
-      
+
       # Rename with the new hash-based name
-      mv "$filename" "$new_name" >/dev/null; 
+      mv "$filename" "$new_name" >/dev/null;
       if [[ $? -ne 0 ]]; then
         echo "Error renaming file."
         return 2
       fi
-      
+
       echo "File renamed to $new_name"
     }
 
@@ -908,7 +911,7 @@ echo -e '\033[6 q'
       find . -maxdepth 1 -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.JPG' -o -name '*.JPEG' \) -exec cp {} originals/ \;
       find . -maxdepth 1 -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.JPG' -o -name '*.JPEG' \) | while read file; do echo "$file"; hashrename "$file"; done;
     }
-    
+
     # connect to postgresql RDS instance via ec2 target at fixed port
     rdsconnect() {
       if [[ -z "$1" ]]; then
@@ -935,7 +938,7 @@ echo -e '\033[6 q'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
     # Source key bindings etc
-    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+    [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
     # fh - search in your command history and execute selected command
     fh() {
@@ -973,22 +976,22 @@ echo -e '\033[6 q'
       # Call the check function whenever a new shell starts
       check_wsl_interop_change
     fi
-    
+
 #   SSH
 #   ------------------------------------------
     # Add ssh keys with passphrase to ssh-agent for each terminal session (Mac)
-    if command -v ssh-agent &>/dev/null \
-      && command -v sw_vers &>/dev/null \
-      && command -v ssh-add &>/dev/null;
-    then
-      eval "$(ssh-agent -s)" >/dev/null
-      MACOSVER="$(sw_vers | sed -n '2p' | cut -f 2)"
-      if [[ "$MACOSVER" < 12.0 ]]; then
-        { ssh-add -A; } &>/dev/null
-      else
-        { ssh-add --apple-load-keychain; } &>/dev/null
-      fi
-    fi
+#   if command -v ssh-agent &>/dev/null \
+#     && command -v sw_vers &>/dev/null \
+#     && command -v ssh-add &>/dev/null;
+#   then
+#     eval "$(ssh-agent -s)" >/dev/null
+#     MACOSVER="$(sw_vers | sed -n '2p' | cut -f 2)"
+#     if [[ "$MACOSVER" < 12.0 ]]; then
+#       { ssh-add -A; } &>/dev/null
+#     else
+#       { ssh-add --apple-load-keychain; } &>/dev/null
+#     fi
+#   fi
 
 #   Additional Sources
 #   ------------------------------------------

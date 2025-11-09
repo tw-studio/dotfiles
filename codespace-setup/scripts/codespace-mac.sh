@@ -9,54 +9,6 @@ set -e
 
 # !!! All steps must be idempotent
 
-# [x] Set global variables
-# [x] Create codespace directory in $HOME
-# [-] Clone private codespace directory
-# [x] Install homebrew
-# [x] Install packages from homebrew
-      # P1
-          # coreutils
-          # fd
-          # fzf
-          # gawk
-          # git
-          # n
-          # neovim
-          # pdm
-          # perl
-          # pnpm
-          # python@3.11 (as of 9/2024)
-          # rename
-          # ripgrep
-          # tesseract
-          # tmux
-          # tree
-          # typescript
-          # wget
-          # zsh
-      # P2 (small)
-          # [x] jq
-          # [x] mkcert
-          # [x] pngquant
-          # woff2
-      # P2 (big)
-          # pandoc
-          # postgresql
-          # [-] youtube-dl
-# [x] Change default shell to zsh installed by Homebrew
-# [x] Clone dotfiles from public repo
-# [x] Install and configure oh-my-zsh
-# [x] Install and configure neovim
-# [-] Associate caps lock key with Esc
-# [x] Configure tmux
-# [x] Make vsc-tmux startup script accessible
-# [x] Install fzf
-# [x] Generate SSH keys for GitHub and add to SSH agent
-# [x] Configure git global config
-# [ ] Install VSCode
-      # [x] Download and install VSCode
-      # [x] Install VSCode extensions
-      # [ ] Import personal settings and keybindings files
 # [ ] Install personal fonts
 # [x] Install iTerm2
 # [ ] Set iTerm2 font to Meslo
@@ -67,16 +19,12 @@ set -e
 # [ ] Set wallpaper
 # [ ] Set system color
 ##### P2
-# [x] Install node, pnpm, and pm2 (does it need n installed earlier?) (P2)
 # [ ] Install Parallels and Windows (P2)
 # [ ] Install Hand Mirror (P2)
 ##### P3
 # [ ] Install Quick Shade (P3)
 # [ ] Install and configure pdm and python (P3)
 ##### Clean up
-# [-] Clean up dotfiles
-# [x] Give user their stuff
-# [x] Start zsh in codespace
 
 # Scratch from before:
 
@@ -332,7 +280,7 @@ fi
 # > MARK: Ensure VS Code is fully closed before continuing
 if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
   echo "VS Code appears to be running. It must be fully closed before setup continues."
-  read -r -p "Quit all VS Code processes now? (y/N): " RESP
+  read -r "RESP?Quit all VS Code processes now? (y/N): "
   case "$RESP" in
     [Yy]* )
       echo "Closing VS Code..."
@@ -429,15 +377,16 @@ fi
 
 ###
 ##
-# MARK: Install fzf
+# MARK: Configure fzf
 
-if ! command -v fzf &>/dev/null; then
-  echo "Installing fzf..."
-  trace git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
-  trace $HOME/.fzf/install --all || true
-  trace rm -f $HOME/.bashrc $HOME/.fzf.bash
+# Create fzf keybindings for zsh
+if [[ ! -f "$HOME/.fzf.zsh" ]]; then
+  if [[ -f "$(brew --prefix)/opt/fzf/install" ]]; then
+    echo "Running fzf install to generate keybindings for zsh..."
+    trace $(brew --prefix)/opt/fzf/install --no-bash --no-fish --key-bindings --completion --no-update-rc
+  fi
 else
-  echo "fzf already installed."
+  echo "fzf keybindings already generated for zsh."
 fi
 
 ###
