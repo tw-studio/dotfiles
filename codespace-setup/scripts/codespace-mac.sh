@@ -9,15 +9,17 @@ set -e
 
 # !!! All steps must be idempotent
 
-# [ ] Install personal fonts
+# [x] Install personal fonts
 # [x] Install iTerm2
-# [ ] Set iTerm2 font to Meslo
+# [-] Set iTerm2 font to Meslo
 # [ ] Install Mullvad VPN
 # [ ] Install Malwarebytes
 # [ ] Install VeraCrypt
 # [ ] Set dock to right side
 # [ ] Set wallpaper
-# [ ] Set system color
+# [ ] Set Screenshots directory
+# [ ] Hide Desktop files
+# [-] Set system color
 ##### P2
 # [ ] Install Parallels and Windows (P2)
 # [ ] Install Hand Mirror (P2)
@@ -40,6 +42,7 @@ set -e
 # [ ] 1. First, know that you should *not* use Homebrew across multiple users on same Mac
 # [ ] 2. Rebind Esc to Caps Lock key in System Preferences > Keyboard > Keyboard > Modifier Keys...
 # [ ] 3. In Safari, click View > Show Status Bar
+# [ ] 4. Set Safari new windows to be New Private Windows
 
 ###
 ##
@@ -398,6 +401,23 @@ if ! command -v pnpm &>/dev/null; then
   trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
 else
   echo "pnpm already installed."
+fi
+
+###
+##
+# MARK: Set wallpaper
+
+PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
+if [[ -f "$PERSONAL_WALLPAPER" ]]; then
+  if command -v osascript &>/dev/null; then
+    CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
+    if [[ "$CURRENT_WALLPAPER" != "$PERSONAL_WALLPAPER" ]]; then
+      echo "Setting personal wallpaper..."
+      osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
+    else
+      echo "Personal wallpaper already set."
+    fi
+  fi
 fi
 
 ###
