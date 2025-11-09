@@ -69,6 +69,7 @@ echo -e '\033[6 q'
 #   Set general environment variables
 #   -----------------------------------------------------------
     export CODESPACE=$HOME/codespace
+    export DOTFILES=$CODESPACE/dotfiles
     if command -v brew &>/dev/null; then
       export HOMEBREW_PREFIX="$(HOMEBREW_NO_AUTO_UPDATE=1 brew --prefix)"
     fi
@@ -526,8 +527,8 @@ echo -e '\033[6 q'
     if command -v wslpath &>/dev/null; then
       alias winspace='cd $WINSPACE'
     fi
-    alias youtube-m4a='youtube-dl -x --no-mtime --audio-format m4a --audio-quality 64K -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
-    alias youtube-mp3='youtube-dl -x --no-mtime --audio-format mp3 -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
+    # alias youtube-m4a='youtube-dl -x --no-mtime --audio-format m4a --audio-quality 64K -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
+    # alias youtube-mp3='youtube-dl -x --no-mtime --audio-format mp3 -o "~/Downloads/YouTube/%(title)s.%(ext)s" --exec "rename -z {}"'
     alias zedit='$EDITOR ~/.zshrc'
     alias znvim='$EDITOR ~/.config/nvim/init.vim'
     alias znvtheme='$EDITOR ~/.config/nvim/colors/monokai-fusion-tw.vim'

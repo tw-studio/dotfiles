@@ -291,7 +291,7 @@
   "eslint.enable": true,
   "eslint.format.enable": true,
   "eslint.run": "onType",
-  "eslint.runtime": "/usr/local/n/versions/node/18.16.0/bin/node",
+  "eslint.runtime": "node",
   "explorer.confirmDragAndDrop": false,
   "explorer.openEditors.visible": 9,
   "extensions.autoUpdate": false,
@@ -486,18 +486,23 @@
   ],
   "terminal.integrated.cursorBlinking": false,
   "terminal.integrated.defaultProfile.linux": "tw",
-  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.osx": "tw",
   "terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
   "terminal.integrated.drawBoldTextInBrightColors": false,
   "terminal.integrated.env.osx": {},
   "terminal.integrated.fontFamily": "Meslo LG L DZ for Powerline",
   "terminal.integrated.fontSize": 12,
   "terminal.integrated.fontWeight": "600",
+  "terminal.integrated.letterSpacing": 1,
+  "terminal.integrated.lineHeight": 1.3,
   "terminal.integrated.macOptionIsMeta": true,
   "terminal.integrated.profiles.linux": {
-    "bash": {
-      "icon": "terminal-bash",
-      "path": "bash"
+    "tw": {
+      "icon": "terminal-tmux",
+      "path": "/home/tomw/codespace/scripts/vsc-tmux.sh"
+    },
+    "zsh": {
+      "path": "zsh"
     },
     "pwsh": {
       "icon": "terminal-powershell",
@@ -507,38 +512,46 @@
       "icon": "terminal-tmux",
       "path": "tmux"
     },
-    "tw": {
-      "icon": "terminal-tmux",
-      "path": "/home/tomw/codespace/scripts/vsc-tmux.sh"
-    },
-    "zsh": {
-      "path": "zsh"
+    "bash": {
+      "icon": "terminal-bash",
+      "path": "bash"
     }
   },
   "terminal.integrated.profiles.osx": {
+    "tw": {
+      "icon": "terminal-tmux",
+      "path": "/Users/tomw/codespace/scripts/vsc-tmux.sh"
+    },
+    "zsh": {
+      "args": [
+        "-l"
+      ],
+      "path": "zsh"
+    },
+    "tmux": {
+      "icon": "terminal-tmux",
+      "path": "tmux"
+    },
     "bash": {
       "args": [
         "-l"
       ],
       "icon": "terminal-bash",
       "path": "bash"
-    },
-    "tmux": {
-      "icon": "terminal-tmux",
-      "path": "tmux"
-    },
-    "tw": {
-      "icon": "terminal-tmux",
-      "path": "/Users/tomw/codespace/.vscode/scripts/vsc-tmux.sh"
-    },
-    "zsh": {
-      "args": [
-        "-l"
-      ],
-      "path": "zsh"
     }
   },
   "terminal.integrated.profiles.windows": {
+    "Ubuntu (WSL)": {
+      "args": [],
+      "icon": "terminal-ubuntu",
+      "path": [
+        "C:\\WINDOWS\\System32\\wsl.exe"
+      ]
+    },
+    "PowerShell": {
+      "icon": "terminal-powershell",
+      "source": "PowerShell"
+    },
     "Command Prompt": {
       "args": [],
       "icon": "terminal-cmd",
@@ -549,17 +562,6 @@
     },
     "Git Bash": {
       "source": "Git Bash"
-    },
-    "PowerShell": {
-      "icon": "terminal-powershell",
-      "source": "PowerShell"
-    },
-    "Ubuntu (WSL)": {
-      "args": [],
-      "icon": "terminal-ubuntu",
-      "path": [
-        "C:\\WINDOWS\\System32\\wsl.exe"
-      ]
     }
   },
   "terminal.integrated.rightClickBehavior": "nothing",
