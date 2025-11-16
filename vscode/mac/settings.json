@@ -608,7 +608,7 @@
   "update.showReleaseNotes": false,
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
   "vscode-neovim.neovimExecutablePaths.linux": "/usr/local/bin/nvim",
-  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init-vscode.vim",
+  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init.vim",
   "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
   "vscode-neovim.useWSL": false,
   "window.newWindowDimensions": "maximized",

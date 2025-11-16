@@ -5,6 +5,7 @@
 ### Codespace Mac
 
 - [ ] Fix `vs` alias
+- [ ] Fix neovim in VS Code not pulling init.vim
 - [ ] Set Screenshots directory
 - [ ] Hide Desktop files
 - [ ] Install window manager (Aerospace?)
