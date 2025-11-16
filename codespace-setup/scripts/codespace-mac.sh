@@ -231,6 +231,9 @@ fi
 ##
 # MARK: Configure git
 
+REPO="tw-studio"
+REPO_KEY="$HOME/.ssh/$REPO"
+
 # > MARK: .gitconfig
 if [[ -f $HOME/.gitconfig ]] && grep -q "main" $HOME/.gitconfig; then
   echo "gitconfig already configured."
@@ -240,7 +243,8 @@ else
 fi
 
 # > MARK: git authentication
-# Copy to ~/.ssh/config
+
+# |1| Configure ~/.ssh/config
 if [[ ! ( -d "$HOME/.ssh" && -f "$HOME/.ssh/config" ) ]]; then
   echo "Configuring .ssh config..."
   mkdir -p $HOME/.ssh
@@ -248,15 +252,22 @@ if [[ ! ( -d "$HOME/.ssh" && -f "$HOME/.ssh/config" ) ]]; then
 else
   echo ".ssh config already configured."
 fi
-# Create tw-studio keys
-if [[ ! ( -f "$HOME/.ssh/tw-studio" && -f "$HOME/.ssh/tw-studio.pub" ) ]]; then
-  echo "Creating keys for tw-studio (upload public key to GitHub)..."
-  ssh-keygen -t ed25519 -f "$HOME/.ssh/tw-studio" -C "<>"
+
+# |2| Create keyfiles
+if [[ ! ( -f "$REPO_KEY" && -f "$REPO_KEY.pub" ) ]]; then
+  echo "Creating keys for $REPO (upload public key to GitHub)..."
+  ssh-keygen -t ed25519 -f "$REPO_KEY" -C "$REPO"
 else
-  echo "Keys for tw-studio already created."
+  echo "Keys for $REPO already created."
 fi
-# Add to keychain (idempotent)
-ssh-add --apple-use-keychain $HOME/.ssh/tw-studio
+
+# |3| Add to keychain
+if ! ssh-add -l 2>/dev/null | grep -q "$REPO"; then
+  echo "Adding $REPO key to keychain..."
+  ssh-add --apple-use-keychain "$REPO_KEY"
+else
+  echo "Key already loaded in ssh-agent."
+fi
 
 ###
 ##
@@ -280,28 +291,8 @@ fi
 ##
 # MARK: Configure VSCode
 
-# > MARK: Ensure VS Code is fully closed before continuing
-if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
-  echo "VS Code appears to be running. It must be fully closed before setup continues."
-  read -r "RESP?Quit all VS Code processes now? (y/N): "
-  case "$RESP" in
-    [Yy]* )
-      echo "Closing VS Code..."
-      pkill -f "Visual Studio Code" 2>/dev/null
-      pkill -f "Code Helper" 2>/dev/null
-      sleep 1
-      echo "VS Code is closed."
-      ;;
-    * )
-      echo "Setup aborted. Please close VS Code manually and re-run this script."
-      exit 1
-      ;;
-  esac
-else
-  echo "VS Code is already not running."
-fi
-
 # > MARK: Configure $CODE to use in this script
+
 CODE="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
 if [[ ! -x "$CODE" ]]; then
   echo "Error: Could not find VSCode CLI at: $CODE"
@@ -311,6 +302,7 @@ if [[ ! -x "$CODE" ]]; then
 fi
 
 # > MARK: Install extensions
+
 EXTENSIONS=(
   "alefragnani.project-manager"
   "asvetliakov.vscode-neovim"
@@ -345,7 +337,26 @@ for EXT in "${EXTENSIONS[@]}"; do
   fi
 done
 
+# > MARK: Install personal box-checker extension
+
+MY_VSIX_ID="tw.box-checker"
+MY_VSIX_FILE="box-checker-0.0.1.vsix"
+MY_VSIX_LOCAL_PATH="$DOTFILES/vscode/$MY_VSIX_FILE"
+# $INSTALLED_EXTENSIONS already exists
+
+if ! printf "%s\n" "$INSTALLED_EXTENSIONS" | grep -qx "$MY_VSIX_ID"; then
+  if [[ ! -f "$MY_VSIX_LOCAL_PATH" ]]; then
+    echo "Error: Installer for $MY_VSIX_ID not found at: $MY_VSIX_LOCAL_PATH"
+    exit 1
+  fi
+  echo "Installing extension: $MY_VSIX_ID..."
+  "$CODE" --install-extension "$MY_VSIX_LOCAL_PATH"
+else
+  echo "Personal extension $MY_VSIX_ID is already installed."
+fi
+
 # > MARK: Make vsc-tmux startup script accessible
+
 if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
   echo "Making vsc-tmux accessible..."
   mkdir -p $CODESPACE/scripts
@@ -356,22 +367,47 @@ else
 fi
 
 # > MARK: Copy personal keybindings and settings
+
 VSC_USER_DIR="$HOME/Library/Application Support/Code/User"
 VSC_SETTINGS="$VSC_USER_DIR/settings.json"
 VSC_KEYBINDINGS="$VSC_USER_DIR/keybindings.json"
-TS=$(date +"%Y%m%d-%H%M%S")
+DATETIME=$(date +"%Y%m%d-%H%M%S")
 mkdir -p "$VSC_USER_DIR"
+
 # Check if settings was already copied
-if [[ -f "$SETTINGS_FILE" ]] && grep -q 'Monokai +' "$SETTINGS_FILE"; then
+if [[ -f "$VSC_SETTINGS" ]] && grep -q 'Monokai +' "$VSC_SETTINGS"; then
   echo "Personal VS Code settings and keybindings already configured."
 else
+
+  # Ensure VS Code is fully closed before continuing
+  if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
+    echo "VS Code appears to be running. It must be fully closed before transferring settings and keybindings."
+    read -r "RESP?Quit all VS Code processes now? (y/N): "
+    case "$RESP" in
+      [Yy]* )
+        echo "Closing VS Code..."
+        pkill -f "Visual Studio Code" 2>/dev/null
+        pkill -f "Code Helper" 2>/dev/null
+        sleep 1
+        echo "VS Code is closed."
+        ;;
+      * )
+        echo "Setup aborted. Please close VS Code manually and re-run this script."
+        exit 1
+        ;;
+    esac
+  else
+    echo "VS Code is already not running."
+  fi
+
+  # Back up then copy settings and keybindings
   if [[ -f "$VSC_SETTINGS" ]]; then
     echo "Backing up existing settings.json..."
-    mv "$VSC_SETTINGS" "$VSC_USER_DIR/settings-$TS.json"
+    mv "$VSC_SETTINGS" "$VSC_USER_DIR/settings-$DATETIME.json"
   fi
   if [[ -f "$VSC_KEYBINDINGS" ]]; then
     echo "Backing up existing keybindings.json..."
-    mv "$VSC_KEYBINDINGS" "$VSC_USER_DIR/keybindings-$TS.json"
+    mv "$VSC_KEYBINDINGS" "$VSC_USER_DIR/keybindings-$DATETIME.json"
   fi
   echo "Copying in personal VS Code settings and keybindings..."
   cp "$DOTFILES/vscode/mac/settings.json" "$VSC_SETTINGS"
@@ -434,4 +470,3 @@ chown -R $USER $CODESPACE
 echo "Starting in codespace..."
 cd $CODESPACE
 zsh
-
