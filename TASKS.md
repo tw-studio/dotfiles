@@ -4,9 +4,7 @@
 
 ### Codespace Mac
 
-- [ ] Identity added: keeps b eing shown even though it should already be there.
 - [ ] Fix holding down j not scrolling down in vs code
-- [ ] Install my personal check the box extension
 - [ ] Fix `vs` alias
 - [ ] Set Screenshots directory
 - [ ] Hide Desktop files
@@ -87,6 +85,8 @@
 
 ## Done
 
+- [x] [codespace-mac]: Identity added: keeps being shown even though it should already be there. (11/16/25 03:09 PM)
+- [x] [codespace-mac]: Install my personal check the box extension (11/16/25 03:08 PM)
 - [x] [codespace-mac]: Fix neovim in VS Code not pulling init.vim (11/15/25 11:26 PM)
 - [x] (P2) [codespace-win]: Install 'trash-cli' on Windows (2024-11-03 20:20)
 - [x] (P2) [vscode]: Adds win keybinding ctrl+shift+alt+m to toggle editor widths (11/03/24 08:03 PM)

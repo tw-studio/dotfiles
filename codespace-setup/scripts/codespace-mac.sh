@@ -301,118 +301,124 @@ if [[ ! -x "$CODE" ]]; then
   exit 1
 fi
 
-# > MARK: Install extensions
+# > MARK: Ensure VS Code is fully closed before continuing
 
-EXTENSIONS=(
-  "alefragnani.project-manager"
-  "asvetliakov.vscode-neovim"
-  "ms-vscode-remote.remote-wsl"
-  "tw.monokai-accent"
-  "dbaeumer.vscode-eslint"
-  "dunstontc.viml"
-  "geddski.macros"
-  "huntertran.auto-markdown-toc"
-  "jebbs.markdown-extended"
-  "jsynowiec.vscode-insertdatestring"
-  "mhutchie.git-graph"
-  "ms-python.black-formatter"
-  "naumovs.color-highlight"
-  "redhat.vscode-yaml"
-  "hoovercj.vscode-settings-cycler"
-  "spywhere.mark-jump"
-  "tyriar.sort-lines"
-  "wayou.vscode-todo-highlight"
-)
-INSTALLED_EXTENSIONS="$("$CODE" --list-extensions)"
-echo "Installing VS Code extensions..."
-sleep 0.5
-for EXT in "${EXTENSIONS[@]}"; do
-  if ! echo "$INSTALLED_EXTENSIONS" | grep -q "^$EXT$"; then
-    # Doesn't need explicit status; already reported by code
-    sleep 0.5
-    "$CODE" --install-extension "$EXT"
+if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
+  echo "VS Code appears to be running. To apply configurations, VS Code must be closed."
+  read -r "RESP?Close VS Code now? (y/N): "
+  case "$RESP" in
+    [Yy]* )
+      echo "Closing VS Code..."
+      pkill -f "Visual Studio Code" 2>/dev/null
+      pkill -f "Code Helper" 2>/dev/null
+      sleep 1
+      echo "VS Code is closed."
+      ;;
+    * )
+      DO_VSCODE_SETUP=false
+      ;;
+  esac
+else
+  echo "VS Code is already not running."
+fi
+
+if [[ "$DO_VSCODE_SETUP" = false ]]; then
+  echo "Skipping VS Code configuration."
+else
+
+  # > MARK: Install extensions
+
+  EXTENSIONS=(
+    "alefragnani.project-manager"
+    "asvetliakov.vscode-neovim"
+    "ms-vscode-remote.remote-wsl"
+    "tw.monokai-accent"
+    "dbaeumer.vscode-eslint"
+    "dunstontc.viml"
+    "geddski.macros"
+    "huntertran.auto-markdown-toc"
+    "jebbs.markdown-extended"
+    "jsynowiec.vscode-insertdatestring"
+    "mhutchie.git-graph"
+    "ms-python.black-formatter"
+    "naumovs.color-highlight"
+    "redhat.vscode-yaml"
+    "hoovercj.vscode-settings-cycler"
+    "spywhere.mark-jump"
+    "tyriar.sort-lines"
+    "wayou.vscode-todo-highlight"
+  )
+  INSTALLED_EXTENSIONS="$("$CODE" --list-extensions)"
+  echo "Installing VS Code extensions..."
+  sleep 1
+  for EXT in "${EXTENSIONS[@]}"; do
+    if ! echo "$INSTALLED_EXTENSIONS" | grep -q "^$EXT$"; then
+      # Doesn't need explicit status; already reported by code
+      sleep 0.5
+      "$CODE" --install-extension "$EXT"
+    else
+      sleep 0.1
+      echo "Already installed: $EXT"
+    fi
+  done
+
+  # > MARK: Install personal box-checker extension
+
+  MY_VSIX_ID="tw.box-checker"
+  MY_VSIX_FILE="box-checker-0.0.1.vsix"
+  MY_VSIX_LOCAL_PATH="$DOTFILES/vscode/$MY_VSIX_FILE"
+  # $INSTALLED_EXTENSIONS already exists
+
+  if ! printf "%s\n" "$INSTALLED_EXTENSIONS" | grep -qx "$MY_VSIX_ID"; then
+    if [[ ! -f "$MY_VSIX_LOCAL_PATH" ]]; then
+      echo "Error: Installer for $MY_VSIX_ID not found at: $MY_VSIX_LOCAL_PATH"
+      exit 1
+    fi
+    echo "Installing extension: $MY_VSIX_ID..."
+    "$CODE" --install-extension "$MY_VSIX_LOCAL_PATH"
   else
-    sleep 0.1
-    echo "Already installed: $EXT"
+    echo "Personal extension $MY_VSIX_ID is already installed."
   fi
-done
 
-# > MARK: Install personal box-checker extension
+  # > MARK: Copy personal keybindings and settings
 
-MY_VSIX_ID="tw.box-checker"
-MY_VSIX_FILE="box-checker-0.0.1.vsix"
-MY_VSIX_LOCAL_PATH="$DOTFILES/vscode/$MY_VSIX_FILE"
-# $INSTALLED_EXTENSIONS already exists
+  VSC_USER_DIR="$HOME/Library/Application Support/Code/User"
+  VSC_SETTINGS="$VSC_USER_DIR/settings.json"
+  VSC_KEYBINDINGS="$VSC_USER_DIR/keybindings.json"
+  DATETIME=$(date +"%Y%m%d-%H%M%S")
+  mkdir -p "$VSC_USER_DIR"
 
-if ! printf "%s\n" "$INSTALLED_EXTENSIONS" | grep -qx "$MY_VSIX_ID"; then
-  if [[ ! -f "$MY_VSIX_LOCAL_PATH" ]]; then
-    echo "Error: Installer for $MY_VSIX_ID not found at: $MY_VSIX_LOCAL_PATH"
-    exit 1
-  fi
-  echo "Installing extension: $MY_VSIX_ID..."
-  "$CODE" --install-extension "$MY_VSIX_LOCAL_PATH"
-else
-  echo "Personal extension $MY_VSIX_ID is already installed."
-fi
-
-# > MARK: Make vsc-tmux startup script accessible
-
-if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
-  echo "Making vsc-tmux accessible..."
-  mkdir -p $CODESPACE/scripts
-  cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
-  chmod +x $CODESPACE/scripts/vsc-tmux.sh
-else
-  echo "vsc-tmux already accessible."
-fi
-
-# > MARK: Copy personal keybindings and settings
-
-VSC_USER_DIR="$HOME/Library/Application Support/Code/User"
-VSC_SETTINGS="$VSC_USER_DIR/settings.json"
-VSC_KEYBINDINGS="$VSC_USER_DIR/keybindings.json"
-DATETIME=$(date +"%Y%m%d-%H%M%S")
-mkdir -p "$VSC_USER_DIR"
-
-# Check if settings was already copied
-if [[ -f "$VSC_SETTINGS" ]] && grep -q 'Monokai +' "$VSC_SETTINGS"; then
-  echo "Personal VS Code settings and keybindings already configured."
-else
-
-  # Ensure VS Code is fully closed before continuing
-  if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
-    echo "VS Code appears to be running. It must be fully closed before transferring settings and keybindings."
-    read -r "RESP?Quit all VS Code processes now? (y/N): "
-    case "$RESP" in
-      [Yy]* )
-        echo "Closing VS Code..."
-        pkill -f "Visual Studio Code" 2>/dev/null
-        pkill -f "Code Helper" 2>/dev/null
-        sleep 1
-        echo "VS Code is closed."
-        ;;
-      * )
-        echo "Setup aborted. Please close VS Code manually and re-run this script."
-        exit 1
-        ;;
-    esac
+  # Check if settings was already copied
+  if [[ -f "$VSC_SETTINGS" ]] && grep -q 'Monokai +' "$VSC_SETTINGS"; then
+    echo "Personal VS Code settings and keybindings already configured."
   else
-    echo "VS Code is already not running."
+
+    # Back up then copy settings and keybindings
+    if [[ -f "$VSC_SETTINGS" ]]; then
+      echo "Backing up existing settings.json..."
+      mv "$VSC_SETTINGS" "$VSC_USER_DIR/settings-$DATETIME.json"
+    fi
+    if [[ -f "$VSC_KEYBINDINGS" ]]; then
+      echo "Backing up existing keybindings.json..."
+      mv "$VSC_KEYBINDINGS" "$VSC_USER_DIR/keybindings-$DATETIME.json"
+    fi
+    echo "Copying in personal VS Code settings and keybindings..."
+    cp "$DOTFILES/vscode/mac/settings.json" "$VSC_SETTINGS"
+    cp "$DOTFILES/vscode/mac/keybindings.json" "$VSC_KEYBINDINGS"
   fi
 
-  # Back up then copy settings and keybindings
-  if [[ -f "$VSC_SETTINGS" ]]; then
-    echo "Backing up existing settings.json..."
-    mv "$VSC_SETTINGS" "$VSC_USER_DIR/settings-$DATETIME.json"
+  # > MARK: Make vsc-tmux startup script accessible
+
+  if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
+    echo "Making vsc-tmux accessible..."
+    mkdir -p $CODESPACE/scripts
+    cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
+    chmod +x $CODESPACE/scripts/vsc-tmux.sh
+  else
+    echo "vsc-tmux already accessible."
   fi
-  if [[ -f "$VSC_KEYBINDINGS" ]]; then
-    echo "Backing up existing keybindings.json..."
-    mv "$VSC_KEYBINDINGS" "$VSC_USER_DIR/keybindings-$DATETIME.json"
-  fi
-  echo "Copying in personal VS Code settings and keybindings..."
-  cp "$DOTFILES/vscode/mac/settings.json" "$VSC_SETTINGS"
-  cp "$DOTFILES/vscode/mac/keybindings.json" "$VSC_KEYBINDINGS"
-fi
+
+fi # DO_VSCODE_SETUP
 
 ###
 ##
@@ -441,7 +447,9 @@ fi
 
 ###
 ##
-# MARK: Set wallpaper
+# MARK: macOS settings
+
+# > MARK: Set wallpaper
 
 PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
 if [[ -f "$PERSONAL_WALLPAPER" ]] && command -v osascript &>/dev/null; then
@@ -455,6 +463,10 @@ if [[ -f "$PERSONAL_WALLPAPER" ]] && command -v osascript &>/dev/null; then
     echo "Personal wallpaper already set."
   fi
 fi
+
+# > MARK: Disable ApplePressAndHold (for neovim in vscode)
+
+defaults write -g ApplePressAndHoldEnabled -bool false
 
 ###
 ##
