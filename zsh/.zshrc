@@ -30,34 +30,36 @@ source $ZSH/oh-my-zsh.sh
 
 # Set Vim bindings for zsh line editor (zle)
 # ------------------------------------------------------------
-# Activate vim mode
-bindkey -v
+# if [[ $TMUX_IN_VSCODE != "1" ]]; then
+  # Activate vim mode
+  bindkey -v
 
-# Remove mode switching delay
-export KEYTIMEOUT=1
+  # Remove mode switching delay
+  export KEYTIMEOUT=1
 
-# Fix backspace not deleting before start of insert
-bindkey -M viins '^?' backward-delete-char
-bindkey -M viins '^H' backward-delete-char
+  # Fix backspace not deleting before start of insert
+  bindkey -M viins '^?' backward-delete-char
+  bindkey -M viins '^H' backward-delete-char
 
-# Change cursor shape for different vi modes.
-function zle-line-init zle-keymap-select {
-  if [[ ${KEYMAP} == vicmd ]] ||
-      [[ $1 = 'block' ]]; then
-    echo -ne '\033[2 q'
+  # Change cursor shape for different vi modes.
+  function zle-line-init zle-keymap-select {
+    if [[ ${KEYMAP} == vicmd ]] ||
+        [[ $1 = 'block' ]]; then
+      echo -ne '\033[2 q'
 
-  elif [[ ${KEYMAP} == main ]] ||
-        [[ ${KEYMAP} == viins ]] ||
-        [[ ${KEYMAP} = '' ]] ||
-        [[ $1 = 'beam' ]]; then
-    echo -ne '\033[6 q'
-  fi
-}
-zle -N zle-line-init
-zle -N zle-keymap-select
+    elif [[ ${KEYMAP} == main ]] ||
+          [[ ${KEYMAP} == viins ]] ||
+          [[ ${KEYMAP} = '' ]] ||
+          [[ $1 = 'beam' ]]; then
+      echo -ne '\033[6 q'
+    fi
+  }
+  zle -N zle-line-init
+  zle -N zle-keymap-select
 
-# Use beam shape cursor on startup.
-echo -e '\033[6 q'
+  # Use beam shape cursor on startup.
+  echo -e '\033[6 q'
+# fi
 
 ################################################################
 #

@@ -1,20 +1,25 @@
 # Tasks
 
-### Working
+## Codespace
 
+### Codespace Mac
 
-### Tasks
+- [ ] Fix `vs` alias
+- [ ] Set Screenshots directory
+- [ ] Hide Desktop files
+- [ ] Install window manager (Aerospace?)
 
-#### Codespace
+### Codespace Ubuntu
 
-**Codespace Ubuntu**:
 - [ ] (P2) `sudo apt install poppler-utils` (installs pdftocairo, pdftotext, and other common utilities used by packages)
 
-**Codespace Ubuntu+WSL2**:
+### Codespace Ubuntu+WSL2
+
 - [ ] (P1) Set WSL2's git credential.helper to use Windows's Git Credential Manager (must first be installed): `git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"`
 - [ ] (P1) Fix neovim url grep installer file name to `linux-x86_64` from `linux64`
 
-**Codespace Win**:
+### Codespace Win
+
 - [ ] (P1) Install Git for Windows (unless using Springboard)
 - [ ] (P1) Install oh-my-posh
 - [ ] (P1) Install Groupy
@@ -39,7 +44,8 @@
 - [ ] (P3) Add "simple" flag to pass in via command line that skips optional installs
 - [ ] (P3) Consider switching install orders so all optional installs are at the end
 
-**pdm setup**:
+### pdm setup
+
 - [ ] (P1) Add global config file to *~/.config/pdm/config.toml*:
 
     ```
@@ -67,7 +73,7 @@
     - [ ] Enable pdm plugin: `plugins=(... pdm ...)
 
 
-#### Other
+### Other
 
 **.zshrc**:
 - [ ] (P2) Add MARKs for Mark Jump
@@ -76,7 +82,7 @@
 **git-push-private-to-public**:
 - [ ] (P3) Switch back to initial branch at end of script
 
-### Done
+## Done
 
 - [x] (P2) [codespace-win]: Install 'trash-cli' on Windows (2024-11-03 20:20)
 - [x] (P2) [vscode]: Adds win keybinding ctrl+shift+alt+m to toggle editor widths (11/03/24 08:03 PM)

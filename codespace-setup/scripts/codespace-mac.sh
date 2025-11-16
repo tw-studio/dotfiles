@@ -63,7 +63,7 @@ trace() {
     "$@"
   fi
 }
-  
+
 
 ###
 ##
@@ -96,7 +96,7 @@ fi
 
 # > MARK: Install Homebrew
 if ! command -v brew &>/dev/null; then
-  echo "Installing Homebrew..." 
+  echo "Installing Homebrew..."
   trace /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
   echo "Homebrew already installed."
@@ -408,15 +408,15 @@ fi
 # MARK: Set wallpaper
 
 PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
-if [[ -f "$PERSONAL_WALLPAPER" ]]; then
-  if command -v osascript &>/dev/null; then
-    CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
-    if [[ "$CURRENT_WALLPAPER" != "$PERSONAL_WALLPAPER" ]]; then
-      echo "Setting personal wallpaper..."
-      osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
-    else
-      echo "Personal wallpaper already set."
-    fi
+if [[ -f "$PERSONAL_WALLPAPER" ]] && command -v osascript &>/dev/null; then
+  CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
+  CURRENT_WALLPAPER_FILENAME="${CURRENT_WALLPAPER##*/}"
+  PERSONAL_WALLPAPER_FILENAME="${PERSONAL_WALLPAPER##*/}"
+  if [[ "$CURRENT_WALLPAPER_FILENAME" != "$PERSONAL_WALLPAPER_FILENAME" ]]; then
+    echo "Setting personal wallpaper..."
+    osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
+  else
+    echo "Personal wallpaper already set."
   fi
 fi
 
