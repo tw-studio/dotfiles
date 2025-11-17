@@ -4,7 +4,6 @@
 
 ### Codespace Mac
 
-- [ ] Fix `vs` alias
 - [ ] Set Screenshots directory
 - [ ] Hide Desktop files
 - [ ] Install window manager (Aerospace?)
@@ -84,6 +83,7 @@
 
 ## Done
 
+- [x] [zshrc]: Fix `vs` alias (11/16/25 04:47 PM)
 - [x] [codespace-mac]: Fix holding down j not scrolling down in vs code (11/16/25 04:33 PM)
 - [x] [codespace-mac]: Identity added: keeps being shown even though it should already be there. (11/16/25 03:09 PM)
 - [x] [codespace-mac]: Install my personal check the box extension (11/16/25 03:08 PM)

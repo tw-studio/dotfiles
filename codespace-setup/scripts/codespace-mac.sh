@@ -208,8 +208,11 @@ fi
 TPM=$HOME/.tmux/plugins/tpm
 if [[ ! -d "$TPM" ]]; then
   echo "Configuring tmux..."
+  # Transfer main tmux config
   cp $DOTFILES/tmux/.tmux.conf $HOME/
+  # Clone tmux plugin manager
   git clone https://github.com/tmux-plugins/tpm $TPM
+  # Start a temporary tmux server so TPM can install plugins
   tmux start-server \
    && tmux new-session -d \
    && sleep 1 \
@@ -221,8 +224,14 @@ fi
 TMUXSCRIPTS=$HOME/.tmux/scripts
 if [[ ! -d "$TMUXSCRIPTS" ]]; then
   echo "Configuring tmux scripts..."
-  mkdir -p $TMUXSCRIPTS \
-   && cp -r $DOTFILES/tmux/scripts $HOME/.tmux/
+  mkdir -p $TMUXSCRIPTS
+  # Transfer scripts directory and make scripts executable
+  if [[ -d "$DOTFILES/tmux/scripts" ]]; then
+    cp -r $DOTFILES/tmux/scripts $HOME/.tmux/
+    chmod +x $TMUXSCRIPTS/*sh
+  else
+    echo "Not found: $DOTFILES/tmux/scripts. Skipping tmux scripts configuration."
+  fi
 else
   echo "tmux scripts already configured."
 fi
@@ -235,6 +244,7 @@ REPO="tw-studio"
 REPO_KEY="$HOME/.ssh/$REPO"
 
 # > MARK: .gitconfig
+
 if [[ -f $HOME/.gitconfig ]] && grep -q "main" $HOME/.gitconfig; then
   echo "gitconfig already configured."
 else
@@ -315,7 +325,6 @@ wait_for_vs_code_exit() {
   done
   return 1
 }
-
 DO_VSCODE_SETUP=true
 if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
   echo "VS Code is running. To apply configurations, VS Code must be closed."
@@ -430,17 +439,6 @@ else
     echo "Copying in personal VS Code settings and keybindings..."
     cp "$DOTFILES/vscode/mac/settings.json" "$VSC_SETTINGS"
     cp "$DOTFILES/vscode/mac/keybindings.json" "$VSC_KEYBINDINGS"
-  fi
-
-  # > MARK: Make vsc-tmux startup script accessible
-
-  if [[ ! -x "$CODESPACE/scripts/vsc-tmux.sh" ]]; then
-    echo "Making vsc-tmux accessible..."
-    mkdir -p $CODESPACE/scripts
-    cp $DOTFILES/vscode/vsc-tmux.sh $CODESPACE/scripts/
-    chmod +x $CODESPACE/scripts/vsc-tmux.sh
-  else
-    echo "vsc-tmux already accessible."
   fi
 
   # > MARK: Disable ApplePressAndHold (which prevents repeat key scrolling)
