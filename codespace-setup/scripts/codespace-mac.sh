@@ -500,8 +500,26 @@ if [[ -f "$PERSONAL_WALLPAPER" ]]; then
     echo "osascript not found. Skipping setting of personal wallpaper."
   fi
 else
-  echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER"
+  echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER."
 fi
+
+# > MARK: Set Screenshots directory
+
+SCREENSHOTS_DIR="$HOME/Desktop/Screenshots"
+mkdir -p "$SCREENSHOTS_DIR"
+
+# Get current configured screenshots directory, or normalize to Desktop if unset
+CURRENT_SCREENSHOTS_DIR="$(defaults read com.apple.screencapture location 2>/dev/null || echo '')"
+[[ -z "$CURRENT_SCREENSHOTS_DIR" ]] && CURRENT_SCREENSHOTS_DIR="$HOME/Desktop"
+
+if [[ "$CURRENT_SCREENSHOTS_DIR" != "$SCREENSHOTS_DIR" ]]; then
+  echo "Updating screenshots directory to: $SCREENSHOTS_DIR..."
+  defaults write com.apple.screencapture location "$SCREENSHOTS_DIR"
+  killall SystemUIServer 2>/dev/null
+else
+  echo "Screenshots directory already set to $SCREENSHOTS_DIR."
+fi
+
 
 ###
 ##
