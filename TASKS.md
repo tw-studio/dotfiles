@@ -4,7 +4,6 @@
 
 ### Codespace Mac
 
-- [ ] Hide Desktop files
 - [ ] Install window manager (Aerospace?)
 
 ### Codespace Ubuntu
@@ -82,6 +81,7 @@
 
 ## Done
 
+- [x] [codespace-mac]: Hide Desktop files (11/16/25 06:55 PM)
 - [x] [codespace-mac]: Set Screenshots directory (11/16/25 06:03 PM)
 - [x] [zshrc]: Fix `vs` alias (11/16/25 04:47 PM)
 - [x] [codespace-mac]: Fix holding down j not scrolling down in vs code (11/16/25 04:33 PM)

@@ -520,6 +520,18 @@ else
   echo "Screenshots directory already set to $SCREENSHOTS_DIR."
 fi
 
+# > MARK: Hide Desktop files on visual desktop
+
+STATE_CREATE_DESKTOP=$(defaults read com.apple.finder CreateDesktop 2>/dev/null || echo "true")
+
+if [[ "$STATE_CREATE_DESKTOP" == "1" || "$STATE_CREATE_DESKTOP" == "true" ]]; then
+  echo "Hiding icons on visual Desktop..."
+  defaults write com.apple.finder CreateDesktop -bool false
+  killall Finder
+else
+  echo "Desktop icons are already hidden."
+fi
+
 
 ###
 ##
