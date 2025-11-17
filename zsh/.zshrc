@@ -110,10 +110,12 @@ source $ZSH/oh-my-zsh.sh
     export EDITOR=nvim
     export NVIM=nvim
     set runtimepath^=~/.config/nvim
-    if command -v wslpath &> /dev/null; then
+    if command -v wslpath &>/dev/null; then
       export VS="$WINHOME/AppData/Local/Programs/Microsoft VS Code/bin/code"
-    else
-      export VS="/Applications/Visual\ Studio\ Code.app/Contents/Resources/app/bin/code"
+    elif [[ -x "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]]; then
+      export VS="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+    elif command -v code &>/dev/null; then
+      export VS=$(command -v code)
     fi
 
 #   Configure terminal
@@ -527,7 +529,8 @@ source $ZSH/oh-my-zsh.sh
     alias vedit='$VS ~/.zshrc'
     alias vnvim='$VS ~/.config/nvim/init.vim'
     alias vnvtheme='$VS ~/.config/nvim/colors/monokai-fusion-tw.vim'
-    alias vs='$VS'
+    unalias vs 2>/dev/null
+    vs() { "$VS" "$@" }
     alias vtmux='$VS ~/.tmux.conf'
     if command -v wslpath &>/dev/null; then
       alias winspace='cd $WINSPACE'
