@@ -532,6 +532,16 @@ else
   echo "Desktop icons are already hidden."
 fi
 
+# > MARK: Change Safari default zoom level
+
+SAFARI_PLIST="$HOME/Library/Preferences/com.apple.Safari.plist"
+SAFARI_ZOOM_LEVEL=$(defaults read "$SAFARI_PLIST" DefaultPageZoom 2>/dev/null || echo "1")
+if [[ "$SAFARI_ZOOM_LEVEL" != "0.85" ]]; then
+  echo "Setting Safari default zoom to 85% (restart Safari to take effect)..."
+  defaults write "$SAFARI_PLIST" DefaultPageZoom -string "0.85"
+else
+  echo "Safari default zoom already set to 85%."
+fi
 
 ###
 ##

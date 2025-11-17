@@ -81,6 +81,7 @@
 
 ## Done
 
+- [x] [codespace-mac]: Set Safari default zoom to 85% (11/16/25 06:58 PM)
 - [x] [codespace-mac]: Hide Desktop files (11/16/25 06:55 PM)
 - [x] [codespace-mac]: Set Screenshots directory (11/16/25 06:03 PM)
 - [x] [zshrc]: Fix `vs` alias (11/16/25 04:47 PM)
