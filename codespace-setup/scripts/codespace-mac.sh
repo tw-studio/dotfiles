@@ -303,16 +303,41 @@ fi
 
 # > MARK: Ensure VS Code is fully closed before continuing
 
+wait_for_vs_code_exit() {
+  for _ in {1..20}; do
+    if ! pgrep -f "Visual Studio Code" \
+       && ! pgrep -f "Code Helper" \
+       && ! pgrep -f "Electron" \
+       && ! pgrep -f "code --list-extensions"; then
+      return 0
+    fi
+    sleep 0.25
+  done
+  return 1
+}
+
+DO_VSCODE_SETUP=true
 if pgrep -f "Visual Studio Code" >/dev/null || pgrep -f "Code Helper" >/dev/null; then
-  echo "VS Code appears to be running. To apply configurations, VS Code must be closed."
+  echo "VS Code is running. To apply configurations, VS Code must be closed."
+  echo "(If the shell running this script was directly launched by VS Code, then closing VS Code will stop the script.)"
   read -r "RESP?Close VS Code now? (y/N): "
   case "$RESP" in
     [Yy]* )
-      echo "Closing VS Code..."
-      pkill -f "Visual Studio Code" 2>/dev/null
-      pkill -f "Code Helper" 2>/dev/null
-      sleep 1
-      echo "VS Code is closed."
+      echo "Ensuring all VS Code processes are stopped..."
+      set +e
+      pkill -f "Visual Studio Code"        2>/dev/null
+      pkill -f "Code Helper"               2>/dev/null
+      pkill -f "Electron Helper"           2>/dev/null
+      pkill -f "Electron"                  2>/dev/null
+      pkill -f "code --list-extensions"    2>/dev/null
+      set -e
+      if ! wait_for_vs_code_exit; then
+        echo "Warning: Some VS Code processes refused to exit."
+        echo "Skipping VS Code configuration."
+        DO_VSCODE_SETUP=false
+      else
+        echo "VS Code is closed."
+      fi
       ;;
     * )
       DO_VSCODE_SETUP=false
@@ -418,6 +443,16 @@ else
     echo "vsc-tmux already accessible."
   fi
 
+  # > MARK: Disable ApplePressAndHold (which prevents repeat key scrolling)
+
+  STATE_APPLE_PRESS_AND_HOLD="$(defaults read -g ApplePressAndHoldEnabled 2>/dev/null || echo 'unset')"
+  if [[ "$STATE_APPLE_PRESS_AND_HOLD" != "0" ]]; then
+    echo "Disabling ApplePressAndHold (requires VS Code restart)..."
+    defaults write -g ApplePressAndHoldEnabled -bool false
+  else
+    echo "ApplePressAndHoldEnabled already disabled."
+  fi
+
 fi # DO_VSCODE_SETUP
 
 ###
@@ -452,21 +487,23 @@ fi
 # > MARK: Set wallpaper
 
 PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
-if [[ -f "$PERSONAL_WALLPAPER" ]] && command -v osascript &>/dev/null; then
-  CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
-  CURRENT_WALLPAPER_FILENAME="${CURRENT_WALLPAPER##*/}"
-  PERSONAL_WALLPAPER_FILENAME="${PERSONAL_WALLPAPER##*/}"
-  if [[ "$CURRENT_WALLPAPER_FILENAME" != "$PERSONAL_WALLPAPER_FILENAME" ]]; then
-    echo "Setting personal wallpaper..."
-    osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
+if [[ -f "$PERSONAL_WALLPAPER" ]]; then
+  if command -v osascript &>/dev/null; then
+    CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
+    CURRENT_WALLPAPER_FILENAME="${CURRENT_WALLPAPER##*/}"
+    PERSONAL_WALLPAPER_FILENAME="${PERSONAL_WALLPAPER##*/}"
+    if [[ "$CURRENT_WALLPAPER_FILENAME" != "$PERSONAL_WALLPAPER_FILENAME" ]]; then
+      echo "Setting personal wallpaper..."
+      osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
+    else
+      echo "Personal wallpaper already set."
+    fi
   else
-    echo "Personal wallpaper already set."
+    echo "osascript not found. Skipping setting of personal wallpaper."
   fi
+else
+  echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER"
 fi
-
-# > MARK: Disable ApplePressAndHold (for neovim in vscode)
-
-defaults write -g ApplePressAndHoldEnabled -bool false
 
 ###
 ##
