@@ -12,6 +12,10 @@
 	# usage: git change-commits GIT_AUTHOR_EMAIL "old@example.com" "new@example.com" (current branch)
 	# usage: git change-commits GIT_AUTHOR_EMAIL "old@example.com" "new@example.com" -- --all (all branches)
 	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f "
+	mdpull = subtree pull --prefix=mdspace mdspace main
+	mdpush = subtree push --prefix=mdspace mdspace main
+	mdstatus = !git log --oneline -- mdspace | head -n 5
+	mdfetch = fetch mdspace
 [init]
 	defaultBranch = main
 [pull]
