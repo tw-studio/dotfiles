@@ -159,12 +159,20 @@ source $ZSH/oh-my-zsh.sh
     export AWS_PROFILE=codespace-24
     export SAM_CLI_TELEMETRY=0      # opt-out of AWS SAM telemetry
 
-#   Enable PEP 582 for pdm
-#   ------------------------------------------------------------
-    # eval "$(pdm --pep582)"
-    # pdm_path='/usr/local/Cellar/pdm/2.8.0/libexec/lib/python3.11/site-packages/pdm/pep582'
-    # Add to PYTHONPATH only when not already there
-    # [[ ":$PYTHONPATH:" != *":$pdm_path:"* ]] && export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$pdm_path"
+# Enable PEP 582 for pdm
+# ------------------------------------------------------------
+if command -v pdm &> /dev/null; then
+  pdm_path="$(pdm --pep582 2>/dev/null | sed -nE "s/.*PYTHONPATH='([^']+)'.*/\1/p" | head -n 1)"
+
+  if [[ -n "$pdm_path" ]]; then
+    case ":${PYTHONPATH-}:" in
+      *":$pdm_path:"*) : ;;  # already present
+      *) export PYTHONPATH="${pdm_path}${PYTHONPATH:+:$PYTHONPATH}" ;;
+    esac
+  fi
+
+  unset pdm_path
+fi
 
 #   Miscellaneous configuration values
 #   ------------------------------------------------------------
