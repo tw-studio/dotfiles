@@ -4,7 +4,7 @@
     { "key": "escape",          "command": "closeFindWidget",
                                 "when": "editorFocus && findWidgetVisible" },
     { "key": "capslock",        "command": "vscode-neovim.escape" },
-                                
+
     { "key": "enter",           "command": "macros.openFileAndKeep",
                                 "when": "explorerViewletFocus && explorerViewletVisible && !inputFocus" },
     { "key": "up",              "command": "macros.filesExplorerFocusUpAndPreview",
@@ -30,19 +30,19 @@
     { "key": "alt+h",                 "command": "workbench.action.previousEditorInGroup"},
     { "key": "ctrl+shift+cmd+right",  "command": "workbench.action.moveEditorRightInGroup"},
     { "key": "ctrl+shift+cmd+left",   "command": "workbench.action.moveEditorLeftInGroup"},
-    
+
     { "key": "alt+k",           "command": "editor.action.moveLinesUpAction",
                                 "when": "editorTextFocus && !editorReadonly" },
     { "key": "alt+j",           "command": "editor.action.moveLinesDownAction",
                                 "when": "editorTextFocus && !editorReadonly" },
-                                
+
     { "key": "ctrl+`",          "command": "workbench.action.terminal.toggleTerminal" },
     { "key": "ctrl+`",          "command": "workbench.action.focusActiveEditorGroup",
                                    "when": "terminalFocus" },
     { "key": "alt+p",           "command": "workbench.action.togglePanelPosition" },
     { "key": "alt+z",           "command": "workbench.action.toggleMaximizedPanel",
                                    "when": "terminalFocus" },
-    
+
     { "key": "alt+u",          "command": "markdownExtended.toggleUnderLine",
                                    "when": "editorTextFocus && editorLangId == 'markdown'" },
     { "key": "alt+b",          "command": "markdownExtended.toggleBold",
@@ -72,5 +72,7 @@
 
     { "key": "ctrl+v tab",          "command": "type",
                                        "args": { "text": "\t" },
-                                       "when": "editorTextFocus && neovim.mode == 'cmdline_insert'" }
+                                      "when": "editorTextFocus && neovim.mode == 'cmdline_insert'"
+                                    },
+    { "key": "alt+0",               "command": "markJumpPlus.focus" }
 ]

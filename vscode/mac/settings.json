@@ -89,7 +89,6 @@
       "strings": false
     }
   },
-  "breadcrumbs.enabled": false,
   "color-highlight.languages": [
     "*",
     "!css",
@@ -118,7 +117,6 @@
   "editor.inlineSuggest.showToolbar": "always",
   "editor.insertSpaces": true,
   "editor.lineNumbers": "relative",
-  "editor.minimap.enabled": false,
   "editor.parameterHints.enabled": false,
   "editor.quickSuggestions": {
     "comments": false,
@@ -309,11 +307,11 @@
   "git.decorations.enabled": false,
   "git.openRepositoryInParentFolders": "never",
   "github.copilot.enable": {
-    "*": true,
-    "javascript": false,
-    "markdown": false,
+    "*": false,
     "plaintext": false,
+    "markdown": false,
     "scminput": false,
+    "javascript": false,
     "secret": false
   },
   "gitlens.codeLens.authors.enabled": false,
@@ -379,6 +377,8 @@
   ],
   "markJump.showProjectMarks": false,
   "markJump.strictLimit": "limit",
+  "markJumpPlus.showLineNumbersInExplorer": false,
+  "markJumpPlus.showLineNumbersInJumpList": false,
   "mdmath.delimiters": "gitlab",
   "npm.packageManager": "pnpm",
   "prettier.enable": false,
@@ -612,7 +612,6 @@
   "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
   "vscode-neovim.useWSL": false,
   "window.newWindowDimensions": "maximized",
-  "workbench.activityBar.location": "hidden",
   "workbench.colorCustomizations": {
     "activityBarBadge.background": "#0000",
     "activityBarBadge.foreground": "#0000",
@@ -637,7 +636,14 @@
   "workbench.panel.defaultLocation": "bottom",
   "workbench.sideBar.location": "left",
   "workbench.startupEditor": "newUntitledFile",
-  "workbench.statusBar.visible": false,
   "yaml.completion": false,
-  "yaml.schemaStore.enable": false
+  "yaml.schemaStore.enable": false,
+  "parallels-desktop.extension.path": "/Users/tomw/.parallels-desktop-vscode",
+  "parallels-desktop.brew.path": "/opt/homebrew/bin/brew",
+  "parallels-desktop.git.path": "/usr/bin/git",
+  "parallels-desktop.devops-service.path": "/Users/tomw/.parallels-desktop-vscode/tools/prldevops",
+  "parallels-desktop.prlctl.path": "/usr/local/bin/prlctl",
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "redhat.telemetry.enabled": false
 }
