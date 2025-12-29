@@ -8,7 +8,8 @@
 ################################################################
 
 set -e
-SET_WALLPAPER=1
+SKIP_WALLPAPER=1      # true
+SKIP_GOTO_CODESPACE=1 # true
 
 ################################################################
 #
@@ -508,7 +509,7 @@ fi
 # > MARK: Wallpaper
 ################################################################
 
-if (( SET_WALLPAPER )); then
+if (( ! SKIP_WALLPAPER )); then
   PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
   if [[ -f "$PERSONAL_WALLPAPER" ]]; then
     if command -v osascript &>/dev/null; then
@@ -593,8 +594,11 @@ chown -R $USER $CODESPACE
 # > MARK: Start zsh in codespace
 ################################################################
 
-echo "Starting in codespace..."
-cd $CODESPACE
+if (( ! SKIP_GOTO_CODESPACE )); then
+  echo "Starting in codespace..."
+  cd $CODESPACE
+fi
+echo "Starting zsh..."
 zsh
 
 ################################################################
