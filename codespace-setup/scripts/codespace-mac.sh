@@ -1,7 +1,14 @@
 #!/bin/zsh
 # This zsh script sets up a codespace environment on Mac.
 
+################################################################
+#
+#   MARK: Options
+#
+################################################################
+
 set -e
+SET_WALLPAPER=1
 
 ################################################################
 #
@@ -501,23 +508,25 @@ fi
 # > MARK: Wallpaper
 ################################################################
 
-PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
-if [[ -f "$PERSONAL_WALLPAPER" ]]; then
-  if command -v osascript &>/dev/null; then
-    CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
-    CURRENT_WALLPAPER_FILENAME="${CURRENT_WALLPAPER##*/}"
-    PERSONAL_WALLPAPER_FILENAME="${PERSONAL_WALLPAPER##*/}"
-    if [[ "$CURRENT_WALLPAPER_FILENAME" != "$PERSONAL_WALLPAPER_FILENAME" ]]; then
-      echo "Setting personal wallpaper..."
-      osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
+if (( SET_WALLPAPER )); then
+  PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
+  if [[ -f "$PERSONAL_WALLPAPER" ]]; then
+    if command -v osascript &>/dev/null; then
+      CURRENT_WALLPAPER="$(osascript -e 'tell application "System Events" to get picture of current desktop')"
+      CURRENT_WALLPAPER_FILENAME="${CURRENT_WALLPAPER##*/}"
+      PERSONAL_WALLPAPER_FILENAME="${PERSONAL_WALLPAPER##*/}"
+      if [[ "$CURRENT_WALLPAPER_FILENAME" != "$PERSONAL_WALLPAPER_FILENAME" ]]; then
+        echo "Setting personal wallpaper..."
+        osascript -e 'tell application "System Events" to set picture of every desktop to "'"$PERSONAL_WALLPAPER"'"'
+      else
+        echo "Personal wallpaper already set."
+      fi
     else
-      echo "Personal wallpaper already set."
+      echo "osascript not found. Skipping setting of personal wallpaper."
     fi
   else
-    echo "osascript not found. Skipping setting of personal wallpaper."
+    echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER."
   fi
-else
-  echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER."
 fi
 
 ################################################################
