@@ -3,50 +3,15 @@
 
 set -e
 
-###
-##
-# MARK: To Do
+################################################################
+#
+#   MARK: Script Helpers
+#
+################################################################
 
-# !!! All steps must be idempotent
-
-# [x] Install personal fonts
-# [x] Install iTerm2
-# [-] Set iTerm2 font to Meslo
-# [ ] Install Mullvad VPN
-# [ ] Install Malwarebytes
-# [ ] Install VeraCrypt
-# [ ] Set dock to right side
-# [ ] Set wallpaper
-# [ ] Set Screenshots directory
-# [ ] Hide Desktop files
-# [-] Set system color
-##### P2
-# [ ] Install Parallels and Windows (P2)
-# [ ] Install Hand Mirror (P2)
-##### P3
-# [ ] Install Quick Shade (P3)
-# [ ] Install and configure pdm and python (P3)
-##### Clean up
-
-# Scratch from before:
-
-# [ ] 1. Add steps for installing Meslo LG font
-# [ ] 2. Customize .zshrc for Mac:
-    # [ ] 1. Change ls to gls
-    # [ ] 2. Add ZSH_DISABLE_COMPFIX="true" *if* configuring multiple user on same Mac
-# [ ] 3. Add steps for installing powerline icons font for neovim
-# [ ] 4. Add steps for installing and configuring VSCode (OPTIONAL: set up Settings sync)
-
-# |0| Preparation steps to take on mac first:
-
-# [ ] 1. First, know that you should *not* use Homebrew across multiple users on same Mac
-# [ ] 2. Rebind Esc to Caps Lock key in System Preferences > Keyboard > Keyboard > Modifier Keys...
-# [ ] 3. In Safari, click View > Show Status Bar
-# [ ] 4. Set Safari new windows to be New Private Windows
-
-###
-##
-# MARK: Parse args for verbose and define trace helper
+################################################################
+# > MARK: trace() - verbose helper
+################################################################
 
 for arg in "$@"; do
   if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
@@ -65,23 +30,43 @@ trace() {
 }
 
 
-###
-##
-# MARK: Global configuration and prechecks
+################################################################
+#
+#   MARK: Script Configurations and Prechecks
+#
+################################################################
+
+################################################################
+# > MARK: Environment variables
+################################################################
 
 echo "Setting environment variables..."
 [[ -z "$CODESPACE" ]] && export CODESPACE=$HOME/codespace
 [[ -z "$DOTFILES" ]] && export DOTFILES=$CODESPACE/dotfiles
+
+################################################################
+# > MARK: Pre-installed binaries
+################################################################
 
 if ! command -v curl &>/dev/null; then
   echo "Error: curl is not installed or not in PATH." >&2
   exit 1
 fi
 
+################################################################
+# > MARK: Dotfiles
+################################################################
 
-###
-##
-# MARK: Create codespace directory
+if [[ ! -d "$DOTFILES" ]]; then
+  echo "Cloning dotfiles..."
+  trace git clone https://github.com/tw-studio/dotfiles $DOTFILES
+else
+  echo "Directory '$DOTFILES' already exists."
+fi
+
+################################################################
+# > MARK: codespace Directory
+################################################################
 
 if [[ ! -d $CODESPACE ]]; then
   echo "Creating '$CODESPACE' directory..."
@@ -90,11 +75,17 @@ else
   echo "Directory '$CODESPACE' already exists."
 fi
 
-###
-##
-# MARK: Set up Homebrew
 
-# > MARK: Install Homebrew
+################################################################
+#
+#   MARK: Installations
+#
+################################################################
+
+################################################################
+# > MARK: Homebrew
+################################################################
+
 if ! command -v brew &>/dev/null; then
   echo "Installing Homebrew..."
   trace /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -102,7 +93,7 @@ else
   echo "Homebrew already installed."
 fi
 
-# > MARK: Ensure brew is available
+# Ensure brew is available
 if ! command -v brew &>/dev/null; then
   if [[ -d "/opt/homebrew/bin" ]]; then
     trace eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -114,7 +105,10 @@ if ! command -v brew &>/dev/null; then
   fi
 fi
 
-# > MARK: Install packages
+################################################################
+# > MARK: Packages from Homebrew
+################################################################
+
 echo "Installing Homebrew packages..."
 trace brew install \
   coreutils \
@@ -147,21 +141,11 @@ if ! command -v git &>/dev/null; then
   exit 1
 fi
 
-###
-##
-# MARK: Clone dotfiles
+################################################################
+# > MARK: oh-my-zsh Install & Configure
+################################################################
 
-if [[ ! -d "$DOTFILES" ]]; then
-  echo "Cloning dotfiles..."
-  trace git clone https://github.com/tw-studio/dotfiles $DOTFILES
-else
-  echo "Directory '$DOTFILES' already exists."
-fi
-
-###
-##
-# MARK: Install oh-my-zsh
-
+# Install oh-my-zsh
 OMZ=$HOME/.oh-my-zsh
 if [[ ! -d "$OMZ" ]]; then
   echo "Installing oh-my-zsh..."
@@ -183,9 +167,45 @@ else
   echo "Directory '$ZSHMARKS' already exists, zshmarks already installed."
 fi
 
-###
-##
-# MARK: Configure neovim
+################################################################
+# > MARK: node, pnpm, and pm2
+################################################################
+
+if ! command -v pnpm &>/dev/null; then
+  echo "Installing node, pnpm, and pm2..."
+  trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
+else
+  echo "pnpm already installed."
+fi
+
+################################################################
+# > MARK: Personal Fonts
+################################################################
+
+FONT_DIR="$HOME/Library/Fonts"
+FONT1="MesloLGLDZNerdFontMono-Bold.ttf"
+FONT2="RobotoMonoNerdFontMono-Medium.ttf"
+
+if [[ ! -f "$FONT_DIR/$FONT1" ]]; then
+  echo "Installing personal fonts..."
+  trace curl -fsSL -o "$FONT_DIR/$FONT1" "https://raw.githubusercontent.com/tw-studio/dotfiles/main/assets/fonts/$FONT1"
+  echo "Installed $FONT1."
+  trace curl -fsSL -o "$FONT_DIR/$FONT2" "https://raw.githubusercontent.com/tw-studio/dotfiles/main/assets/fonts/$FONT2"
+  echo "Installed $FONT2."
+else
+  echo "Personal fonts already installed."
+fi
+
+
+################################################################
+#
+#   MARK: Configurations
+#
+################################################################
+
+################################################################
+# > MARK: neovim
+################################################################
 
 if [[ ! -d "$HOME/.config/nvim/colors" ]]; then
   echo "Configuring neovim..."
@@ -201,9 +221,9 @@ else
   echo "neovim already configured."
 fi
 
-###
-##
-# MARK: Configure tmux
+################################################################
+# > MARK: tmux
+################################################################
 
 TPM=$HOME/.tmux/plugins/tpm
 if [[ ! -d "$TPM" ]]; then
@@ -236,14 +256,14 @@ else
   echo "tmux scripts already configured."
 fi
 
-###
-##
-# MARK: Configure git
+################################################################
+# > MARK: git
+################################################################
 
 REPO="tw-studio"
 REPO_KEY="$HOME/.ssh/$REPO"
 
-# > MARK: .gitconfig
+# >> MARK: .gitconfig
 
 if [[ -f $HOME/.gitconfig ]] && grep -q "main" $HOME/.gitconfig; then
   echo "gitconfig already configured."
@@ -279,29 +299,11 @@ else
   echo "Key already loaded in ssh-agent."
 fi
 
-###
-##
-# MARK: Install personal fonts
+################################################################
+# > MARK: VS Code
+################################################################
 
-FONT_DIR="$HOME/Library/Fonts"
-FONT1="MesloLGLDZNerdFontMono-Bold.ttf"
-FONT2="RobotoMonoNerdFontMono-Medium.ttf"
-
-if [[ ! -f "$FONT_DIR/$FONT1" ]]; then
-  echo "Installing personal fonts..."
-  trace curl -fsSL -o "$FONT_DIR/$FONT1" "https://raw.githubusercontent.com/tw-studio/dotfiles/main/assets/fonts/$FONT1"
-  echo "Installed $FONT1."
-  trace curl -fsSL -o "$FONT_DIR/$FONT2" "https://raw.githubusercontent.com/tw-studio/dotfiles/main/assets/fonts/$FONT2"
-  echo "Installed $FONT2."
-else
-  echo "Personal fonts already installed."
-fi
-
-###
-##
-# MARK: Configure VSCode
-
-# > MARK: Configure $CODE to use in this script
+# >> MARK: Configure $CODE to use in this script
 
 CODE="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
 if [[ ! -x "$CODE" ]]; then
@@ -311,7 +313,7 @@ if [[ ! -x "$CODE" ]]; then
   exit 1
 fi
 
-# > MARK: Ensure VS Code is fully closed before continuing
+# >> MARK: Ensure VS Code is fully closed before continuing
 
 wait_for_vs_code_exit() {
   for _ in {1..20}; do
@@ -360,7 +362,7 @@ if [[ "$DO_VSCODE_SETUP" = false ]]; then
   echo "Skipping VS Code configuration."
 else
 
-  # > MARK: Install extensions
+  # >> MARK: Install marketplace extensions
 
   EXTENSIONS=(
     "alefragnani.project-manager"
@@ -396,25 +398,47 @@ else
     fi
   done
 
-  # > MARK: Install personal box-checker extension
+  # >> MARK: Install personal VSIX extensions (latests in folder)
 
-  MY_VSIX_ID="tw.box-checker"
-  MY_VSIX_FILE="box-checker-0.0.1.vsix"
-  MY_VSIX_LOCAL_PATH="$DOTFILES/vscode/$MY_VSIX_FILE"
-  # $INSTALLED_EXTENSIONS already exists
+  # My extension's details
+  MY_PUBLISHER="tw"
+  MY_EXTENSIONS=(
+    "box-checker"
+    "mark-jump-plus"
+  )
 
-  if ! printf "%s\n" "$INSTALLED_EXTENSIONS" | grep -qx "$MY_VSIX_ID"; then
-    if [[ ! -f "$MY_VSIX_LOCAL_PATH" ]]; then
-      echo "Error: Installer for $MY_VSIX_ID not found at: $MY_VSIX_LOCAL_PATH"
-      exit 1
+  # Install helper (assumes $CODE is set)
+  install_latest_vsix() {
+    local ext_id="$1"
+    local glob_path="$2"
+
+    # Find newest VSIX by modification time
+    local vsix_path
+    vsix_path="$(ls -t $glob_path 2>/dev/null | head -n 1)"
+
+    if [[ -z "$vsix_path" || ! -f "$vsix_path" ]]; then
+      echo "Error: Installer for $ext_id not found (glob: $glob_path). Skipping..."
+    else
+      echo "Installing extension: $ext_id from $vsix_path..."
+      "$CODE" --install-extension "$vsix_path"
     fi
-    echo "Installing extension: $MY_VSIX_ID..."
-    "$CODE" --install-extension "$MY_VSIX_LOCAL_PATH"
-  else
-    echo "Personal extension $MY_VSIX_ID is already installed."
-  fi
+  }
 
-  # > MARK: Copy personal keybindings and settings
+  # Installs each extension
+  for EXT in "${MY_EXTENSIONS[@]}"; do
+    MY_EXT_ID="${MY_PUBLISHER}.${EXT}"
+    MY_VSIX_GLOB="$DOTFILES/vscode/${EXT}-*.vsix"
+
+    # Assumes $INSTALLED_EXTENSIONS already exists
+    if ! printf "%s\n" "$INSTALLED_EXTENSIONS" | grep -qx "$MY_EXT_ID"; then
+      echo "Installing personal extension $MY_EXT_ID..."
+      install_latest_vsix "$MY_EXT_ID" "$MY_VSIX_GLOB"
+    else
+      echo "Personal extension $MY_EXT_ID is already installed."
+    fi
+  done
+
+  # >> MARK: Copy personal keybindings and settings
 
   VSC_USER_DIR="$HOME/Library/Application Support/Code/User"
   VSC_SETTINGS="$VSC_USER_DIR/settings.json"
@@ -441,7 +465,7 @@ else
     cp "$DOTFILES/vscode/mac/keybindings.json" "$VSC_KEYBINDINGS"
   fi
 
-  # > MARK: Disable ApplePressAndHold (which prevents repeat key scrolling)
+  # >> MARK: Disable ApplePressAndHold (which prevents repeat key scrolling)
 
   STATE_APPLE_PRESS_AND_HOLD="$(defaults read -g ApplePressAndHoldEnabled 2>/dev/null || echo 'unset')"
   if [[ "$STATE_APPLE_PRESS_AND_HOLD" != "0" ]]; then
@@ -453,9 +477,9 @@ else
 
 fi # DO_VSCODE_SETUP
 
-###
-##
-# MARK: Configure fzf
+################################################################
+# > MARK: fzf
+################################################################
 
 # Create fzf keybindings for zsh
 if [[ ! -f "$HOME/.fzf.zsh" ]]; then
@@ -467,22 +491,16 @@ else
   echo "fzf keybindings already generated for zsh."
 fi
 
-###
-##
-# MARK: Install node, pnpm, and pm2
 
-if ! command -v pnpm &>/dev/null; then
-  echo "Installing node, pnpm, and pm2..."
-  trace curl -fsSL https://raw.githubusercontent.com/tw-studio/dotfiles/main/scripts/install-node-pnpm.zsh | zsh
-else
-  echo "pnpm already installed."
-fi
+################################################################
+#
+#   MARK: macOS Settings
+#
+################################################################
 
-###
-##
-# MARK: macOS settings
-
-# > MARK: Set wallpaper
+################################################################
+# > MARK: Wallpaper
+################################################################
 
 PERSONAL_WALLPAPER="$DOTFILES/assets/images/abstract-wallpaper.jpg"
 if [[ -f "$PERSONAL_WALLPAPER" ]]; then
@@ -503,7 +521,9 @@ else
   echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER."
 fi
 
-# > MARK: Set Screenshots directory
+################################################################
+# > MARK: Screenshots directory
+################################################################
 
 SCREENSHOTS_DIR="$HOME/Desktop/Screenshots"
 mkdir -p "$SCREENSHOTS_DIR"
@@ -520,7 +540,9 @@ else
   echo "Screenshots directory already set to $SCREENSHOTS_DIR."
 fi
 
+################################################################
 # > MARK: Hide Desktop files on visual desktop
+################################################################
 
 STATE_CREATE_DESKTOP=$(defaults read com.apple.finder CreateDesktop 2>/dev/null || echo "true")
 
@@ -532,7 +554,9 @@ else
   echo "Desktop icons are already hidden."
 fi
 
+################################################################
 # > MARK: Change Safari default zoom level
+################################################################
 
 SAFARI_PLIST="$HOME/Library/Preferences/com.apple.Safari.plist"
 SAFARI_ZOOM_LEVEL=$(defaults read "$SAFARI_PLIST" DefaultPageZoom 2>/dev/null || echo "1")
@@ -543,17 +567,67 @@ else
   echo "Safari default zoom already set to 85%."
 fi
 
-###
-##
-# MARK: Housekeeping
+
+################################################################
+#
+#   MARK: Final Steps
+#
+################################################################
+
+################################################################
+# > MARK: Give user ownership of codespace
+################################################################
 
 echo "Giving user ownership of their codespace directory..."
 chown -R $USER $CODESPACE
 
-###
-##
-# MARK: Start zsh in codespace
+################################################################
+# > MARK: Start zsh in codespace
+################################################################
 
 echo "Starting in codespace..."
 cd $CODESPACE
 zsh
+
+################################################################
+#
+#   MARK: To Do (archive)
+#
+################################################################
+
+# !!! All steps must be idempotent
+
+# [x] Install personal fonts
+# [x] Install iTerm2
+# [-] Set iTerm2 font to Meslo
+# [ ] Install Mullvad VPN
+# [ ] Install Malwarebytes
+# [ ] Install VeraCrypt
+# [ ] Set dock to right side
+# [ ] Set wallpaper
+# [ ] Set Screenshots directory
+# [ ] Hide Desktop files
+# [-] Set system color
+##### P2
+# [ ] Install Parallels and Windows (P2)
+# [ ] Install Hand Mirror (P2)
+##### P3
+# [ ] Install Quick Shade (P3)
+# [ ] Install and configure pdm and python (P3)
+##### Clean up
+
+# Scratch from before:
+
+# [ ] 1. Add steps for installing Meslo LG font
+# [ ] 2. Customize .zshrc for Mac:
+    # [ ] 1. Change ls to gls
+    # [ ] 2. Add ZSH_DISABLE_COMPFIX="true" *if* configuring multiple user on same Mac
+# [ ] 3. Add steps for installing powerline icons font for neovim
+# [ ] 4. Add steps for installing and configuring VSCode (OPTIONAL: set up Settings sync)
+
+# |0| Preparation steps to take on mac first:
+
+# [ ] 1. First, know that you should *not* use Homebrew across multiple users on same Mac
+# [ ] 2. Rebind Esc to Caps Lock key in System Preferences > Keyboard > Keyboard > Modifier Keys...
+# [ ] 3. In Safari, click View > Show Status Bar
+# [ ] 4. Set Safari new windows to be New Private Windows
