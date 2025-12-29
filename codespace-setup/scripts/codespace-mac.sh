@@ -596,14 +596,14 @@ chown -R $USER $CODESPACE
 # > MARK: Start zsh in codespace
 ################################################################
 
-if (( ! SKIP_GOTO_CODESPACE )); then
+if (( ! SKIP_CODESPACE_START )); then
   echo "Starting in codespace..."
   cd $CODESPACE
-echo
-  echo "SKIP_CODESPACE_START: Skipping starting in codespace."
+  echo "Starting zsh..."
+  zsh
+else
+  echo "SKIP_CODESPACE_START: Skipping starting zsh in codespace."
 fi
-echo "Starting zsh..."
-zsh
 
 ################################################################
 #
