@@ -8,8 +8,8 @@
 ################################################################
 
 set -e
-SKIP_WALLPAPER=1      # true
-SKIP_GOTO_CODESPACE=1 # true
+SKIP_WALLPAPER=1        # true
+SKIP_CODESPACE_START=1  # true
 
 ################################################################
 #
@@ -528,6 +528,8 @@ if (( ! SKIP_WALLPAPER )); then
   else
     echo "Personal wallpaper not found at: $PERSONAL_WALLPAPER."
   fi
+else
+  echo "SKIP_WALLPAPER: Skipping setting of personal wallpaper."
 fi
 
 ################################################################
@@ -597,6 +599,8 @@ chown -R $USER $CODESPACE
 if (( ! SKIP_GOTO_CODESPACE )); then
   echo "Starting in codespace..."
   cd $CODESPACE
+echo
+  echo "SKIP_CODESPACE_START: Skipping starting in codespace."
 fi
 echo "Starting zsh..."
 zsh
