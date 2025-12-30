@@ -280,7 +280,7 @@ else
   cp $DOTFILES/git/.gitconfig $HOME/
 fi
 
-# > MARK: git authentication
+# >> MARK: git authentication
 
 # |1| Configure ~/.ssh/config
 if [[ ! ( -d "$HOME/.ssh" && -f "$HOME/.ssh/config" ) ]]; then
