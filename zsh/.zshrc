@@ -580,6 +580,7 @@ alias dzi="find . -type f -name \"*:Zone.Identifier\" -delete"
 [[ "${(L)OS_NAME}" == "ubuntu" ]] && FD_CMD='fdfind' || FD_CMD='fd'
 alias fd='$FD_CMD --hidden --no-ignore --exclude .git --exclude node_modules --exclude .cache'
 alias fde='fd --hidden --no-ignore --exclude .git --exclude node_modules --exclude .cache'
+alias gdiff='git diff --no-index'
 # Fix git when wsl corrupts and empties object
 alias gitfix='find .git/objects/ -type f -empty | xargs rm; git fetch -p; git fsck --full'
 alias gm='jump'                             # zshmarks plugin
