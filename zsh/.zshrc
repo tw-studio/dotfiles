@@ -6,12 +6,13 @@
 #
 ################################################################
 
+################################################################
+# > MARK: oh-my-zsh setup
+################################################################
+
 # Path to your oh-my-zsh installation
 export ZSH=$HOME/.oh-my-zsh
 
-################################################################
-# > MARK: zsh variables
-################################################################
 if [[ $USER == 'root' ]]; then
   ZSH_THEME="codespace256-rt"
 else
@@ -30,6 +31,13 @@ plugins=(git zshmarks)
 #keychain# eval $(keychain -q --eval --agents ssh SSH_IDENTITY)
 
 source $ZSH/oh-my-zsh.sh
+
+################################################################
+# > MARK: zsh options
+################################################################
+setopt appendhistory        # Append to history file, don't overwrite
+setopt extendedglob         # Enable ^, ~, # patterns
+setopt globdots             # Don't miss hidden files
 
 ################################################################
 # > MARK: Vim bindings for zsh line editor (zle)
@@ -115,9 +123,8 @@ fi
 ################################################################
 # > MARK: Editors
 ################################################################
-export editor=nvim
+export EDITOR=nvim
 export NVIM=nvim
-set runtimepath^=~/.config/nvim
 if command -v wslpath &>/dev/null; then
   export VS="$WINHOME/AppData/Local/Programs/Microsoft VS Code/bin/code"
 elif [[ -x "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]]; then
@@ -624,7 +631,6 @@ alias temp='cd $CODESPACE/tempspace'
 alias texlocal='cd /usr/local/texlive/texmf-local/tex/latex/local'
 alias timeout90='timeout --preserve-status --kill-after=90s 90s'
 alias tm='tmux ls'
-alias tm#='tmux attach #'
 alias tma='tmux attach -t'
 alias tmac='tmux new -s codespace || tmux attach -t codespace'
 alias tmat='tmux attach -t'
