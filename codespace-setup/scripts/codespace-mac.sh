@@ -545,19 +545,6 @@ else
   echo "BentoBox already a login item."
 fi
 
-# Grant Accessibility permissions if not already granted by checking TCC database
-BENTOBOX_BUNDLE_ID="com.bentobox.app"  # verify with: osascript -e 'id of app "BentoBox"'
-if sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
-   "SELECT auth_value FROM access WHERE service='kTCCServiceAccessibility' AND client='$BENTOBOX_BUNDLE_ID';" 2>/dev/null \
-   | grep -q "2"; then
-  echo "BentoBox already has Accessibility permissions."
-else
-  echo "BentoBox needs Accessibility permissions. Opening System Settings..."
-  open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-  echo "Grant BentoBox Accessibility access, then press Enter to continue."
-  read -r
-fi
-
 ################################################################
 #
 #   MARK: macOS Settings
