@@ -114,8 +114,7 @@ if ! command -v brew &>/dev/null; then
 fi
 
 ################################################################
-# > MARK: Homebrew multi-user permissions
-#   Ensure /opt/homebrew is usable by all admin accounts on this Mac.
+# > MARK: Enable Homebrew for all admin accounts
 ################################################################
 
 BREW_PREFIX="/opt/homebrew"
@@ -459,7 +458,7 @@ else
     # Assumes $INSTALLED_EXTENSIONS already exists
     if ! printf "%s\n" "$INSTALLED_EXTENSIONS" | grep -qx "$MY_EXT_ID"; then
       echo "Installing personal extension $MY_EXT_ID..."
-      install_latest_vsix "$MY_EXT_ID" "$MY_VSIX_GLOB"
+      install_latest_vsix "$MY_EXT_ID" $~MY_VSIX_GLOB
     else
       echo "Personal extension $MY_EXT_ID is already installed."
     fi
