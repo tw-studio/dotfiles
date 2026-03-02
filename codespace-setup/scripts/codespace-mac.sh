@@ -114,6 +114,26 @@ if ! command -v brew &>/dev/null; then
 fi
 
 ################################################################
+# > MARK: Homebrew multi-user permissions
+#   Ensure /opt/homebrew is usable by all admin accounts on this Mac.
+################################################################
+
+BREW_PREFIX="/opt/homebrew"
+if [[ -d "$BREW_PREFIX" ]]; then
+  # Check if current user can actually write to the Homebrew prefix
+  if [[ ! -w "$BREW_PREFIX" ]]; then
+    echo "Fixing Homebrew permissions for multi-admin use..."
+    sudo chown -R :admin "$BREW_PREFIX"
+    sudo chmod -R g+w "$BREW_PREFIX"
+    # setgid ensures new files/dirs inherit the 'admin' group
+    sudo find "$BREW_PREFIX" -type d -exec chmod g+s {} +
+    echo "Homebrew permissions updated for group 'admin'."
+  else
+    echo "Homebrew directory is already writable by current user."
+  fi
+fi
+
+################################################################
 # > MARK: Packages from Homebrew
 ################################################################
 
