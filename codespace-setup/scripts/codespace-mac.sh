@@ -138,6 +138,7 @@ fi
 
 echo "Installing Homebrew packages..."
 trace brew install \
+  bentobox \
   coreutils \
   fd \
   fzf \
@@ -517,6 +518,43 @@ else
   echo "fzf keybindings already generated for zsh."
 fi
 
+################################################################
+# > MARK: BentoBox
+################################################################
+
+# Launch BentoBox if it's not already open
+if ! pgrep -x "BentoBox" > /dev/null; then
+  if [[ -d "/Applications/BentoBox.app" ]] ; then
+    echo "Opening BentoBox..."
+    open -a BentoBox
+    sleep 1
+  else
+    echo "BentoBox app not found. Skipping launch and configuration..."
+  fi
+else
+  echo "BentoBox already running."
+fi
+
+# Add BentoBox as a login item if not already set
+if ! osascript -e 'tell application "System Events" to get the name of every login item' 2>/dev/null | grep -q "BentoBox"; then
+  echo "Adding BentoBox as a login item..."
+  osascript -e 'tell application "System Events" to make login item at end with properties {path:"/Applications/BentoBox.app", hidden:false}'
+else
+  echo "BentoBox already a login item."
+fi
+
+# Grant Accessibility permissions if not already granted by checking TCC database
+BENTOBOX_BUNDLE_ID="com.bentobox.app"  # verify with: osascript -e 'id of app "BentoBox"'
+if sqlite3 "/Library/Application Support/com.apple.TCC/TCC.db" \
+   "SELECT auth_value FROM access WHERE service='kTCCServiceAccessibility' AND client='$BENTOBOX_BUNDLE_ID';" 2>/dev/null \
+   | grep -q "2"; then
+  echo "BentoBox already has Accessibility permissions."
+else
+  echo "BentoBox needs Accessibility permissions. Opening System Settings..."
+  open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+  echo "Grant BentoBox Accessibility access, then press Enter to continue."
+  read -r
+fi
 
 ################################################################
 #
