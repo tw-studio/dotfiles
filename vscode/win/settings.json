@@ -545,16 +545,9 @@
     }
   },
   "terminal.integrated.profiles.windows": {
-    "Command Prompt": {
-      "args": [],
-      "icon": "terminal-cmd",
-      "path": [
-        "${env:windir}\\Sysnative\\cmd.exe",
-        "${env:windir}\\System32\\cmd.exe"
-      ]
-    },
-    "Git Bash": {
-      "source": "Git Bash"
+    "tw": {
+      "icon": "terminal-tmux",
+      "path": "${env:USERPROFILE}\\winspace\\vscode\\scripts\\vsc-tmux-pwsh.bat"
     },
     "PowerShell": {
       "icon": "terminal-powershell",
@@ -566,6 +559,17 @@
       "path": [
         "C:\\WINDOWS\\System32\\wsl.exe"
       ]
+    },
+    "Command Prompt": {
+      "args": [],
+      "icon": "terminal-cmd",
+      "path": [
+        "${env:windir}\\Sysnative\\cmd.exe",
+        "${env:windir}\\System32\\cmd.exe"
+      ]
+    },
+    "Git Bash": {
+      "source": "Git Bash"
     }
   },
   "terminal.integrated.rightClickBehavior": "nothing",
