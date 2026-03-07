@@ -499,7 +499,7 @@
   "terminal.integrated.profiles.linux": {
     "tw": {
       "icon": "terminal-tmux",
-      "path": "/home/tomw/codespace/scripts/vsc-tmux.sh"
+      "path": "${userHome}/codespace/dotfiles/vscode/tmux/vsc-tmux.sh"
     },
     "zsh": {
       "path": "zsh"
@@ -520,7 +520,7 @@
   "terminal.integrated.profiles.osx": {
     "tw": {
       "icon": "terminal-tmux",
-      "path": "/Users/tomw/codespace/scripts/vsc-tmux.sh"
+      "path": "${userHome}/codespace/dotfiles/vscode/tmux/vsc-tmux.sh"
     },
     "zsh": {
       "args": [
