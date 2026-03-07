@@ -15,6 +15,11 @@
         5. Shortcuts… > disable all
     3. iCloud > iCloud
         1. Disable multiple services
+    4. Appearance
+        1. Change Theme color
+        2. Change Folder color
+    5. Spelling and prediction
+        1. Disable top four options (like Autocorrect)
 2. Change Screenshots directory
     1. mkdir -p “$HOME/Desktop/Screenshots”
     2. defaults write com.apple.screencapture location “$HOME/Desktop/Screenshots”
