@@ -523,9 +523,7 @@
       "path": "${userHome}/codespace/dotfiles/vscode/tmux/vsc-tmux.sh"
     },
     "zsh": {
-      "args": [
-        "-l"
-      ],
+      "args": ["-l"],
       "path": "zsh"
     },
     "tmux": {
@@ -533,24 +531,26 @@
       "path": "tmux"
     },
     "bash": {
-      "args": [
-        "-l"
-      ],
+      "args": ["-l"],
       "icon": "terminal-bash",
       "path": "bash"
     }
   },
   "terminal.integrated.profiles.windows": {
+    "tw": {
+      "icon": "terminal-tmux",
+      "path": "${userHome}\\winspace\\dotfiles\\vscode\\tmux\\vsc-tmux-pwsh.bat"
+    },
+    "PowerShell": {
+      "icon": "terminal-powershell",
+      "path": "pwsh.exe"
+    },
     "Ubuntu (WSL)": {
       "args": [],
       "icon": "terminal-ubuntu",
       "path": [
         "C:\\WINDOWS\\System32\\wsl.exe"
       ]
-    },
-    "PowerShell": {
-      "icon": "terminal-powershell",
-      "source": "PowerShell"
     },
     "Command Prompt": {
       "args": [],
@@ -606,10 +606,11 @@
   ],
   "update.mode": "manual",
   "update.showReleaseNotes": false,
+  "vscode-neovim.logLevel": "info",
   "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
   "vscode-neovim.neovimExecutablePaths.linux": "/usr/local/bin/nvim",
-  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init.vim",
-  "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
+  "vscode-neovim.neovimInitVimPaths.darwin": "${userHome}/.config/nvim/init.vim",
+  "vscode-neovim.neovimInitVimPaths.linux": "${userHome}/.config/nvim/init.vim",
   "vscode-neovim.useWSL": false,
   "window.newWindowDimensions": "maximized",
   "workbench.colorCustomizations": {
@@ -638,10 +639,10 @@
   "workbench.startupEditor": "newUntitledFile",
   "yaml.completion": false,
   "yaml.schemaStore.enable": false,
-  "parallels-desktop.extension.path": "/Users/tomw/.parallels-desktop-vscode",
+  "parallels-desktop.extension.path": "${userHome}/.parallels-desktop-vscode",
   "parallels-desktop.brew.path": "/opt/homebrew/bin/brew",
   "parallels-desktop.git.path": "/usr/bin/git",
-  "parallels-desktop.devops-service.path": "/Users/tomw/.parallels-desktop-vscode/tools/prldevops",
+  "parallels-desktop.devops-service.path": "${userHome}/.parallels-desktop-vscode/tools/prldevops",
   "parallels-desktop.prlctl.path": "/usr/local/bin/prlctl",
   "github.copilot.nextEditSuggestions.enabled": true,
   "security.workspace.trust.untrustedFiles": "open",

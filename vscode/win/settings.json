@@ -381,6 +381,8 @@
   ],
   "markJump.showProjectMarks": false,
   "markJump.strictLimit": "limit",
+  "markJumpPlus.showLineNumbersInExplorer": false,
+  "markJumpPlus.showLineNumbersInJumpList": false,
   "mdmath.delimiters": "gitlab",
   "npm.packageManager": "pnpm",
   "prettier.enable": false,
@@ -501,9 +503,12 @@
   "terminal.integrated.fontWeight": "600",
   "terminal.integrated.macOptionIsMeta": true,
   "terminal.integrated.profiles.linux": {
-    "bash": {
-      "icon": "terminal-bash",
-      "path": "bash"
+    "tw": {
+      "icon": "terminal-tmux",
+      "path": "${userHome}/codespace/dotfiles/vscode/tmux/vsc-tmux.sh"
+    },
+    "zsh": {
+      "path": "zsh"
     },
     "pwsh": {
       "icon": "terminal-powershell",
@@ -513,45 +518,38 @@
       "icon": "terminal-tmux",
       "path": "tmux"
     },
-    "tw": {
-      "icon": "terminal-tmux",
-      "path": "/home/tomw/codespace/scripts/vsc-tmux.sh"
-    },
-    "zsh": {
-      "path": "zsh"
+    "bash": {
+      "icon": "terminal-bash",
+      "path": "bash"
     }
   },
   "terminal.integrated.profiles.osx": {
-    "bash": {
-      "args": [
-        "-l"
-      ],
-      "icon": "terminal-bash",
-      "path": "bash"
+    "tw": {
+      "icon": "terminal-tmux",
+      "path": "${userHome}/codespace/dotfiles/vscode/tmux/vsc-tmux.sh"
+    },
+    "zsh": {
+      "args": ["-l"],
+      "path": "zsh"
     },
     "tmux": {
       "icon": "terminal-tmux",
       "path": "tmux"
     },
-    "tw": {
-      "icon": "terminal-tmux",
-      "path": "/Users/tomw/codespace/.vscode/scripts/vsc-tmux.sh"
-    },
-    "zsh": {
-      "args": [
-        "-l"
-      ],
-      "path": "zsh"
+    "bash": {
+      "args": ["-l"],
+      "icon": "terminal-bash",
+      "path": "bash"
     }
   },
   "terminal.integrated.profiles.windows": {
     "tw": {
       "icon": "terminal-tmux",
-      "path": "${env:USERPROFILE}\\winspace\\vscode\\scripts\\vsc-tmux-pwsh.bat"
+      "path": "${userHome}\\winspace\\dotfiles\\vscode\\tmux\\vsc-tmux-pwsh.bat"
     },
     "PowerShell": {
       "icon": "terminal-powershell",
-      "source": "PowerShell"
+      "path": "pwsh.exe"
     },
     "Ubuntu (WSL)": {
       "args": [],
@@ -615,10 +613,10 @@
   "update.mode": "manual",
   "update.showReleaseNotes": false,
   "vscode-neovim.logLevel": "info",
-  "vscode-neovim.neovimExecutablePaths.darwin": "/Users/tomw/codespace/.vscode/nvim-osx64/bin/nvim",
+  "vscode-neovim.neovimExecutablePaths.darwin": "/opt/homebrew/bin/nvim",
   "vscode-neovim.neovimExecutablePaths.linux": "/usr/local/bin/nvim",
-  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/tomw/.config/nvim/init-vscode.vim",
-  "vscode-neovim.neovimInitVimPaths.linux": "/home/tomw/.config/nvim/init.vim",
+  "vscode-neovim.neovimInitVimPaths.darwin": "${userHome}/.config/nvim/init.vim",
+  "vscode-neovim.neovimInitVimPaths.linux": "${userHome}/.config/nvim/init.vim",
   "vscode-neovim.useWSL": true,
   "window.newWindowDimensions": "maximized",
   "workbench.activityBar.location": "hidden",
