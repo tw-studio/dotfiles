@@ -208,19 +208,39 @@ export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 ################################################################
-# > MARK: Enable PEP 582 for pdm
+# > MARK: Configure pdm (for python)
 ################################################################
-if command -v pdm &> /dev/null; then
-  pdm_path="$(pdm --pep582 2>/dev/null | sed -nE "s/.*PYTHONPATH='([^']+)'.*/\1/p" | head -n 1)"
 
+# >> MARK: Enable PEP 582
+if command -v pdm &>/dev/null; then
+  pdm_path="$(pdm --pep582 2>/dev/null | sed -nE "s/.*PYTHONPATH='([^']+)'.*/\1/p" | head -n 1)"
   if [[ -n "$pdm_path" ]]; then
     case ":${PYTHONPATH-}:" in
       *":$pdm_path:"*) : ;;  # already present
       *) export PYTHONPATH="${pdm_path}${PYTHONPATH:+:$PYTHONPATH}" ;;
     esac
   fi
-
   unset pdm_path
+fi
+
+## >> MARK: Enable global-project user-site, and add it to PATH
+if command -v pdm &>/dev/null; then
+  pdm_global_user_site_setting="$(pdm config global_project.user_site 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+  if [[ "$pdm_global_user_site_setting" != "true" ]]; then
+    pdm config global_project.user_site true &>/dev/null
+  fi
+  unset pdm_global_user_site_setting
+
+  pdm_user_base="$(pdm run -g python -m site --user-base 2>/dev/null | head -n 1)"
+  if [[ -n "$pdm_user_base" ]]; then
+    pdm_user_bin="${pdm_user_base%/}/bin"
+    case ":$PATH:" in
+      *":$pdm_user_bin:"*) ;;
+      *) path+=("$pdm_user_bin") ;;
+    esac
+    unset pdm_user_bin
+  fi
+  unset pdm_user_base
 fi
 
 ################################################################
