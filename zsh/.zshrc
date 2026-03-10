@@ -92,9 +92,16 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 if command -v wslpath &>/dev/null; then
-  export WINHOME=$(wslpath $(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r'))
-  export WINSPACE=$WINHOME/winspace
-  export POWERSHELL_PROFILE=$WINHOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+  # Verify interop is working before relyig on it
+  local _userprofile
+  _userprofile=$(cmd.exe /C "echo %USERPROFILE%" 2>/dev/null | tr -d '\r')
+  if [[ -n "$_userprofile"]]; then
+    export WINHOME=$(wslpath "$_userprofile")
+    export WINSPACE=$WINHOME/winspace
+    export POWERSHELL_PROFILE=$WINHOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+  else
+    echo "WSL interop not ready — skipping WSL path environment variables" >&2
+  fi
 fi
 if [[ -z "$OS_NAME" ]] && [[ -f /etc/os-release ]]; then
   export OS_NAME=$(awk -F= '$1=="NAME" {gsub(/"/, "", $s); print $2}' /etc/os-release)
@@ -309,7 +316,7 @@ fi
 
 ################################################################
 #
-#   MARK: Prereq Functions for Aliases
+#   MARK: Prereq Functions
 #
 ################################################################
 
@@ -572,6 +579,28 @@ runscript_cache_cleanup() {
 }
 # run once per shell startup
 runscript_cache_cleanup
+
+################################################################
+# > MARK: dedupe_colon_var: Dedupe colon-separated var in place
+#   Usage: dedupe_colon_var VAR_NAME
+################################################################
+dedupe_colon_var() {
+  emulate -L zsh
+  setopt localoptions noshwordsplit
+
+  local name=$1
+  [[ -z $name ]] && return 0
+
+  # Get current value; bail if unset/empty
+  local val; val="${(P)name}"
+  [[ -z $val ]] && return 0
+
+  # Split -> unique -> join
+  local -a parts
+  parts=(${(s.:.)val})    # split on :
+  typeset -U parts        # make unique (keeps first occurrence)
+  typeset -g "$name"="${(j.:.)parts}"
+}
 
 ################################################################
 #
@@ -1113,6 +1142,7 @@ function s3hashrename {
 ################################################################
 # > MARK: Dedupe PATH
 ################################################################
+dedupe_colon_var PYTHONPATH
 typeset -aU path
 
 ################################################################
