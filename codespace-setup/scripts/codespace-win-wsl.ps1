@@ -355,7 +355,13 @@ if ($grepResolvConfOutput -match "OK") {
   Write-Host "resolv.conf has been fixed."
 }
 
-# >> MARK: |3| Run codespace setup in Ubuntu
+# >> MARK: |3| Start wsl at startup to run indefinitely
+Set-Content "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\wsl-init.vbs" @"
+Set ws = CreateObject("Wscript.Shell")
+ws.Run "wsl -e sleep infinity", 0, False
+"@
+
+# >> MARK: |4| Run codespace setup in Ubuntu
 $wslEtcPasswdPath = "$wslUbuntuDrive\etc\passwd"
 $rootPasswdEntry = wsl -d Ubuntu -u root -- bash -c "grep '^root:' /etc/passwd"
 if (-not ($rootPasswdEntry -and $rootPasswdEntry -match "root:.*:/bin/zsh$")) {
