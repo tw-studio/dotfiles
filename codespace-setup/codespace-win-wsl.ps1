@@ -275,6 +275,7 @@ if (-not (Test-Path $codespaceUbuntuSetupWinPath)) {
 }
 
 # >> MARK: |2| Ensure wsl.conf and resolv.conf are correctly configured
+
 # Idempotent bash script to ensure keys exist in INI sections
 $ensureWslConfScript = @'
 #!/usr/bin/env bash
