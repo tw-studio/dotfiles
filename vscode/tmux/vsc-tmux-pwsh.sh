@@ -15,7 +15,7 @@ Description=tmux server
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/tmux new-session -d -s _keepalive
+ExecStart=/usr/bin/tmux new-session -d -s _keepalive 'sleep infinity'
 ExecStop=/usr/bin/tmux kill-server
 
 [Install]
@@ -38,6 +38,9 @@ MD5=$(command -v md5 || command -v md5sum)
 SESSION="vscodepwsh`pwd | $MD5 | cut -d' ' -f1`"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PWSH_SCRIPT="$SCRIPT_DIR/wsl-open-pwsh.sh"
+PWSH_LINK="$HOME/.local/bin/wsl-open-pwsh"
+mkdir -p "$HOME/.local/bin"
+ln -sf "$PWSH_SCRIPT" "$PWSH_LINK"
 
 if [[ ! -f "/opt/homebrew/bin/tmux" && ! -f "/usr/bin/tmux" && ! -f "/usr/local/bin/tmux" ]]; then
   echo "tmux not found. Starting zsh in 3 seconds..."
@@ -46,8 +49,10 @@ if [[ ! -f "/opt/homebrew/bin/tmux" && ! -f "/usr/bin/tmux" && ! -f "/usr/local/
 else
   TMUX_BIN=$(command -v /opt/homebrew/bin/tmux || command -v /usr/local/bin/tmux || command -v /usr/bin/tmux)
 
-  if [[ ! -x "$PWSH_SCRIPT" ]]; then
+  if [[ ! -f "$PWSH_SCRIPT" ]]; then
     # Fallback: no pwsh script available
+    echo "PowerShell script not found at $PWSH_SCRIPT. Starting zsh in 3 seconds..."
+    sleep 3
     if "$TMUX_BIN" has-session -t "$SESSION" 2>/dev/null; then
       TERM=screen-256color-bce "$TMUX_BIN" new-session -t "$SESSION"
     else
@@ -58,16 +63,13 @@ else
     if "$TMUX_BIN" has-session -t "$SESSION" 2>/dev/null; then
       TERM=screen-256color-bce "$TMUX_BIN" new-session -t "$SESSION"
     else
-      TERM=screen-256color-bce "$TMUX_BIN" new-session -d -s "$SESSION" -c "$PWD" "zsh -lc '$PWSH_SCRIPT'"
+      TERM=screen-256color-bce "$TMUX_BIN" new-session -d -s "$SESSION" -c "$PWD" -n "pwsh" "zsh -lc '$PWSH_LINK'"
 
-      "$TMUX_BIN" set-option -t "$SESSION" -g default-command "zsh -lc '$PWSH_SCRIPT'"
+      "$TMUX_BIN" set-option -t "$SESSION" default-command "zsh -lc '\"$PWSH_SCRIPT\"'"
       "$TMUX_BIN" set-window-option -t "$SESSION:1" automatic-rename off
-      "$TMUX_BIN" rename-window -t "$SESSION:1" "pwsh"
       "$TMUX_BIN" set-hook -t "$SESSION" after-new-window "rename-window pwsh"
 
       TERM=screen-256color-bce "$TMUX_BIN" attach-session -t "$SESSION"
     fi
   fi
-  # TMUX_IN_VSCODE=1 TERM=screen-256color $TMUX attach-session -d -t $SESSION || TMUX_IN_VSCODE=1 TERM=screen-256color $TMUX new-session -s $SESSION
-  #tmux attach-session -d -t ${PWD##*/} || tmux attach-session -d -t $SESSION || tmux new-session -s $SESSION
 fi
