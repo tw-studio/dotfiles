@@ -1,6 +1,6 @@
 #!/bin/bash
 ###############################################################################
-# 
+#
 #     Run script as root with "dot space syntax" when local:
 #     $ . /path/to/codespace-ubuntu-wsl.sh
 #
@@ -58,6 +58,7 @@ echo "Installing packages..." \
     dos2unix \
     fd-find \
     git \
+    just \
     keychain \
     locales \
     ncurses-base \

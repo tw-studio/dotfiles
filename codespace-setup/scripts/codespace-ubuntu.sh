@@ -1,6 +1,6 @@
 #!/bin/sh
 ###############################################################################
-# 
+#
 #     Run script as root with "dot space syntax" when local:
 #     $ . /path/to/codespace-ubuntu.sh
 #
@@ -28,6 +28,7 @@ echo "Installing packages..." \
     curl \
     fd-find \
     git \
+    just \
     locales \
     ncurses-base \
     neovim \
@@ -40,13 +41,13 @@ echo "Installing packages..." \
     zsh \
  && apt-get clean
 rm -rf /var/lib/apt/lists/*
- 
+
 # Fix locale issues, e.g. with Perl
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen \
  && dpkg-reconfigure --frontend=noninteractive locales \
  && update-locale LANG=en_US.UTF-8
-export LANG=en_US.UTF-8 
- 
+export LANG=en_US.UTF-8
+
 # Configure home, user, and working dir
 export OS_NAME=ubuntu
 export USER=ubuntu

@@ -145,6 +145,7 @@ trace brew install \
   gawk \
   git \
   jq \
+  just \
   mkcert \
   n \
   neovim \
