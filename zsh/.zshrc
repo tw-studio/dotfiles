@@ -262,27 +262,29 @@ fi
 ################################################################
 # Already added env vars and path earlier
 # Adds pyenv's own helper function, outputted by `pyenv init -`
-pyenv() {
-  local command=${1:-}
-  [ "$#" -gt 0 ] && shift
-  case "$command" in
-  rehash|shell)
-    eval "$(pyenv "sh-$command" "$@")"
-    ;;
-  *)
-    command pyenv "$command" "$@"
-    ;;
-  esac
-}
+if command -v pyenv &>/dev/null; then
+  pyenv() {
+    local command=${1:-}
+    [ "$#" -gt 0 ] && shift
+    case "$command" in
+    rehash|shell)
+      eval "$(pyenv "sh-$command" "$@")"
+      ;;
+    *)
+      command pyenv "$command" "$@"
+      ;;
+    esac
+  }
+fi
 # Shell completions
 if command -v brew &>/dev/null && command -v pyenv &>/dev/null; then
   pyenv_completion="$(brew --prefix pyenv 2>/dev/null)/completions/pyenv.zsh"
   [[ -r "$pyenv_completion" ]] && source "$pyenv_completion"
 fi
-# Refreshes available python shims
-if command -v pyenv &>/dev/null; then
-  pyenv rehash
-fi
+# Refreshes available python shims (not needed often)
+# if command -v pyenv &>/dev/null; then
+#   pyenv rehash
+# fi
 
 
 ################################################################
