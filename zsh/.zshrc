@@ -128,9 +128,8 @@ if command -v wslpath &>/dev/null; then
   path+=("/mnt/c/Windows/System32")
   path+=("$WINHOME/AppData/Local/Microsoft/WindowsApps")
 fi
-if [[ -n "$PYENV_ROOT" ]] && [[ -d "$PYENV_ROOT/bin" ]]; then
-  path+=("$PYENV_ROOT/bin")
-  path=("$PYENV_ROOT/shims" $path[@])
+if [[ -n "$PYENV_ROOT" ]]; then
+  [[ -d "$PYENV_ROOT/shims" ]] && path=("$PYENV_ROOT/shims" $path[@])
 fi
 
 # typeset -aU path                    # dedupes PATH ## PLACED AT END OF FILE
