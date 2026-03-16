@@ -106,6 +106,10 @@ fi
 if [[ -z "$OS_NAME" ]] && [[ -f /etc/os-release ]]; then
   export OS_NAME=$(awk -F= '$1=="NAME" {gsub(/"/, "", $s); print $2}' /etc/os-release)
 fi
+if command -v pyenv &>/dev/null; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PYENV_SHELL=zsh
+fi
 
 ################################################################
 # > MARK: PATH
@@ -120,10 +124,15 @@ path+=("/usr/local/sbin")
 if [[ -n "$HOMEBREW_PREFIX" ]] && [[ -d "$HOMEBREW_PREFIX/opt/gawk/libexec/gnubin" ]]; then
   path=("$HOMEBREW_PREFIX/opt/gawk/libexec/gnubin" $path[@])
 fi
-if command -v wslpath &> /dev/null; then
+if command -v wslpath &>/dev/null; then
   path+=("/mnt/c/Windows/System32")
   path+=("$WINHOME/AppData/Local/Microsoft/WindowsApps")
 fi
+if [[ -n "$PYENV_ROOT" ]] && [[ -d "$PYENV_ROOT/bin" ]]; then
+  path+=("$PYENV_ROOT/bin")
+  path=("$PYENV_ROOT/shims" $path[@])
+fi
+
 # typeset -aU path                    # dedupes PATH ## PLACED AT END OF FILE
 # path=("/usr/local/bin" $path[@])    # JFYI: this is how to prepend
 
@@ -215,9 +224,8 @@ export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 ################################################################
-# > MARK: Configure pdm (for python)
+# > MARK: Python: pdm (PEP 582)
 ################################################################
-
 # >> MARK: Enable PEP 582
 if command -v pdm &>/dev/null; then
   pdm_path="$(pdm --pep582 2>/dev/null | sed -nE "s/.*PYTHONPATH='([^']+)'.*/\1/p" | head -n 1)"
@@ -237,7 +245,6 @@ if command -v pdm &>/dev/null; then
     pdm config global_project.user_site true &>/dev/null
   fi
   unset pdm_global_user_site_setting
-
   pdm_user_base="$(pdm run -g python -m site --user-base 2>/dev/null | head -n 1)"
   if [[ -n "$pdm_user_base" ]]; then
     pdm_user_bin="${pdm_user_base%/}/bin"
@@ -249,6 +256,34 @@ if command -v pdm &>/dev/null; then
   fi
   unset pdm_user_base
 fi
+
+################################################################
+# > MARK: Python: pyenv
+################################################################
+# Already added env vars and path earlier
+# Adds pyenv's own helper function, outputted by `pyenv init -`
+pyenv() {
+  local command=${1:-}
+  [ "$#" -gt 0 ] && shift
+  case "$command" in
+  rehash|shell)
+    eval "$(pyenv "sh-$command" "$@")"
+    ;;
+  *)
+    command pyenv "$command" "$@"
+    ;;
+  esac
+}
+# Shell completions
+if command -v brew &>/dev/null && command -v pyenv &>/dev/null; then
+  pyenv_completion="$(brew --prefix pyenv 2>/dev/null)/completions/pyenv.zsh"
+  [[ -r "$pyenv_completion" ]] && source "$pyenv_completion"
+fi
+# Refreshes available python shims
+if command -v pyenv &>/dev/null; then
+  pyenv rehash
+fi
+
 
 ################################################################
 # > MARK: Update WSL_INTEROP in tmux for when value changes due to WSL restart

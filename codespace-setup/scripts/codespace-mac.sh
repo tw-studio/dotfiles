@@ -153,6 +153,7 @@ trace brew install \
   perl \
   pngquant \
   pnpm \
+  pyenv \
   rename \
   ripgrep \
   tesseract \
@@ -223,6 +224,31 @@ if [[ ! -f "$FONT_DIR/$FONT1" ]]; then
   echo "Installed $FONT2."
 else
   echo "Personal fonts already installed."
+fi
+
+################################################################
+# > MARK: Python install (pyenv)
+################################################################
+
+# Install latest patch of previous stable feature line
+if command -v brew &>/dev/null; then
+  pyenv_prefix="$(brew --prefix pyenv 2>/dev/null)"
+  pyenv_bin="$pyenv_prefix/bin/pyenv"
+
+  if [[ -x "$pyenv_bin" ]]; then
+    target_minor="$("$pyenv_bin" install --list \
+      | sed 's/^[[:space:]]*//' \
+      | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+      | awk -F. '{print $1 "." $2}' \
+      | sort -V -u \
+      | tail -n 2 \
+      | head -n 1)"
+
+    if [[ -n "$target_minor" ]]; then
+      "$pyenv_bin" install -s "$target_minor"
+      "$pyenv_bin" global "$target_minor"
+    fi
+  fi
 fi
 
 
