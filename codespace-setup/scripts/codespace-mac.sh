@@ -577,6 +577,21 @@ else
 fi
 
 ################################################################
+# > MARK: pdm for Python (PEP 582)
+################################################################
+
+if command -v brew &>/dev/null; then
+  pdm_prefix="$(brew --prefix pdm 2>/dev/null)"
+  pdm_bin="$pdm_prefix/bin/pdm"
+
+  # Only install when current global isn't "system" default
+  if [[ -x "$pdm_bin" ]]; then
+    $pdm_bin config python.use_venv False
+  fi
+fi
+
+
+################################################################
 #
 #   MARK: macOS Settings
 #
