@@ -2,11 +2,21 @@
 #
 # clone-ignored-repos.zsh
 #
-# Scan this monorepo for .gitignore files and clone any repos referenced in
-# entries of the form:
+# Scan this monorepo for .gitignore files and clone any repos referenced
+# by paired lines of the form:
 #
-#     repo-name/  # https://github.com/user/repo-name.git
-#     repo-name/  # git@github.com:user/repo-name.git
+#     # remote: https://github.com/user/repo-name.git
+#     repo-name/
+#
+#     # remote: git@github.com:user/repo-name.git
+#     repo-name/
+#
+# Each entry is a "# remote: <url>" comment line followed *immediately* (no
+# blank line, no other line between) by a "<name>/" directory pattern. This
+# layout matches how git itself parses .gitignore — comments must occupy
+# their own line, and trailing inline comments on patterns are not honoured.
+# The URL is whatever non-empty token follows "# remote: "; no URL-format
+# validation is done.
 #
 # For each such entry, `git clone <url> <repo-name>` is run in the directory
 # containing that .gitignore.
@@ -69,17 +79,26 @@ function collect_gitignores() {
   done
 }
 
-# Parse one .gitignore line. If it matches the expected shape, print
-# "<repo-name>\t<url>" on stdout. Otherwise print nothing.
-#
-# Shape:
-#     <name>/  # <url>
-# where <url> begins with https://, http://, git@, ssh://, or git://.
-function parse_line() {
+# If the line is a "# remote: <url>" comment, print the URL on stdout (with
+# trailing whitespace stripped). Otherwise print nothing.
+function parse_remote_comment() {
   local line="${1%$'\r'}"   # strip any trailing CR (CRLF safety)
 
-  if [[ "$line" =~ '^[[:space:]]*([A-Za-z0-9_][A-Za-z0-9._-]*)/[[:space:]]+#[[:space:]]+((https?://|git@|ssh://|git://)[^[:space:]]+)[[:space:]]*$' ]]; then
-    print -r -- "${match[1]}"$'\t'"${match[2]}"
+  if [[ "$line" =~ '^[[:space:]]*#[[:space:]]+remote:[[:space:]]+(.+)$' ]]; then
+    local url="${match[1]%%[[:space:]]##}"
+    [[ -n "$url" ]] && print -r -- "$url"
+  fi
+}
+
+# If the line is a bare "<n>/" directory pattern (optional surrounding
+# whitespace, trailing slash required), print the bare name. Otherwise
+# print nothing. Negations, wildcards, and nested paths intentionally don't
+# match — they're ordinary gitignore content the script leaves alone.
+function parse_dir_pattern() {
+  local line="${1%$'\r'}"
+
+  if [[ "$line" =~ '^[[:space:]]*([A-Za-z0-9_][A-Za-z0-9._-]*)/[[:space:]]*$' ]]; then
+    print -r -- "${match[1]}"
   fi
 }
 
@@ -129,7 +148,7 @@ function main() {
     return 0
   fi
 
-  local gitignore dir rel_dir line parsed repo_name url target output
+  local gitignore dir rel_dir line pending_url repo_name url target output
   local -i rc
 
   for gitignore in $gitignores; do
@@ -138,48 +157,67 @@ function main() {
     rel_dir="${rel_dir#/}"
     [[ -z "$rel_dir" ]] && rel_dir="."
 
-    # Read the file line-by-line; the `|| [[ -n $line ]]` handles a final
-    # line missing a trailing newline.
+    # Read line-by-line, tracking a "pending URL" from any "# remote: <url>"
+    # comment so the immediately-following "<n>/" pattern can use it.
+    # Strict adjacency — anything else between the two breaks the pairing.
+    # The `|| [[ -n $line ]]` clause handles a final line missing a newline.
+    pending_url=""
     while IFS= read -r line || [[ -n "$line" ]]; do
-      parsed=$(parse_line "$line")
-      [[ -z "$parsed" ]] && continue
-
-      repo_name="${parsed%%$'\t'*}"
-      url="${parsed#*$'\t'}"
-      target="$dir/$repo_name"
-
-      (( total++ ))
-
-      if [[ -e "$target" ]]; then
-        print -- "$repo_name already exists."
-        (( existed++ ))
+      # Case 1: a "# remote: <url>" comment — remember its URL.
+      url=$(parse_remote_comment "$line")
+      if [[ -n "$url" ]]; then
+        pending_url="$url"
         continue
       fi
 
-      # Run the clone. GIT_TERMINAL_PROMPT=0 prevents an interactive credential
-      # prompt from hanging the script on private HTTPS repos.
-      output=$(GIT_TERMINAL_PROMPT=0 git clone -- "$url" "$target" 2>&1)
-      rc=$?
+      # Case 2: a "<n>/" directory pattern. If a URL is pending from the
+      # line right above, this is a clone-eligible entry; otherwise it's
+      # an ordinary ignore pattern and we leave it alone.
+      repo_name=$(parse_dir_pattern "$line")
+      if [[ -n "$repo_name" && -n "$pending_url" ]]; then
+        url="$pending_url"
+        pending_url=""
+        target="$dir/$repo_name"
 
-      if (( rc == 0 )); then
-        print -- "Cloned '$repo_name' into $rel_dir/ from $url"
-        (( cloned++ ))
+        (( total++ ))
+
+        if [[ -e "$target" ]]; then
+          print -- "$repo_name already exists."
+          (( existed++ ))
+          continue
+        fi
+
+        # Run the clone. GIT_TERMINAL_PROMPT=0 prevents an interactive
+        # credential prompt from hanging the script on private HTTPS repos.
+        output=$(GIT_TERMINAL_PROMPT=0 git clone -- "$url" "$target" 2>&1)
+        rc=$?
+
+        if (( rc == 0 )); then
+          print -- "Cloned '$repo_name' into $rel_dir/ from $url"
+          (( cloned++ ))
+          continue
+        fi
+
+        # Clean up any empty target directory git may have left behind.
+        if [[ -d "$target" && -z "$(command ls -A "$target" 2>/dev/null)" ]]; then
+          rmdir "$target" 2>/dev/null
+        fi
+
+        if is_auth_failure "$output"; then
+          print -u2 -- "⚠️  Could not clone '$repo_name' (at $rel_dir/) from $url — authentication failed. Skipping and moving on."
+          (( auth_failed++ ))
+        else
+          print -u2 -- "⚠️  Could not clone '$repo_name' (at $rel_dir/) from $url. Git reported:"
+          indent "$output" >&2
+          (( other_failed++ ))
+        fi
         continue
       fi
 
-      # Clean up any empty target directory git may have left on failure.
-      if [[ -d "$target" && -z "$(command ls -A "$target" 2>/dev/null)" ]]; then
-        rmdir "$target" 2>/dev/null
-      fi
-
-      if is_auth_failure "$output"; then
-        print -u2 -- "⚠️  Could not clone '$repo_name' (at $rel_dir/) from $url — authentication failed. Skipping and moving on."
-        (( auth_failed++ ))
-      else
-        print -u2 -- "⚠️  Could not clone '$repo_name' (at $rel_dir/) from $url. Git reported:"
-        indent "$output" >&2
-        (( other_failed++ ))
-      fi
+      # Case 3: anything else — blank line, regular comment, plain ignore
+      # pattern, or a directory pattern with no URL pending. Strict adjacency
+      # is broken, so drop any pending URL.
+      pending_url=""
     done < "$gitignore"
   done
 
