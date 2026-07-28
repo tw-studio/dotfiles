@@ -1,6 +1,6 @@
 ---
 name: taskflows-system-fundamentals.md
-version: 00.02
+version: 00.06
 updated: 2026-07-27
 ---
 
@@ -20,29 +20,37 @@ Canonical reference for the Taskflows system: its entities, statement standards,
 
 | Entity | What it is | Written as | Pri |
 |---|---|---|---|
-| Area | Topmost grouping; the title user navigates by | Short name | — |
-| Outcome | A desired result; Objectives type (one-time) or Operations type (recurring) | Heading as Detailed Gist, one-sentence statement, fields (§3.2) | Optional |
-| Task | Agent-assignable unit of work, defined by the output it produces | Task Gist, one-sentence Task Statement, field block (§3.3) | Optional |
-| Step | Smallest sequential move toward completing a Task | Short imperative line, numbered from 1 | Position only |
+| Focus Area | Flexibly scoped slice of user's responsibilities; the unit user prioritizes across daily | Kebab-cased folder name, user-defined | Via index |
+| Outcome | A desired result; Objectives type (one-time) or Operations type (recurring) | Verb-led Outcome Gist, type-named section, one-sentence statement, fields (§3.2) | Optional |
+| Task | Agent-assignable unit of work, defined by the output it produces | Task Gist, Task Statement, Agentic Hypothesis, field block (§3.3) | Optional |
+| Step | Smallest sequential move toward completing a Task | Table row: imperative line plus Subagent (§3.4) | Position only |
 
 **Semantic gradient.** An Outcome says what is true when it is done. A Task says what output gets produced. A Step says what action gets taken. Keep each level in its lane: results at the top, outputs in the middle, actions at the bottom.
 
-**Reserved level.** A level between Area and Outcome (working names: Objective / Vision) is reserved but deliberately not standardized. Agents must not invent standards for it; user will define it from usage evidence.
+**Agentic decomposition.** The system's core hypothesis: successful agentic execution of a big Outcome comes from breaking it into right-sized interim deliverables, each one something a specialist agent can be tuned to, razor-focused on, and trusted to deliver at high quality with high confidence — ideally scoped with enough generality that the specialist is reusable across taskflows. A taskflow is the claim that the right sequence of right-sized Tasks for right-sized specialists has been found; each Task's Agentic Hypothesis (§3.3) states why its scoping earns a place in that claim.
+
+**Reserved level.** A level between Focus Area and Outcome (working names: Objective / Vision) is reserved but deliberately not standardized. Agents must not invent standards for it; user will define it from usage evidence.
 
 ## 3. Entity Standards
 
-### 3.1 Area
+### 3.1 Focus Area
 
-Short name, nothing more for now — e.g. `Taskflows`. Areas can be timebound projects or ongoing areas of responsibility; the system imposes no distinction yet.
+Flexibly scoped, numerous by design — user's current set runs around twenty, many being sub-areas of one large responsibility (e.g. `service-keep-lights-on`, `service-onboarding`, `service-wiki`, `manager-1-1s`). Scoping criteria are deliberately imprecise and inconsistent: the enumeration exists to match user's mental model for making prioritized daily progress, nothing more. Only rarely is a focus area just a product or service name itself, though it can be, especially before user has decomposed it.
+
+**User-defined, always.** User creates and names focus areas — directly, or by instructing an agent with the exact name. Agents never invent, rename, merge, or infer focus areas, and never need to understand the scoping criteria.
 
 ### 3.2 Outcome
 
 **Two types.** *Objectives* Outcomes are one-time: achieved once, then done. *Operations* Outcomes are recurring: maintained true period after period via repeating work. Recurrence mechanics (periods, resets, period status) are deferred until the first recurring taskflow exists — define nothing about them until then.
 
-**Heading as Detailed Gist.** An Outcome's heading *is* its gist, in detailed form: Title Cased, roughly six to eight words, up to ten when needed, and fully comprehensible in isolation — reading the heading alone, out of context, tells you what the Outcome is about. An inline `[Outcome]` marker sits at the heading's end (format on trial, §9). No separate gist field exists.
+**Outcome Gist.** Canonical compact form of an Outcome, used wherever the Outcome is referenced — and, in -ing form, as its taskflow file's title (§5). Starts with a verb, and captures both the gist of what needs to be done and the basic package the output is expected in. The `in {Output Package Term}` pattern often carries the package — but only when the package isn't already implied by the gist. Package terms name the concept of what gets directly evaluated, never the file format.
 
-- **Good:** `Spec Specialists Built And Taskflows MVP Spec Delivered`
-- **Bad:** `Spec Pipeline Delivered` — too short to stand on its own; forces reading further to learn which pipeline, for what.
+- **Good:** `Build Taskflows MVP Spec`
+- **Good:** `Evaluate Progress Towards Milestone in Report`
+- **Good:** `Articulate Next Real Outcome in Backlog`
+- **Bad:** `Build Taskflows MVP Spec in Doc` — the spec is already the package; `in Doc` adds nothing.
+
+**Expression in a taskflow file.** One taskflow file carries exactly one Outcome (§5). Its gist lives in the file title; its section is headed by its type name — `Objective` or `Operational Outcome` — with the Outcome Statement directly beneath as plain prose.
 
 | Field | Required | Standard |
 |---|---|---|
@@ -58,19 +66,20 @@ Short name, nothing more for now — e.g. `Taskflows`. Areas can be timebound pr
 
 ### 3.3 Task
 
-**Defining principle.** A Task is what an agent gets assigned to, and it is defined by the output it produces — never by the activity performed to get there. When writing or evaluating a Task, the first questions are always: what does it consume, and what must exist when it is done?
+**Defining principle.** A Task is what an agent gets assigned to, and it is defined by the output it produces — never by the activity performed to get there. When writing or evaluating a Task, the first questions are always: what does it consume, and what must exist when it is done? Task scoping is where agentic decomposition (§2) gets applied — and each Task's Agentic Hypothesis is where that application gets justified.
 
 | # | Field | Required | Standard |
 |---|---|---|---|
 | 1 | Task Gist | Required | Title Cased, roughly one to six words, fully self-explanatory. Reading it alone must convey the full scope of the Task — no further reading, no guessing. Never encode status in a gist: approval state lives in the Approval field, and repeating it gist after gist ruins the scan. |
 | 2 | Task Statement | Required | One full, readable sentence stating exactly what the Task is — output-defined, naming what gets produced and to what bar. A miniature Outcome Statement at Task scope. |
-| 3 | Suggested Agent | Required | Slash-named specialist (e.g. `/product-core-vision-clarifier`), `me` (user), or `agent` (competent non-specialist; no special charter needed). Never blank — envisioning the needed agent is part of planning a Task. |
-| 4 | Expected Input | Optional | What the Task starts from: files, a predecessor's output, a braindump user will attach. |
-| 5 | Output Essentials | Required | Outputs that matter — the ones user cares about approving. This field is the Task's defining core. |
-| 6 | Procedure Principles | Optional | How the agent should go about it, when that matters: interview mechanics, ordering rules, style constraints. |
-| 7 | Success Specifics | Optional | Concrete checks the output must pass before the Task can be called done. |
-| 8 | Pri | Optional | Per §4. |
-| 9 | Approval | Optional — experimental | If set at planning time: `Required` (user will review the output before successors consume it) or `Trusted` (proceed without user). At runtime, `Required` flips to `Approved` on sign-off. When absent, no orchestrator obligation is defined yet; treat as trusted, with judgment. Field earns real semantics from first-run evidence; verdict then. |
+| 3 | Pri | Optional | Per §4. Renders directly beneath Task Statement. |
+| 4 | Suggested Agent | Required | Slash-named specialist (e.g. `/product-core-vision-clarifier`), `me` (user), or `agent` (competent non-specialist; no special charter needed). Never blank — envisioning the needed agent is part of planning a Task. |
+| 5 | Agentic Hypothesis | Required for `/specialist` and `agent` Tasks; omitted for `me` Tasks | Concise justification for why this scoping, at this stage of outcome delivery, is an interim deliverable a specialist agent can be razor-focused on and deliver at high quality with high confidence — reuse across taskflows in view. Manifests §2's agentic decomposition principle for this specific Task; pairs with Suggested Agent as its justification. |
+| 6 | Expected Input | Optional | What the Task starts from: files, a predecessor's output, a braindump user will attach. |
+| 7 | Output Essentials | Required | Outputs that matter — the ones user cares about approving. This field is the Task's defining core. |
+| 8 | Procedure Principles | Optional | How the agent should go about it, when that matters: interview mechanics, ordering rules, style constraints. |
+| 9 | Success Specifics | Optional | Concrete checks the output must pass before the Task can be called done. |
+| 10 | Approval | Optional — experimental | If set at planning time: `Required` (user will review the output before successors consume it) or `Trusted` (proceed without user). At runtime, `Required` flips to `Approved` on sign-off. When absent, no orchestrator obligation is defined yet; treat as trusted, with judgment. Renders after Steps, last in the section. Field earns real semantics from first-run evidence; verdict then. |
 
 **On unbuilt specialists.** A Suggested Agent that does not exist yet is a normal, expected state — it is discovered by checking the fleet, never marked in the field. At execution time the sourcing order is: existing fleet → /agent-recommender candidates → commission the build via /agent-creator under the envisioned name. The envisioned name is a proposal; a commission-time rename is allowed and does not block upstream documents.
 
@@ -87,16 +96,21 @@ Short name, nothing more for now — e.g. `Taskflows`. Areas can be timebound pr
 - **Good:** "Delivers a user-approved core vision doc for Taskflows MVP capturing the elevator pitch, complete job enumeration, tech stack decision, and style gists."
 - **Bad:** "Interview user about the product vision." — activity, not output; says nothing about what exists when the Task is done.
 
+**Agentic Hypothesis examples.**
+
+- **Good:** "Detail specification is high-volume, format-driven elaboration within an already-approved structure — exactly the razor-focused, low-ambiguity work a specialist excels at once format standards are pinned."
+- **Bad:** "An agent can do this." — asserts capability without justifying the scoping, the stage fit, or the specialization.
+
 ### 3.4 Step
 
-Short imperative line stating one concrete action, numbered from 1, strictly sequenced within its Task. No Pri — position is the ordering. When a step's actor differs from the Task's Suggested Agent, append a bracketed actor tag — e.g. `6. Approve the doc plan. [me]`. Steps are the current best decomposition, freely revisable during execution (§8).
+Steps render as a table: `# | Step | Subagent`. Step is a short imperative line stating one concrete action, numbered from 1, strictly sequenced within its Task. Subagent column values: `—` (em dash) when the Task's Suggested Agent performs the step itself; `me` when user does; a slash-named subagent when the step is delegated. No Pri — position is the ordering. Every Task in a ratified taskflow plan carries Steps; absent Steps means planning is still in progress. Steps are the current best decomposition, freely revisable during execution (§8).
 
-- **Good:** `1. Ingest the vision braindump and workspace context in full before asking anything.`
+- **Good:** `Ingest the vision braindump and workspace context in full before asking anything.`
 - **Bad:** `Make progress on the vision doc.` — no single concrete action; can never be checked off with confidence.
 
 ### 3.5 Agent Designation
 
-Slash names are kebab-cased and role-descriptive: `/product-architecture-specifier`, `/agent-recommender`. `me` designates user. `agent` designates non-specialist agentic work where any competent general instance suffices. These three forms are the complete set of valid Suggested Agent values.
+Slash names are kebab-cased and role-descriptive: `/product-architecture-specifier`, `/agent-recommender`. `me` designates user. `agent` designates non-specialist agentic work where any competent general instance suffices. These three forms are the complete set of valid values for Suggested Agent; the Subagent column additionally uses `—` for the Task's own agent.
 
 ## 4. Priority Semantics
 
@@ -104,74 +118,81 @@ Pri is a bare number — no letter attached — always written with one decimal 
 
 ## 5. Taskflow Document Format
 
-A taskflow is a markdown file. Frontmatter carries `name` (the filename without any `NN.VV` prefix), `version`, `updated`, and `area`.
+A taskflow is a markdown file. Frontmatter carries `name` (the filename without any `NN.VV` prefix), `version`, `updated`, `area` (the focus area), and optionally `status` for operational notes an orchestrator needs (provisional, superseded-by, and the like).
 
-**Title standard.** A taskflow's title is held to the same detailed-gist standard as Outcome headings (§3.2): Title Cased, comprehensible in isolation. When a file carries a single Outcome, title and Outcome heading may simply match.
+**One file, one Outcome.** A taskflow file is tied to exactly one Outcome — a deliberate constraint at this time. Work spanning several Outcomes becomes a sequence of taskflow files, one per Outcome.
 
-**Fixed intro structure.** Body opens with exactly two subsections before the first Outcome — never freeform prose:
+**Title standard.** The title is the Outcome Gist (§3.2) rendered in -ing form, followed by the ` — Taskflow Plan` suffix. Comprehensible in isolation — reading the title alone, out of context, orients completely.
 
-- **Purpose** — two to four sentences: what this taskflow delivers and why it exists now. A closing operational note (supersession, provisional status) is permitted when an orchestrator needs it.
-- **Outcome Summary** — table `# | Outcome | Pri`, the scan index for the file. Always present, even with a single Outcome, so every taskflow file opens identically.
+- **Good:** `Building Taskflows MVP Spec — Taskflow Plan`
+- **Good:** `Evaluating Progress Towards Milestone in Report — Taskflow Plan`
+- **Bad:** `Spec Work — Taskflow Plan` — orients nobody.
 
 **Document voice.** Direct, technical, label-led: bold field labels first, content after. Nothing discursive — a taskflow file never talks about itself, never editorializes, never fills space. If a line isn't orienting the reader or specifying the work, it doesn't belong.
 
 **Body structure:**
 
 ```
-# {Taskflow Title}
+# {Outcome Gist, -ing Form} — Taskflow Plan
 
-## Purpose
+## Objective                     (or: ## Operational Outcome)
 
-{Two to four sentences.}
+{Outcome Statement as plain prose.}
 
-## Outcome Summary
-
-| # | Outcome | Pri |
-
-## {Detailed Gist} [Outcome]
-
-**Outcome Statement:** ...
 **Pri:** ...
+
 **Success Specifics:**
 - ...
 
-### Task Summary
+## Task Breakdown
 
-| # | Task Gist | Suggested Agent | Pri | Approval |
+| # | Task Gist | Suggested Agent | Approval | Pri |
 
-### Task 1 — {Task Gist}
+## Task 1 — {Task Gist}
 
 **Task Statement:** ...
+**Pri:** ...
 **Suggested Agent:** ...
+**Agentic Hypothesis:** ...
 **Expected Input:** ...
 **Output Essentials:**
 - ...
 **Procedure Principles:** (when used)
 **Success Specifics:** (when used)
-**Pri:** / **Approval:** (when used)
 
 **Steps:**
-1. ...
-2. ...
+| # | Step | Subagent |
+
+**Approval:** ...
 ```
 
-**One or many Outcomes.** A taskflow file carries one or more Outcomes in sequence, each repeating the full structure above. Multiple Outcomes is the norm at sprint scale — a sprint taskflow is defined as a sequence of Outcomes — and single-Outcome files are equally legitimate.
+**Why hybrid.** Long-form fields (Output Essentials, Procedure Principles) cannot live in table cells without destroying readability, so each Task gets its own section; the Task Breakdown table exists purely for the scan. Table rows and section headings must never disagree — the section is authoritative, the table is its index.
 
-**Why hybrid.** Long-form fields (Output Essentials, Procedure Principles) cannot live in table cells without destroying readability, so each Task gets a block; the summary tables exist purely for the scan. Table rows and block headings must never disagree — the block is authoritative, the table is its index.
+**Numbering.** In-document numbering starts at 1: task indices are bare numbers (`1, 2, 3`) in the Task Breakdown table and `Task N` in section headings; steps and all numbered lists start at 1. Filesystem `NN.VV` numbering stays 00-based per §6 — the two conventions coexist deliberately.
 
-**Numbering.** In-document numbering starts at 1: outcome and task indices are bare numbers (`1, 2, 3`) in summary tables, `Task N` in block headings; steps and all numbered lists start at 1. Filesystem `NN.VV` numbering stays 00-based per §6 — the two conventions coexist deliberately.
-
-Steps may be omitted for Tasks not yet decomposed — absent Steps means "not yet planned," and that is a legitimate published state.
-
-**Worked example:** `taskflows/examples/00.00-taskflows-mvp-spec-taskflow.md`. When it and this file disagree, this file wins and the example gets fixed.
+**Worked example:** `taskflows/system/examples/00.02-building-taskflows-mvp-spec.md`. When it and this file disagree, this file wins and the example gets fixed.
 
 ## 6. Folder & Naming Conventions
 
-**System home.** `taskflows/` at workspace top level holds this file, `examples/`, and later system artifacts (agent index, status log).
+**System home.** `taskflows/system/` holds the system's canonical artifacts: this file, `examples/`, proposals for system design still in flight, and later the agent index and status log.
 
-**Product efforts.** `product-flows/{product-version}/` (e.g. `taskflows-mvp/`), containing `sprints/`, containing 00-indexed `sprint-{NN}-{theme-slug}/` folders. Within each sprint: `agentspaces/`, containing `{agent-name}-{NN}/` per agent run (NN counts runs of that agent within the sprint), each with at least `proposals/`, `chat-history/`, `logs/`, `drafts/`, `finals/`. Orchestrators get agentspaces too and log there frequently. Sibling to `agentspaces/`: `handoffs/`, receiving copies of everything that lands in any `finals/`, named `{NN.VV}-{description}-{type}.{ext}` where numbering is relative to that `handoffs/` folder.
+**Focus areas.** `taskflows/focus-areas/` holds one subfolder per focus area (§3.1), kebab-named by user. Everything belonging to a focus area lives inside its folder, so a single `git add` scopes cleanly to one area.
 
-**NN.VV numbering.** `NN` is the first major number not yet taken in that folder; `VV` is the monotonically increasing revision of that file. Both always start at `00`.
+**Taskflow files.** Live at the top level of their focus area's folder: `focus-areas/{focus-area}/{NN.VV}-{slug}.md`, slug drawn from the Outcome Gist's -ing form. **Major numbers are never reused within a focus area:** when assigning `NN`, scan the folder *including* its archive subfolders, and take the first major number never used anywhere in that focus area.
+
+**Archive subfolders.** Optional, standard names, per focus area: `done/` for completed taskflows, `cut/` for abandoned ones, `active-past/` for superseded versions of still-active taskflows that user no longer wants at top level. All files sharing a major number move to `done/` or `cut/` as a group — every VV together — and stay at top level until the whole group can move.
+
+**Focus-area index.** `taskflows/focus-areas/FOCUS-AREAS.md` stack-ranks all focus areas in priority order. Deliberately minimal until usage teaches more. Written by user (or a future sync job — never both; §8).
+
+**Daily working files.** User's primary work surface pending the Taskflows app: `focus-areas-{yymmdd}-{hhmm}.md` files in `taskflows/focus-areas/daily/`. Two rules are canonical now; the rest of the lifecycle is proposed, not canon (see `system/00.00-daily-flow-proposal.md`): at most one live daily file exists at any time, and no agent ever edits the live daily file (§8).
+
+**Planning workspaces.** `focus-areas/{focus-area}/planning/{taskflow-slug}/` holds each taskflow's planning workspace — proposals, drafts, reviews, chat history — used by /taskflow-planner.
+
+**Reserved:** `taskflows/focus-areas/FOCUS-AREAS-TREES.md` — a full rollup view of all focus areas' Outcomes, Tasks, and Steps. When built, it is a *generated* file: one generation job is its only writer, no agent or human edits it, and it is rebuilt from the taskflow files rather than maintained. Deferred until FOCUS-AREAS.md and the daily file prove insufficient.
+
+**Product efforts.** `product-flows/{product-version}/` (e.g. `taskflows-mvp/`), containing `sprints/`, containing 00-indexed `sprint-{NN}-{theme-slug}/` folders. Within each sprint: `agentspaces/`, containing `{agent-name}-{NN}/` per agent run, each with at least `proposals/`, `chat-history/`, `logs/`, `drafts/`, `finals/`. Orchestrators get agentspaces too and log there frequently. Sibling to `agentspaces/`: `handoffs/`, receiving copies of everything that lands in any `finals/`, named `{NN.VV}-{description}-{type}.{ext}` with numbering relative to that `handoffs/` folder.
+
+**NN.VV numbering.** `NN` is the first major number not yet taken in that folder (for taskflow files: never used anywhere in the focus area, archives included); `VV` is the monotonically increasing revision of that file. Both always start at `00`.
 
 **Stable names for canonical references.** Files agents must reliably route to — this file foremost — keep a fixed filename; the version lives in frontmatter and git holds history. Working artifacts (plans, drafts, handoffs) carry `NN.VV` in the filename, mirrored by `version` in frontmatter.
 
@@ -183,7 +204,9 @@ A Task is complete when it has produced its Output Essentials, passed its Succes
 
 **Precedence.** Outcome Statement and its Success Specifics govern. Tasks are the current best hypothesis for achieving the Outcome; Steps are the current best hypothesis for completing their Task. When execution reveals a conflict, the higher level wins and the lower level gets revised — an orchestrator optimizes for the Outcome, never for step-completion.
 
-**Status log.** One append-only status file per workspace in the current single-machine setup. Any agent appends rows; no agent edits or deletes prior rows. Columns: `Time | Agent | Ref | Event | Note` — where Ref points at the Outcome/Task/Step concerned and Note may carry a link (to an output awaiting review, for instance). Latest state is read from the bottom up.
+**Single-writer rule.** Every file in the system has exactly one writer class, and cross-writing is forbidden — conflict prevention comes from this structure, never from merge cleverness. User's live daily file: user only, no agent ever. A taskflow draft: its planner session. A generated view (FOCUS-AREAS-TREES.md when built): its one generation job. FOCUS-AREAS.md: user, until a sync job takes over — never both concurrently. An agent's logs and agentspace: that agent. The one sanctioned multi-writer file is the status log, and only because it is append-only.
+
+**Status log.** One append-only status file per workspace in the current single-machine setup. Any agent appends rows; no agent edits or deletes prior rows. Columns: `Time | Agent | Ref | Event | Note` — where Ref points at the Outcome/Task/Step concerned and Note may carry a link. Latest state is read from the bottom up.
 
 **Commit cadence.** Agents commit and push whenever they write meaningful artifacts — logs, drafts, handoffs, finals — so a crashed machine or dead chat session can always be resumed from the trail by a fresh instance.
 
@@ -193,4 +216,4 @@ A Task is complete when it has produced its Output Essentials, passed its Succes
 
 **Mid-flight updates.** Agents read the latest fundamentals at task start. An update landing mid-taskflow applies from the next Task boundary onward — never retroactively to work already approved.
 
-**Experimental markers.** Currently on trial: the Approval field (§3.3) and the inline `[Outcome]` heading marker (§3.2). Each gets an explicit verdict — kept, revised, or dropped — after the first real taskflow run completes.
+**Experimental markers.** Currently on trial: the Approval field (§3.3). It gets an explicit verdict — kept, revised, or dropped — after the first real taskflow run completes.
