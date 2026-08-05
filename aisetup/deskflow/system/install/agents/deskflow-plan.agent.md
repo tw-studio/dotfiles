@@ -56,7 +56,7 @@ If a task genuinely requires modifying an existing file, say so plainly and hand
 
 **Entities.** Epic (Objective, Operations, or Bucket type) → Outcome (Objectives or Operations) → Task → Step. Bucket epics carry tasks directly, worked in priority order, done when user feels done. Gists are verb-led with output implied, never participle-led, never "The"-led, never status-carrying.
 
-**DESK contract.** User may reword, reorder, re-indent, and fold anything; `-`, `*`, and numbered bullets all valid. `[#xx]` tags at line ends are the identity anchors — user moves lines whole and never retypes tags. `[tag]:` children are attributes; `[Raw Prompt]:` preserves everything unplaceable. Glyphs: 🔄 recurring, ✓ plan-baseline, 🟧 unplanned, 🟥 not established.
+**DESK contract.** User may reword, reorder, re-indent, and fold anything; `-`, `*`, and numbered bullets all valid. `[#xx]` tags at line ends are the identity anchors — user moves lines whole and never retypes tags. `[tag]:` children are attributes; originals live in the epic's `raw-prompts.jsonl` as gatherings, never on the desk. Glyphs: 🔄 recurring, ✓ plan-baseline, 🟧 unplanned, 🟥 not established.
 
 **Pulse.** Sessions append to their own `events.md`: `Time | Ref | Event | Note`, vocabulary `stage` / `done` / `review-ready` / `blocked` / `note` / `signal`. Times open with `yymmdd`. Plan files are state-free; progress lives in events.
 

@@ -1,7 +1,7 @@
 ---
 name: CRAFT-LIBRARY.md
-version: 00.05
-updated: 2026-08-02
+version: 00.06
+updated: 2026-08-05
 ---
 
 # Craft Library
@@ -126,7 +126,7 @@ More archetypes are expected; propose them here when real work reveals one.
 3. **Bundled Decisions.** A consequential choice buried inside a production task, made silently mid-work instead of reviewed before the expensive work it shapes.
 4. **Uniform Slicing.** Cutting by volume instead of by the nature of the work. Even slices look organized and review terribly.
 5. **Kitchen-Sink Tasks.** One task spanning research, deciding, producing, and verifying; its agent cannot specialize and its package cannot be judged cleanly.
-6. **Premature Parallelism.** Branching structures before the linear canon supports them.
+6. **Unjustified Parallelism.** Branching without independence, fan-out without synthesis, or handoffs left implicit. Parallelism justified by the work's shape is first-class — see Pipeline Planning; what stays an anti-pattern is parallelism the decomposition cannot defend.
 
 ## Recipes v0
 
@@ -151,6 +151,50 @@ Recipes suggest; the planner adapts, blends, or discards with stated reasoning. 
 4. Is this format standardized enough yet to shed ceremony?
 
 Derivation of tasks and steps is as much an intuitive, intelligent, high-craft process as any other aspect of productivity; agents doing it are empowered accordingly — principles over procedure, reasoning stated.
+
+## Pipeline Planning — multi-agent decompositions
+
+Confidence-Forward Selection's default output is a ladder — a linear confidence sequence. When the work's shape warrants it, the output is a **pipeline**: a directed acyclic decomposition where independent specialist tracks run in parallel and a synthesis close merges them. Reference pattern, mined from open-multi-agent (`repos/aitools/open-multi-agent/`, reference only — never a runtime dependency): one goal decomposes into parallel stable-role specialists, each with schema-precise outputs, and an aggregator waits for every track before merging the record. The meeting-record and security-review exemplars: three parallel reviewers (summary, action-items, sentiment; attack-surface, data-security, supply-chain), one synthesizer, one report.
+
+**Pipeline shapes.**
+
+1. **Fan-out / fan-in.** Independent specializations in parallel, one synthesizer closes. The canonical shape.
+2. **Chain.** Linear handoffs where each stage's contract feeds exactly one successor — a ladder with explicit contracts.
+3. **Hybrid.** Parallel tracks around linear segments; synthesis may be staged (partial merges before the final close).
+
+**When a pipeline beats a ladder** — all three required, and the planner states the reasoning per decomposition:
+
+1. **Independence.** The work partitions into specializations that neither consume each other's outputs nor share a consequential decision.
+2. **Specialization mass.** Each partition is sizable enough to carry its own specialist's craft — a fragment nobody would judge alone stays a Step.
+3. **Synthesis is craft.** Merging the tracks is itself a judgment act worth its own agent and Review — if synthesis is mere concatenation, a ladder with an assembly step is simpler and better.
+
+When in doubt, ladder. Pipelines cost coordination: contracts to draft, tracks to track, a merge to judge. That cost is paid only when the three tests pass.
+
+**Contract discipline — first-order.** Every edge in the DAG is a declared handoff contract: the producer's Output Essentials must satisfy the consumer's Expected Input, both written precisely enough that a cold executing agent needs nothing beyond the file. "The findings" is not a contract; "a triaged table of vulnerabilities with severity, location, and one-line evidence per row" is. Vague handoffs are a plan defect on par with a missing task. Contract precision scales with handoff count and agent coldness: single-agent linear tasks keep lightweight fields; multi-track pipelines get full contracts on every edge.
+
+**Stable roles.** Pipeline specialists are conceived as reusable roles (attack-surface reviewer, sentiment specialist), not one-off task-doers — the reuse seam signal applied to teams. The synthesizer's charter names its judgment: what it resolves when tracks conflict, what it merges silently, what it escalates.
+
+**Backward audit, pipeline form.** From the final synthesis backward: every track's output consumed by the merge, every merge input produced by a track, no orphan branches, no missing prerequisite. Parallel tracks that turn out to share a hidden dependency get re-chained — independence claims must survive the audit.
+
+## Proposal Craft — plans and their files
+
+Governs every implementation plan and proposal any Deskflow skill or agent produces, wherever it runs.
+
+**Chat is primary; the file is archive.** A plan's content is always presented **in chat, in full** — user must never need to open a file to review a plan. The proposal file exists so the conversation survives: it is written after presentation, carries the same content plus provenance, and is linked from the chat-history entry. Plans and drafts are different species: a plan is conversation and lives in chat; a draft of a file to be created (code, a skill, a config) is an artifact user opens for review. Never confuse the two — never say "I've written the proposal to X" in place of presenting the plan.
+
+**Every proposal names its triage call.** From the deskflow skill's reuse triage, stated at the top with one line of reasoning:
+
+1. **Human-primary** — user does it; the plan is about preparation and companionship.
+2. **Chat-native** — real AI leverage, too circumstance-unique to justify a specialization; plan and execute in conversation.
+3. **Build the specialist** — the essential activity recurs with craft stakes; the plan includes conceiving or commissioning the reusable skill or agent.
+
+The call is made even when obvious — one line costs nothing, and the habit is the point.
+
+**Template.** Proposal files follow `deskflow/system/.proposals/proposal-template.md`: frontmatter and provenance header (source task, triage call), Understanding, Overview, Requirements, Affected Files, Implementation Steps (phased, ordering structural), Edge Cases & Risks, Verification Strategy, For Your Review (numbered judgment calls with leans), What Needs You (genuine forks only). The chat presentation mirrors the template exactly, minus frontmatter. Sections genuinely not applicable are marked `N/A` with a word of why — the template structures presentation, never replaces thinking.
+
+**Source linkage.** Every proposal links the task or desk item that commissioned it. A proposal whose origin can't be traced is an orphan.
+
+**Review anatomy.** The Attention-Call Anatomy applies in full: headline with the cost, numbered judgments with leans on their own lines, forks reserved for what only user can decide.
 
 ## Interview Bandwidth Craft
 
@@ -181,7 +225,11 @@ Enough bone structure that a later /agent-creator commission starts warm instead
 
 ## Statement Elevation Classes
 
-Every elevation change is classified by one question — *is meaning at stake?* No (casing, tense, format compliance): silent. Possibly (rewording that could shift intent): numbered, one line of why, standing if unanswered. Unelevatable without guessing: a fork. When meaning-bearing words changed, the literal original is preserved in `[Raw Prompt]:` — on trial, judged on real runs. The hard rule: an elevation must read as user's thought sharpened, never replaced.
+Every elevation change is classified by one question — *is meaning at stake?* No (casing, tense, format compliance): silent. Possibly (rewording that could shift intent): numbered, one line of why, standing if unanswered. Unelevatable without guessing: a fork. The hard rule: an elevation must read as user's thought sharpened, never replaced.
+
+**Gist and statement travel as a pair.** Every proposed Task Statement arrives with its proposed Task Gist beside it; both are numbered and independently vetoable, and both stand together if unanswered. The gist is not derived noise — it is the line's headline on the desk and gets the same meaning-at-stake scrutiny as the statement.
+
+**Gathering assembly.** Desk bullets and statements are many-to-many: one paragraph of user's writing may decompose into several statements, and one statement may draw on fragments written under different items, in different sections, or on different days. When elevating, gather every fragment bearing on the item before proposing — including fragments under other items, in One-offs & Inbox, and in prior desks when the same thread visibly continues. Stitching is normal and expected. The result is recorded as the statement's Raw Prompt Gathering in the owning epic's `raw-prompts.jsonl` (fundamentals §6a): verbatim within each fragment, each fragment provenanced to its source desk, on trial, judged on real runs.
 
 ## Self-Improvement Settings
 
@@ -196,3 +244,14 @@ Every elevation change is classified by one question — *is meaning at stake?* 
 - **auto-implement:** high-confidence changes are written immediately; a Recent Self-Improvements section on the TASKBOARD records each with timestamp, summary, plan link, and commit hash for easy review or revert.
 
 **Values live in `deskflow/system/SETTINGS.md`** (single writer: user): signal-threshold, improvement-mode, and epic-sessions all configure there.
+
+## Persistence Contract
+
+Binds every Deskflow session and every Deskflow-adjacent skill and agent. The rule is absolute: every write is persisted, immediately, with no judgment applied to whether the write was "meaningful." A file an agent wrote that exists only locally is a file a crash can take — the trail is the system working.
+
+1. **Every write is committed and pushed immediately.** Proposal files, plan files, stamped desks, ledgers, registry updates, events, improvements, scratch artifacts worth keeping — if a session wrote a file, that file is committed and pushed before the response ends. No batching across exchanges, no waiting to be asked, no significance threshold.
+2. **Approval moments are their own commits.** When user approves a proposal or plan and it is published, that publication is committed on the spot as its own named write — never folded into unrelated later work. The git trail mirrors the conversation's decision points.
+3. **Scoped adds.** `git add` only the paths written in this exchange.
+4. **Message format.** `[{area}]: {Verb}s {description}`, under 72 chars, imperative — the shared workspace convention. Area is `deskflow` for system and steward writes, `taskflow-{slug}` for epic plan writes, `self-improve` for self-improvement runs, or the epic slug for epic-folder artifacts.
+5. **Push failure protocol.** On rejection: `git pull --rebase`, retry once. Still rejected: notify user and move on — a run never blocks on git.
+6. **Suppression.** `skip-chat-save` and `fast-mode` suppress per the workspace's command-prefix rules; chat-history saving stays governed by the shared workspace rules, which this contract does not duplicate.

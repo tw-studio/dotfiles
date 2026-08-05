@@ -463,7 +463,7 @@ function doctor() {
     let missingRequired = false;
     let copilotMissing = false;
     for (const c of checks) {
-        const r = spawnSync(c.tool, c.args, { shell: true, timeout: 8000, encoding: 'utf8' });
+        const r = spawnSync(`${c.tool} ${c.args.join(' ')}`, { shell: true, timeout: 8000, encoding: 'utf8' });
         const ok = r.status === 0;
         if (ok) {
             const ver = ((r.stdout || '').split('\n')[0] || '').trim();
@@ -619,7 +619,7 @@ function openDesk() {
         return;
     }
     const { spawn } = require('child_process');
-    const child = spawn('code', [p], { stdio: 'ignore', detached: true, shell: true });
+    const child = spawn(`code "${p}"`, { stdio: 'ignore', detached: true, shell: true });
     child.on('error', () => console.log(`Could not launch VS Code. Open manually: ${p}`));
     child.unref();
     console.log(`Opened ${p}`);

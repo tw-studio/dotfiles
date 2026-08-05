@@ -1,7 +1,7 @@
 ---
 name: SYSTEM-FUNDAMENTALS.md
-version: 00.14
-updated: 2026-08-02
+version: 00.18
+updated: 2026-08-05
 ---
 
 # Deskflow and Taskflows System Fundamentals
@@ -65,13 +65,15 @@ Output-defined, never activity-defined. **Archetypes** (Crafting, Process Orches
 | 3 | Pri | Optional | Per §4. Beneath Task Statement. |
 | 4 | Suggested Agent | Required | Slash name, `me`, or `agent`. `tbd` on the TASKBOARD's Up Next only. |
 | 5 | Agentic Hypothesis | Required for non-`me` Tasks | Justification that this scoping suits a razor-focused, reusable specialist. |
-| 6 | Expected Input | Optional | What the Task starts from. |
-| 7 | Output Essentials | Required | Outputs user cares about approving. |
+| 6 | Expected Input | Optional | What the Task starts from. In multi-task plans, a **handoff contract** with the producing task's Output Essentials — see below. |
+| 7 | Output Essentials | Required | Outputs user cares about approving. In multi-task plans, a **handoff contract** with each consuming task's Expected Input — see below. |
 | 8 | Procedure Principles | Optional | How the agent should go about it. |
 | 9 | Success Specifics | Optional | Concrete checks. |
 | 10 | Review | Required | Reviewer agent, `me`, or explicit `none`. Runtime passes recorded as pulse events (§9), never in plan files. |
 
 **Gist examples.** Good: `Clarify Core Vision` · `Refresh Agent Index` · `Clean Both ADO Backlog Trees`. Bad: `Vision Work` · `Approved Core Vision Doc` · `The Backlog Cleanup`.
+
+**Handoff contracts.** When one task's output feeds another, the pair of fields forms a declared contract: the producer's Output Essentials must satisfy the consumer's Expected Input, both written precisely enough that a cold executing agent needs nothing beyond the file. "The findings" is not a contract; "a triaged table of vulnerabilities with severity, location, and one-line evidence per row" is. Precision scales with handoff count and agent coldness — single-agent linear tasks keep lightweight fields; multi-track pipelines (craft library, Pipeline Planning) carry full contracts on every edge.
 
 ### 3.4 Step
 
@@ -89,13 +91,19 @@ Bare number, one decimal, 0–3.9, lower more urgent, optional, sequencing-first
 
 Frontmatter: `name`, `version`, `updated`, `epic` (Display Name), optional `status`. **One file, one Outcome.** Title: gist in -ing form + ` — Taskflow Plan`. Task Breakdown table: `# | Task Gist | Suggested Agent | Review | Pri | ID`. Task sections in field order per §3.3. **Plan files are state-free:** progress lives in pulse (§9). **The ID column is the durability anchor:** stable two-letter IDs must persist in plan files so tracking survives desk regeneration. Document voice: label-led, never self-referential.
 
+**Pipeline-shaped plans.** When the decomposition is a pipeline (craft library, Pipeline Planning), the Task Breakdown table gains a `Track` column naming each task's parallel track (or `synthesis` for the merge task), and a one-paragraph DAG sketch precedes the table: tracks named, independence rationale in one line, synthesis close named. Optional for ladders; expected whenever parallel tracks exist.
+
 ## 6. DESK Format
 
 User's one working surface: ritual page and workbench. `deskflow/desk/DESK_{yymmdd}-{hhmm}.md`; same-minute stamps append `-01`, `-02`; strict timestamp names only — the engine ignores anything else. At most one DESK is live; **no agent ever edits the live DESK.** Provenance frontmatter: `supersedes`, `snapshot`. Daily archive consolidates stamps into `desk/archive/DESK_{yymmdd}.md`.
 
 **Sections, in order:** For Your Review (experimental), Operations Today, Epics Today (curated), Waiting (on others, with age), One-offs & Inbox Today, Done Today (user moves lines down), Meetings.
 
-**Tree grammar.** 4-space indented, checkboxed; `-`, `*`, and numbered bullets all valid, freely mixed — the engine reads lines, not list styles. Inline content first-class. **Attribute grammar.** `[{tag}]: ` children; `[Agent]:` per bones schema; `[Raw Prompt]:` universal preserve.
+**Tree grammar.** 4-space indented, checkboxed; `-`, `*`, and numbered bullets all valid, freely mixed — the engine reads lines, not list styles. Inline content first-class. **Attribute grammar.** `[{tag}]: ` children; `[Agent]:` per bones schema. Originals live in the epic's `raw-prompts.jsonl` (§6a) — a processed desk never carries Raw Prompt content.
+
+**Gist-first lines.** A processed Task line opens with its Task Gist as an inline bolded heading, an em dash, then the Task Statement, with the ID trailing: `- [ ] **Open Epics Today with Operations Trees** — Delivers a desk layout where … [#ot]`. Step lines approved with inline headings follow the same grammar. Epic lines carry no gist and never show the Epic Statement. Done lines strike through the whole line, gist included, with the timestamp tag trailing as always.
+
+**6a. Raw Prompt Gatherings.** Desk bullets and approved statements are many-to-many: one paragraph may decompose into several statements, and one statement may draw on fragments written across different items, sections, or days. The record of what user actually said about an item is therefore not any single bullet but a **gathering** — a steward-assembled stitching of user's original wording, whole sentences or fragments, judged relevant to the statement's definition. Verbatim within each fragment; each fragment carries its source desk as provenance; fragments may repeat across statements. Gatherings live in the owning epic's `raw-prompts.jsonl`, one JSON object per line, append-only, steward-written, machine-read — the self-improver's evidence base, never a display surface.
 
 **Glyphs and tags.** 🔄 recurring · ✓ plan-baseline · 🟧 unplanned · 🟥 not established. Cadence: `[daily]`, `[weekly:Day]`, `[responsively]`; engine-assigned days wear `?`.
 
@@ -122,7 +130,7 @@ Cells obey the craft library's Voice & Register: no "The" openers, no system nou
 
 ## 8. Folder & Naming Conventions
 
-**System home** `deskflow/system/`: fundamentals, CRAFT-LIBRARY.md, SETTINGS.md (user-owned configuration: epic-sessions, signal-threshold, improvement-mode), deskflow-engine.js and its README, `improvements/` (self-improvement plan files), `snapshots/` (board snapshots), `.proposals/` (temporal planning artifacts, NN.VV-versioned), `.examples/` (illustrative prototypes). **DESK home** `deskflow/desk/` with `archive/`. **Epics** `deskflow/epics/{slug}/`, EPICS.md beside them, both steward-maintained. **Taskflow files** at epic-folder top level, `{NN.VV}-{slug}.md`; **major numbers never reused within an Epic**, archives included. **Archive subfolders** per Epic: `done/`, `cut/`, `active-past/`. **Planning workspaces** `epics/{slug}/planning/{taskflow-slug}/`. **Skills** in `.claude/skills/{name}/SKILL.md`; the Deskflow custom agent in `.github/agents/`. **Stable names** for canon; NN.VV for working artifacts.
+**System home** `deskflow/system/`: fundamentals, CRAFT-LIBRARY.md, SETTINGS.md (user-owned configuration: epic-sessions, signal-threshold, improvement-mode), deskflow-engine.js and its README, `improvements/` (self-improvement plan files), `snapshots/` (board snapshots), `.proposals/` (temporal planning artifacts, NN.VV-versioned), `.examples/` (illustrative prototypes). **DESK home** `deskflow/desk/` with `archive/`. **Epics** `deskflow/epics/{slug}/`, EPICS.md beside them, both steward-maintained. Each epic folder carries `ledger.md` (the readable tree — for Bucket epics, a Tasks table `# | ID | Task Gist | Task Statement | Status`) and `raw-prompts.jsonl` (Raw Prompt Gatherings, §6a). **Taskflow files** at epic-folder top level, `{NN.VV}-{slug}.md`; **major numbers never reused within an Epic**, archives included. **Archive subfolders** per Epic: `done/`, `cut/`, `active-past/`. **Planning workspaces** `epics/{slug}/planning/{taskflow-slug}/`. **Skills** in `.claude/skills/{name}/SKILL.md`; the Deskflow custom agent in `.github/agents/`. **Stable names** for canon; NN.VV for working artifacts.
 
 **Justfile recipes** (proposal 04.03) wrap the engine: `desk-doctor`, `desk-fresh`, `desk-open`, `desk-watch`, `desk-render`, `desk-archive`, `desk-snapshot-cleanup` — all shell-neutral `node` invocations that paste identically into zsh and PowerShell workspace justfiles.
 
@@ -144,8 +152,8 @@ A Task is complete when it has produced its Output Essentials, passed its Succes
 
 **Graceful degradation.** Agents check prerequisites first (`doctor`), never wait beyond fifteen seconds on any external command, and treat background CLI sessions as an upgrade, never a requirement — /deskflow delivers full value in single-session mode.
 
-**Commit cadence.** Commit and push on every meaningful write.
+**Commit cadence.** Every write is committed and pushed immediately — no significance threshold, no batching, no waiting to be asked. The full contract — approval-moment commits, scoped adds, message format, push failure protocol — lives in the craft library's Persistence Contract section and binds every session.
 
 **Version forward.** Canonical files bump frontmatter versions. Working artifacts take a new VV. Agents read latest at task start; mid-flight updates apply from the next Task boundary.
 
-**Experimental markers.** On trial: For Your Review on the DESK, the `Now:` watch-pane prefix, Raw Prompt literal-preservation, grace continuation across day rollover, and archived-session revival.
+**Experimental markers.** On trial: For Your Review on the DESK, the `Now:` watch-pane prefix, ledger-based Raw Prompt gatherings, grace continuation across day rollover, and archived-session revival.

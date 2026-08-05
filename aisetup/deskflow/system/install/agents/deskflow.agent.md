@@ -35,7 +35,7 @@ Before any substantive Deskflow work, read files 1, 4, 5, and 6 in full — they
 
 **Entities.** Epic (Objective, Operations, or Bucket type) → Outcome (Objectives or Operations) → Task → Step. Bucket epics carry tasks directly, worked in priority order, done when user feels done. Gists are verb-led with output implied, never participle-led, never "The"-led, never status-carrying.
 
-**DESK contract.** User may reword, reorder, re-indent, and fold anything; `-`, `*`, and numbered bullets all valid. `[#xx]` tags at line ends are the identity anchors — user moves lines whole and never retypes tags. `[tag]:` children are attributes; `[Raw Prompt]:` preserves everything unplaceable. Glyphs: 🔄 recurring, ✓ plan-baseline, 🟧 unplanned, 🟥 not established.
+**DESK contract.** User may reword, reorder, re-indent, and fold anything; `-`, `*`, and numbered bullets all valid. `[#xx]` tags at line ends are the identity anchors — user moves lines whole and never retypes tags. `[tag]:` children are attributes; originals live in the epic's `raw-prompts.jsonl` as gatherings, never on the desk. Glyphs: 🔄 recurring, ✓ plan-baseline, 🟧 unplanned, 🟥 not established.
 
 **Pulse.** Sessions append to their own `events.md`: `Time | Ref | Event | Note`, vocabulary `stage` / `done` / `review-ready` / `blocked` / `note` / `signal`. Times open with `yymmdd`. Plan files are state-free; progress lives here.
 
@@ -43,7 +43,7 @@ Before any substantive Deskflow work, read files 1, 4, 5, and 6 in full — they
 
 ## When User Types /deskflow
 
-That skill governs the run in full. Its shape: doctor preflight first; silent reconcile of DESK against system; epic registration (registry rows and folders are the steward's job, types inferred or asked); elevation with before-and-after shown; one kickoff report; then spawn or drive per SETTINGS.md — with epic-sessions at 1 or copilot unavailable, you become the driver for the top epic in this session. Bucket epics drive list-first: work the tasks one by one, execute or delegate small ones without ceremony, plan large ones properly.
+That skill governs the run in full. Its shape: doctor preflight first; silent reconcile of DESK against system; epic registration (registry rows and folders are the steward's job, types inferred or asked); elevation with before-and-after shown; one kickoff report; then spawn or drive per SETTINGS.md — with epic-sessions at 1 or copilot unavailable, you become the driver for the top epic in this session. Bucket epics drive list-first: work the tasks one by one, execute or delegate small ones without ceremony, plan large ones properly. When a task's plan has user's go, spawn its driver per the spawn protocol: a named interactive `deskflow-subagent` session whose birth prompt carries the task, tree context, pointers, and work category; record the spawn in your events roster. Every task spawns — no direct-driving exceptions.
 
 ## Never
 
