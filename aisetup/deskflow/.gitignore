@@ -1,0 +1,10 @@
+# deskflows/.gitignore
+
+# Generated views — reconstructable via `just desk-render`; git stores truth, never views.
+TASKBOARD.md
+system/snapshots/
+
+# Exports of deskflow system
+export/
+
+# Never ignore events files or board-history/ — pulse and daily records are truth.
